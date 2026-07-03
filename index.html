@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="theme-color" content="#F2F2F7" />
+<title>lu — natal chart</title>
+<style>
+  /*
+    COLOR SYSTEM — color encodes data, never decoration.
+    1. Elements (signs everywhere): water=teal fire=orange earth=brown air=cyan
+    2. Aspect types: conjunction=gold trine=green sextile=blue square=red opposition=purple
+    3. Modes (modes donut only): fixed=indigo mutable=mint cardinal=pink
+    4. Neutral quantity (power bars): blue. Retrograde: red. Chrome: ink/gray.
+  */
+  :root {
+    --ink: #1C1C1E;
+    --subtle: #8A8A8E;
+    --faint: #C7C7CC;
+    --canvas: #F2F2F7;
+    --card: #FFFFFF;
+    --hairline: #E5E5EA;
+    --field: #F6F6F8;
+    --font: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, sans-serif;
+    --mono: 'SF Mono', ui-monospace, Menlo, monospace;
+    --blue: #007AFF;
+    --red: #FF3B30;
+    --el-water: #30B0C7; --el-water-txt: #1D7F94;
+    --el-fire:  #FF9500; --el-fire-txt:  #C77700;
+    --el-earth: #A2845E; --el-earth-txt: #7A6244;
+    --el-air:   #32ADE6; --el-air-txt:   #1786B8;
+    --as-conj: #EBB800; --as-conj-txt: #937300;
+    --as-tri:  #34C759; --as-tri-txt:  #248A3D;
+    --as-sex:  #007AFF; --as-sex-txt:  #0066D6;
+    --as-sq:   #FF3B30; --as-sq-txt:   #D70015;
+    --as-opp:  #AF52DE; --as-opp-txt:  #8E30C4;
+    --mo-fix: #5856D6; --mo-mut: #00C7BE; --mo-car: #FF2D55;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html { scroll-behavior: smooth; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--canvas);
+    font-family: var(--font);
+    color: var(--ink);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 560px; margin: 0 auto; padding: 0 16px 80px; }
+  [id] { scroll-margin-top: 86px; }
+
+  /* header */
+  .header {
+    position: sticky; top: 0; z-index: 10;
+    background: rgba(242,242,247,0.85);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    padding: calc(env(safe-area-inset-top) + 18px) 0 12px;
+  }
+  .header h1 { font-size: 22px; font-weight: 700; margin: 0; letter-spacing: -0.3px; }
+  .header .sub { font-size: 13px; color: var(--subtle); margin-top: 2px; }
+
+  /* meta */
+  .meta-card { background: var(--card); border-radius: 16px; overflow: hidden; margin-top: 14px; }
+  .meta-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; }
+  .meta-row + .meta-row { border-top: 1px solid var(--hairline); }
+  .meta-key { font-size: 15px; }
+  .meta-val { font-size: 14px; color: var(--subtle); text-align: right; }
+  .meta-val .mono { font-family: var(--mono); font-size: 13px; }
+
+  /* groups */
+  .group { margin-top: 26px; }
+  .group-label {
+    font-family: var(--mono); font-size: 11px; letter-spacing: 0.6px;
+    text-transform: uppercase; font-weight: 600; color: var(--subtle);
+    margin-bottom: 8px; padding-left: 4px;
+  }
+  .group-note { font-size: 13px; color: var(--subtle); line-height: 1.55; padding: 10px 4px 0; }
+  .group-intro { font-size: 13px; color: var(--subtle); line-height: 1.55; padding: 0 4px 8px; }
+  .group-card { background: var(--card); border-radius: 16px; overflow: hidden; }
+
+  /* target flash on in-page navigation */
+  @keyframes targetFlash {
+    0% { box-shadow: 0 0 0 3px rgba(0,122,255,0.4); }
+    100% { box-shadow: 0 0 0 3px rgba(0,122,255,0); }
+  }
+  section:target .group-card, .config:target { animation: targetFlash 1.6s ease; }
+
+  /* rows */
+  .row { display: flex; align-items: center; gap: 10px; padding: 12px 16px; }
+  .row + .row { border-top: 1px solid var(--hairline); }
+
+  /* planets */
+  .p-sym { font-size: 17px; width: 24px; text-align: center; flex-shrink: 0; }
+  .p-name { font-size: 15px; font-weight: 500; width: 74px; flex-shrink: 0; }
+  .p-deg { font-family: var(--mono); font-size: 12px; color: var(--subtle); margin-left: auto; white-space: nowrap; }
+  .p-note { font-size: 12px; color: var(--faint); display: block; margin-top: 2px; }
+
+  .pill {
+    font-family: var(--mono); font-size: 10px; letter-spacing: 0.5px;
+    text-transform: uppercase; padding: 3px 8px; border-radius: 999px;
+    font-weight: 600; white-space: nowrap;
+  }
+  .pill.water { background: rgba(48,176,199,0.12);  color: var(--el-water-txt); }
+  .pill.fire  { background: rgba(255,149,0,0.13);   color: var(--el-fire-txt); }
+  .pill.earth { background: rgba(162,132,94,0.14);  color: var(--el-earth-txt); }
+  .pill.air   { background: rgba(50,173,230,0.12);  color: var(--el-air-txt); }
+  .pill.house { background: var(--field); border: 1px solid var(--hairline); color: var(--subtle); font-weight: 500; }
+  .pill.retro { background: rgba(255,59,48,0.10); color: var(--red); }
+  .pill.conj { background: rgba(235,184,0,0.15); color: var(--as-conj-txt); }
+  .pill.tri  { background: rgba(52,199,89,0.12); color: var(--as-tri-txt); }
+  .pill.sex  { background: rgba(0,122,255,0.10); color: var(--as-sex-txt); }
+  .pill.sq   { background: rgba(255,59,48,0.10); color: var(--as-sq-txt); }
+  .pill.opp  { background: rgba(175,82,222,0.12); color: var(--as-opp-txt); }
+
+  /* key strips */
+  .key-strip {
+    display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+    padding: 10px 16px; border-top: 1px solid var(--hairline); background: var(--field);
+  }
+  .key-title { font-family: var(--mono); font-size: 9px; letter-spacing: 0.5px; text-transform: uppercase; font-weight: 700; color: var(--faint); width: 100%; }
+  .key-item { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; color: var(--subtle); }
+  .key-dot { width: 8px; height: 8px; border-radius: 4px; flex-shrink: 0; }
+
+  /* wheel */
+  .wheel-box { padding: 10px 10px 4px; }
+  .wheel-box svg { display: block; width: 100%; height: auto; }
+  .wheel-info { padding: 12px 16px 14px; border-top: 1px solid var(--hairline); min-height: 56px; }
+  .wi-empty { font-size: 13px; color: var(--faint); }
+  .wi-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .wi-glyph { font-size: 18px; }
+  .wi-name { font-size: 15px; font-weight: 600; }
+  .wi-deg { font-family: var(--mono); font-size: 12px; color: var(--subtle); }
+  .wi-asps { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
+  .ai-chip {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-family: var(--mono); font-size: 10px; font-weight: 600;
+    letter-spacing: 0.3px; padding: 3px 8px; border-radius: 6px;
+    cursor: pointer; user-select: none;
+  }
+  .asp-line { transition: opacity 0.18s, stroke-width 0.18s; }
+  .asp-line.lo { opacity: 0.07; }
+  .asp-line.hi { opacity: 0.95; stroke-width: 1.7; }
+  .pl-hit { cursor: pointer; }
+
+  /* cusps */
+  .cusp-grid { display: grid; grid-template-columns: repeat(3, 1fr); }
+  .cusp-cell { padding: 12px 14px; border-top: 1px solid var(--hairline); border-left: 1px solid var(--hairline); }
+  .cusp-cell:nth-child(-n+3) { border-top: none; }
+  .cusp-cell:nth-child(3n+1) { border-left: none; }
+  .cusp-h { font-family: var(--mono); font-size: 10px; letter-spacing: 0.5px; text-transform: uppercase; color: var(--subtle); font-weight: 600; }
+  .cusp-d { font-size: 14px; font-weight: 500; margin-top: 3px; }
+
+  /* power bars */
+  .bar-row { display: flex; align-items: center; gap: 10px; padding: 10px 16px; }
+  .bar-row + .bar-row { border-top: 1px solid var(--hairline); }
+  .bar-rank { font-family: var(--mono); font-size: 10px; color: var(--faint); width: 16px; text-align: center; flex-shrink: 0; }
+  .bar-name { font-size: 14px; font-weight: 500; width: 96px; flex-shrink: 0; }
+  .bar-track { flex: 1; height: 6px; background: var(--field); border-radius: 3px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 3px; background: var(--blue); transition: width 0.7s cubic-bezier(0.25,0.1,0.25,1); }
+  .bar-val { font-family: var(--mono); font-size: 12px; color: var(--subtle); width: 52px; text-align: right; flex-shrink: 0; }
+
+  /* balance */
+  .balance-wrap { display: flex; padding: 16px; gap: 16px; }
+  .balance-half { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  .balance-half + .balance-half { border-left: 1px solid var(--hairline); }
+  .legend { display: flex; flex-direction: column; gap: 6px; width: 100%; padding: 0 8px; }
+  .legend-row { display: flex; align-items: center; gap: 7px; font-size: 13px; }
+  .legend-dot { width: 8px; height: 8px; border-radius: 4px; flex-shrink: 0; }
+  .legend-name { color: var(--subtle); flex: 1; }
+  .legend-val { font-family: var(--mono); font-size: 12px; font-weight: 600; }
+
+  /* aspects table */
+  .asp-head {
+    display: grid; grid-template-columns: 20px 1fr 74px 46px 60px;
+    gap: 8px; padding: 9px 16px 7px; border-bottom: 1px solid var(--hairline);
+  }
+  .asp-head span {
+    font-family: var(--mono); font-size: 9px; letter-spacing: 0.5px;
+    text-transform: uppercase; font-weight: 700; color: var(--faint);
+  }
+  .asp-head span:nth-child(4), .asp-head span:nth-child(5) { text-align: right; }
+  .asp-row {
+    display: grid; grid-template-columns: 20px 1fr 74px 46px 60px;
+    gap: 8px; align-items: center; padding: 10px 16px;
+  }
+  .asp-row + .asp-row { border-top: 1px solid var(--hairline); }
+  .asp-num { font-family: var(--mono); font-size: 10px; color: var(--faint); text-align: center; }
+  .asp-pair { font-size: 14px; font-weight: 500; margin-bottom: 4px; }
+  .asp-bar { height: 3px; background: var(--field); border-radius: 2px; overflow: hidden; }
+  .asp-fill { height: 100%; border-radius: 2px; transition: width 0.7s cubic-bezier(0.25,0.1,0.25,1); }
+  .asp-orb { font-family: var(--mono); font-size: 11px; color: var(--subtle); text-align: right; white-space: nowrap; }
+  .asp-str { font-family: var(--mono); font-size: 10px; text-align: right; color: var(--subtle); white-space: nowrap; }
+  .asp-str.tight { color: var(--ink); font-weight: 700; }
+
+  /* stelliums */
+  .config { padding: 14px 16px; }
+  .config + .config { border-top: 1px solid var(--hairline); }
+  .config-title { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+  .config-planets { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+  .config-chip { font-family: var(--mono); font-size: 11px; background: var(--field); border-radius: 6px; padding: 4px 8px; }
+  .config-note { font-size: 13px; color: var(--subtle); line-height: 1.55; }
+
+  /* reference link chips */
+  .refs { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .ref {
+    font-family: var(--mono); font-size: 10px; font-weight: 600;
+    letter-spacing: 0.3px; text-transform: uppercase;
+    padding: 3px 8px 3px 7px; border-radius: 6px;
+    background: var(--field); border: 1px solid var(--hairline);
+    color: var(--subtle); text-decoration: none; white-space: nowrap;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .ref::before { content: '→ '; color: var(--faint); }
+  .ref:active, .ref:hover { color: var(--blue); border-color: rgba(0,122,255,0.35); }
+
+  /* stories */
+  .story { padding: 14px 16px; }
+  .story + .story { border-top: 1px solid var(--hairline); }
+  .story-head { display: flex; align-items: center; gap: 10px; }
+  .sg {
+    width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 15px; background: var(--field); color: var(--ink);
+  }
+  .sg.multi { font-size: 10px; letter-spacing: -0.5px; }
+  .sg.water { background: rgba(48,176,199,0.12); color: var(--el-water-txt); }
+  .sg.air   { background: rgba(50,173,230,0.12); color: var(--el-air-txt); }
+  .sg.conj  { background: rgba(235,184,0,0.15);  color: var(--as-conj-txt); }
+  .sg.tri   { background: rgba(52,199,89,0.12);  color: var(--as-tri-txt); }
+  .sg.sq    { background: rgba(255,59,48,0.10);  color: var(--as-sq-txt); }
+  .story-titles { min-width: 0; }
+  .story-num { font-family: var(--mono); font-size: 9px; letter-spacing: 0.5px; color: var(--faint); font-weight: 700; }
+  .story-title { font-size: 15px; font-weight: 600; line-height: 1.3; }
+  .story-body { font-size: 13px; color: var(--subtle); line-height: 1.6; margin-top: 7px; }
+  .story-body strong { color: var(--ink); font-weight: 600; }
+
+  /* features */
+  .feat { display: flex; gap: 10px; padding: 12px 16px; font-size: 14px; line-height: 1.55; }
+  .feat + .feat { border-top: 1px solid var(--hairline); }
+  .feat::before { content: ''; width: 6px; height: 6px; border-radius: 3px; background: var(--faint); margin-top: 7px; flex-shrink: 0; }
+
+  /* codes */
+  .code { padding: 14px 16px; }
+  .code + .code { border-top: 1px solid var(--hairline); }
+  .code-head { display: flex; align-items: center; gap: 10px; }
+  .code-n {
+    width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-family: var(--mono); font-size: 12px; font-weight: 700;
+    background: var(--field); color: var(--subtle);
+  }
+  .code-title { font-size: 15px; font-weight: 600; line-height: 1.3; }
+  .code-body { font-size: 13px; color: var(--subtle); line-height: 1.6; margin-top: 7px; }
+  .code-body strong { color: var(--ink); font-weight: 600; }
+
+  /* prompts */
+  .prompt { display: flex; gap: 12px; padding: 14px 16px; }
+  .prompt + .prompt { border-top: 1px solid var(--hairline); }
+  .prompt-n {
+    font-family: var(--mono); font-size: 11px; font-weight: 700;
+    width: 22px; height: 22px; border-radius: 11px;
+    background: var(--field); border: 1px solid var(--hairline); color: var(--subtle);
+    display: inline-flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 1px;
+  }
+  .prompt-body { font-size: 13px; line-height: 1.6; }
+
+  .callout { padding: 12px 16px; border-top: 1px solid var(--hairline); background: var(--field); }
+  .callout p { margin: 0; font-size: 13px; color: var(--subtle); line-height: 1.55; }
+  .callout strong { color: var(--ink); font-weight: 600; }
+
+  .footer { text-align: center; padding: 40px 24px 20px; font-size: 12px; color: var(--faint); line-height: 1.7; }
+  .footer .mono { font-family: var(--mono); font-size: 11px; }
+
+  @media (max-width: 420px) {
+    .cusp-grid { grid-template-columns: repeat(2, 1fr); }
+    .cusp-cell:nth-child(-n+3) { border-top: 1px solid var(--hairline); }
+    .cusp-cell:nth-child(-n+2) { border-top: none; }
+    .cusp-cell:nth-child(3n+1) { border-left: 1px solid var(--hairline); }
+    .cusp-cell:nth-child(2n+1) { border-left: none; }
+    .bar-name { width: 82px; font-size: 13px; }
+    .balance-wrap { flex-direction: column; }
+    .balance-half + .balance-half { border-left: none; border-top: 1px solid var(--hairline); padding-top: 16px; }
+    .asp-head, .asp-row { grid-template-columns: 1fr 68px 44px 54px; }
+    .asp-head span:first-child, .asp-num { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- header -->
+  <header class="header">
+    <h1>lu</h1>
+    <div class="sub">Natal chart · 11 Mar 1994, 04:10 · Singapore</div>
+  </header>
+
+  <!-- birth data -->
+  <div class="meta-card">
+    <div class="meta-row"><span class="meta-key">Date &amp; time</span><span class="meta-val">Fri 11 March 1994 · <span class="mono">04:10</span> SGT</span></div>
+    <div class="meta-row"><span class="meta-key">Location</span><span class="meta-val">Singapore · <span class="mono">103°51'E 1°16'N</span></span></div>
+    <div class="meta-row"><span class="meta-key">Houses</span><span class="meta-val">Placidus</span></div>
+    <div class="meta-row"><span class="meta-key">Zodiac</span><span class="meta-val">Tropical, geocentric</span></div>
+  </div>
+
+  <!-- ═══ BIRTH CHART WHEEL ═══ -->
+  <section class="group" id="wheel">
+    <div class="group-label">Birth chart</div>
+    <div class="group-card">
+      <div class="wheel-box"><svg id="wheelSvg" viewBox="0 0 360 360" role="img" aria-label="Interactive natal chart wheel"></svg></div>
+      <div class="wheel-info" id="wheelInfo"><span class="wi-empty">Tap any planet to see its position and aspects.</span></div>
+      <div class="key-strip">
+        <span class="key-title">Aspect line color</span>
+        <span class="key-item"><span class="key-dot" style="background:var(--as-conj)"></span>Conjunction</span>
+        <span class="key-item"><span class="key-dot" style="background:var(--as-tri)"></span>Trine</span>
+        <span class="key-item"><span class="key-dot" style="background:var(--as-sex)"></span>Sextile</span>
+        <span class="key-item"><span class="key-dot" style="background:var(--as-sq)"></span>Square</span>
+        <span class="key-item"><span class="key-dot" style="background:var(--as-opp)"></span>Opposition (Chiron–Saturn only)</span>
+      </div>
+    </div>
+    <p class="group-note">Positions plotted exactly from the Astrolog 7.80 output (minute precision), with true Placidus house widths. Where planets crowd together the glyphs fan apart for legibility — the tick on the ring marks each planet's true degree.</p>
+  </section>
+
+  <!-- planets -->
+  <section class="group" id="planets">
+    <div class="group-label">Planetary positions</div>
+    <div class="group-card">
+      <div class="row"><span class="p-sym">☉</span><div class="p-name">Sun<span class="p-note">Ray 2 match</span></div><span class="pill water">Pisces</span><span class="pill house">2nd</span><span class="p-deg">20°01'</span></div>
+      <div class="row"><span class="p-sym">☽</span><div class="p-name">Moon<span class="p-note">Esot. debilitated</span></div><span class="pill water">Pisces</span><span class="pill house">2nd</span><span class="p-deg">3°37'</span></div>
+      <div class="row"><span class="p-sym">☿</span><div class="p-name">Mercury<span class="p-note">Mind from the future</span></div><span class="pill air">Aquarius</span><span class="pill house">1st</span><span class="p-deg">24°08'</span></div>
+      <div class="row"><span class="p-sym">♀</span><div class="p-name">Venus<span class="p-note">Exot. debilitated; near 3rd cusp</span></div><span class="pill fire">Aries</span><span class="pill house">2nd</span><span class="p-deg">2°47'</span></div>
+      <div class="row"><span class="p-sym">♂</span><div class="p-name">Mars<span class="p-note">Ray 6 match</span></div><span class="pill water">Pisces</span><span class="pill house">2nd</span><span class="p-deg">2°39'</span></div>
+      <div class="row"><span class="p-sym">♃</span><div class="p-name">Jupiter</div><span class="pill water">Scorpio</span><span class="pill house">10th</span><span class="pill retro">℞</span><span class="p-deg">14°29'</span></div>
+      <div class="row"><span class="p-sym">♄</span><div class="p-name">Saturn</div><span class="pill water">Pisces</span><span class="pill house">2nd</span><span class="p-deg">4°54'</span></div>
+      <div class="row"><span class="p-sym">♅</span><div class="p-name">Uranus<span class="p-note">Ray 7 match</span></div><span class="pill earth">Capricorn</span><span class="pill house">12th</span><span class="p-deg">25°16'</span></div>
+      <div class="row"><span class="p-sym">♆</span><div class="p-name">Neptune<span class="p-note">Esot. &amp; hierarch. debilitated</span></div><span class="pill earth">Capricorn</span><span class="pill house">12th</span><span class="p-deg">22°47'</span></div>
+      <div class="row"><span class="p-sym">♇</span><div class="p-name">Pluto<span class="p-note">Domicile ✓ — dominant</span></div><span class="pill water">Scorpio</span><span class="pill house">10th</span><span class="pill retro">℞</span><span class="p-deg">28°02'</span></div>
+      <div class="row"><span class="p-sym">☊</span><div class="p-name">N. Node<span class="p-note">Karmic axis — public</span></div><span class="pill water">Scorpio</span><span class="pill house">10th</span><span class="pill retro">℞</span><span class="p-deg">27°27'</span></div>
+      <div class="row"><span class="p-sym">⚷</span><div class="p-name">Chiron<span class="p-note">Opp. Saturn 0°09'</span></div><span class="pill earth">Virgo</span><span class="pill house">8th</span><span class="p-deg">5°03'</span></div>
+      <div class="row"><span class="p-sym">↑</span><div class="p-name">ASC<span class="p-note">Fixed air rising</span></div><span class="pill air">Aquarius</span><span class="pill house">1st</span><span class="p-deg">1°54'</span></div>
+      <div class="row"><span class="p-sym">⌖</span><div class="p-name">MC<span class="p-note">Fixed water vocation</span></div><span class="pill water">Scorpio</span><span class="pill house">10th</span><span class="p-deg">6°57'</span></div>
+      <div class="key-strip">
+        <span class="key-title">Sign color = element</span>
+        <span class="key-item"><span class="key-dot" style="background:var(--el-water)"></span>Water</span>
+        <span class="key-item"><span class="key-dot" style="background:var(--el-fire)"></span>Fire</span>
+        <span class="key-item"><span class="key-dot" style="background:var(--el-earth)"></span>Earth</span>
+        <span class="key-item"><span class="key-dot" style="background:var(--el-air)"></span>Air</span>
+        <span class="key-item"><span class="key-dot" style="background:var(--red)"></span>℞ Retrograde</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- cusps -->
+  <section class="group" id="cusps">
+    <div class="group-label">House cusps · Placidus</div>
+    <div class="group-card">
+      <div class="cusp-grid">
+        <div class="cusp-cell"><div class="cusp-h">1st · ASC</div><div class="cusp-d">1° Aqu 54'</div></div>
+        <div class="cusp-cell"><div class="cusp-h">2nd</div><div class="cusp-d">2° Pis 29'</div></div>
+        <div class="cusp-cell"><div class="cusp-h">3rd</div><div class="cusp-d">5° Ari 03'</div></div>
+        <div class="cusp-cell"><div class="cusp-h">4th · IC</div><div class="cusp-d">6° Tau 57'</div></div>
+        <div class="cusp-cell"><div class="cusp-h">5th</div><div class="cusp-d">6° Gem 19'</div></div>
+        <div class="cusp-cell"><div class="cusp-h">6th</div><div class="cusp-d">3° Can 54'</div></div>
+        <div class="cusp-cell"><div class="cusp-h">7th · DSC</div><div class="cusp-d">1° Leo 54'</div></div>
+        <div class="cusp-cell"><div class="cusp-h">8th</div><div class="cusp-d">2° Vir 29'</div></div>
+        <div class="cusp-cell"><div class="cusp-h">9th</div><div class="cusp-d">5° Lib 03'</div></div>
+        <div class="cusp-cell"><div class="cusp-h">10th · MC</div><div class="cusp-d">6° Sco 57'</div></div>
+        <div class="cusp-cell"><div class="cusp-h">11th</div><div class="cusp-d">6° Sag 19'</div></div>
+        <div class="cusp-cell"><div class="cusp-h">12th</div><div class="cusp-d">3° Cap 54'</div></div>
+      </div>
+      <div class="callout"><p><strong>91.4% of chart power sits in four houses</strong> — 2nd, 10th, 12th, 1st. Houses 3–9 are essentially empty. This chart operates in extremes, not through the middle.</p></div>
+    </div>
+  </section>
+
+  <!-- power -->
+  <section class="group" id="power">
+    <div class="group-label">Power rankings — planets</div>
+    <div class="group-card">
+      <div class="bar-row"><span class="bar-rank">1</span><span class="bar-name">♇ Pluto</span><div class="bar-track"><div class="bar-fill" style="width:100%"></div></div><span class="bar-val">13.17%</span></div>
+      <div class="bar-row"><span class="bar-rank">2</span><span class="bar-name">♆ Neptune</span><div class="bar-track"><div class="bar-fill" style="width:80.9%"></div></div><span class="bar-val">10.66%</span></div>
+      <div class="bar-row"><span class="bar-rank">3</span><span class="bar-name">♃ Jupiter</span><div class="bar-track"><div class="bar-fill" style="width:76.8%"></div></div><span class="bar-val">10.11%</span></div>
+      <div class="bar-row"><span class="bar-rank">4</span><span class="bar-name">♄ Saturn</span><div class="bar-track"><div class="bar-fill" style="width:75.8%"></div></div><span class="bar-val">9.98%</span></div>
+      <div class="bar-row"><span class="bar-rank">5</span><span class="bar-name">♂ Mars</span><div class="bar-track"><div class="bar-fill" style="width:74.6%"></div></div><span class="bar-val">9.82%</span></div>
+      <div class="bar-row"><span class="bar-rank">6</span><span class="bar-name">♀ Venus</span><div class="bar-track"><div class="bar-fill" style="width:70.7%"></div></div><span class="bar-val">9.31%</span></div>
+    </div>
+
+    <div class="group-label" style="margin-top:18px;">Power rankings — houses</div>
+    <div class="group-card">
+      <div class="bar-row"><span class="bar-rank">1</span><span class="bar-name">2nd house</span><div class="bar-track"><div class="bar-fill" style="width:100%"></div></div><span class="bar-val">36.95%</span></div>
+      <div class="bar-row"><span class="bar-rank">2</span><span class="bar-name">10th house</span><div class="bar-track"><div class="bar-fill" style="width:75.8%"></div></div><span class="bar-val">28.00%</span></div>
+      <div class="bar-row"><span class="bar-rank">3</span><span class="bar-name">12th house</span><div class="bar-track"><div class="bar-fill" style="width:44.1%"></div></div><span class="bar-val">16.28%</span></div>
+      <div class="bar-row"><span class="bar-rank">4</span><span class="bar-name">1st house</span><div class="bar-track"><div class="bar-fill" style="width:27.6%"></div></div><span class="bar-val">10.19%</span></div>
+      <div class="callout"><p><strong>2nd house: 36.95%.</strong> Sun, Moon, Mars, Saturn all occupy the 2nd. Self-worth is not one theme among many — it is the organizing field of the entire chart.</p></div>
+    </div>
+    <p class="group-note">Normalized planetary and house strength. Pluto receives more major aspects than any other planet (8 total) despite being retrograde.</p>
+  </section>
+
+  <!-- balance -->
+  <section class="group" id="balance">
+    <div class="group-label">Elemental &amp; modal balance</div>
+    <div class="group-card">
+      <div class="balance-wrap">
+        <div class="balance-half">
+          <svg width="110" height="110" viewBox="0 0 120 120">
+            <circle cx="60" cy="60" r="46" fill="none" stroke="#F6F6F8" stroke-width="20"/>
+            <circle cx="60" cy="60" r="46" fill="none" stroke="#30B0C7" stroke-width="20" transform="rotate(-90 60 60)" style="stroke-dasharray:calc(49.12 * 2.8877) calc(100 * 2.8877);stroke-dashoffset:0;"/>
+            <circle cx="60" cy="60" r="46" fill="none" stroke="#A2845E" stroke-width="20" transform="rotate(-90 60 60)" style="stroke-dasharray:calc(18.81 * 2.8877) calc(100 * 2.8877);stroke-dashoffset:calc(-49.12 * 2.8877);"/>
+            <circle cx="60" cy="60" r="46" fill="none" stroke="#32ADE6" stroke-width="20" transform="rotate(-90 60 60)" style="stroke-dasharray:calc(16.80 * 2.8877) calc(100 * 2.8877);stroke-dashoffset:calc(-(49.12 + 18.81) * 2.8877);"/>
+            <circle cx="60" cy="60" r="46" fill="none" stroke="#FF9500" stroke-width="20" transform="rotate(-90 60 60)" style="stroke-dasharray:calc(15.27 * 2.8877) calc(100 * 2.8877);stroke-dashoffset:calc(-(49.12 + 18.81 + 16.80) * 2.8877);"/>
+            <text x="60" y="64" text-anchor="middle" fill="#8A8A8E" font-family="-apple-system,sans-serif" font-size="10" font-weight="600">ELEMENTS</text>
+          </svg>
+          <div class="legend">
+            <div class="legend-row"><span class="legend-dot" style="background:var(--el-water)"></span><span class="legend-name">Water</span><span class="legend-val">49.12%</span></div>
+            <div class="legend-row"><span class="legend-dot" style="background:var(--el-earth)"></span><span class="legend-name">Earth</span><span class="legend-val">18.81%</span></div>
+            <div class="legend-row"><span class="legend-dot" style="background:var(--el-air)"></span><span class="legend-name">Air</span><span class="legend-val">16.80%</span></div>
+            <div class="legend-row"><span class="legend-dot" style="background:var(--el-fire)"></span><span class="legend-name">Fire</span><span class="legend-val">15.27%</span></div>
+          </div>
+        </div>
+        <div class="balance-half">
+          <svg width="110" height="110" viewBox="0 0 120 120">
+            <circle cx="60" cy="60" r="46" fill="none" stroke="#F6F6F8" stroke-width="20"/>
+            <circle cx="60" cy="60" r="46" fill="none" stroke="#5856D6" stroke-width="20" transform="rotate(-90 60 60)" style="stroke-dasharray:calc(40.57 * 2.8877) calc(100 * 2.8877);stroke-dashoffset:0;"/>
+            <circle cx="60" cy="60" r="46" fill="none" stroke="#00C7BE" stroke-width="20" transform="rotate(-90 60 60)" style="stroke-dasharray:calc(30.10 * 2.8877) calc(100 * 2.8877);stroke-dashoffset:calc(-40.57 * 2.8877);"/>
+            <circle cx="60" cy="60" r="46" fill="none" stroke="#FF2D55" stroke-width="20" transform="rotate(-90 60 60)" style="stroke-dasharray:calc(29.33 * 2.8877) calc(100 * 2.8877);stroke-dashoffset:calc(-(40.57 + 30.10) * 2.8877);"/>
+            <text x="60" y="64" text-anchor="middle" fill="#8A8A8E" font-family="-apple-system,sans-serif" font-size="10" font-weight="600">MODES</text>
+          </svg>
+          <div class="legend">
+            <div class="legend-row"><span class="legend-dot" style="background:var(--mo-fix)"></span><span class="legend-name">Fixed</span><span class="legend-val">40.57%</span></div>
+            <div class="legend-row"><span class="legend-dot" style="background:var(--mo-mut)"></span><span class="legend-name">Mutable</span><span class="legend-val">30.10%</span></div>
+            <div class="legend-row"><span class="legend-dot" style="background:var(--mo-car)"></span><span class="legend-name">Cardinal</span><span class="legend-val">29.33%</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="callout"><p><strong>Dominant Fixed (40.57%):</strong> concentrated, immovable, accumulative. Water dominance + Fixed mode = a soul that runs deep and holds its form. Transformation happens inwardly, not through external adaptation.</p></div>
+    </div>
+  </section>
+
+  <!-- signs -->
+  <section class="group" id="signs">
+    <div class="group-label">Sign emphasis · top 4</div>
+    <div class="group-card">
+      <div class="bar-row"><span class="bar-rank">♏</span><span class="bar-name">Scorpio</span><div class="bar-track"><div class="bar-fill" style="width:100%;background:var(--el-water)"></div></div><span class="bar-val">23.58%</span></div>
+      <div class="bar-row"><span class="bar-rank">♓</span><span class="bar-name">Pisces</span><div class="bar-track"><div class="bar-fill" style="width:98.9%;background:var(--el-water)"></div></div><span class="bar-val">23.31%</span></div>
+      <div class="bar-row"><span class="bar-rank">♑</span><span class="bar-name">Capricorn</span><div class="bar-track"><div class="bar-fill" style="width:59.2%;background:var(--el-earth)"></div></div><span class="bar-val">13.96%</span></div>
+      <div class="bar-row"><span class="bar-rank">♒</span><span class="bar-name">Aquarius</span><div class="bar-track"><div class="bar-fill" style="width:50.8%;background:var(--el-air)"></div></div><span class="bar-val">11.96%</span></div>
+      <div class="key-strip">
+        <span class="key-title">Bar color = element</span>
+        <span class="key-item"><span class="key-dot" style="background:var(--el-water)"></span>Water</span>
+        <span class="key-item"><span class="key-dot" style="background:var(--el-earth)"></span>Earth</span>
+        <span class="key-item"><span class="key-dot" style="background:var(--el-air)"></span>Air</span>
+      </div>
+      <div class="callout"><p>Scorpio leads by power despite no personal planets there — driven by Jupiter, Pluto, and North Node in the 10th. Pisces nearly ties via the 2nd house stellium. <strong>The chart operates as a Scorpio–Pisces dyad:</strong> depth from Scorpio, dissolution from Pisces — visible above as two water bars at the top.</p></div>
+    </div>
+  </section>
+
+  <!-- aspects -->
+  <section class="group" id="aspects">
+    <div class="group-label">Aspects · ranked by strength</div>
+    <div class="group-card">
+      <div class="asp-head"><span>#</span><span>Aspect · power</span><span>Type</span><span>Orb</span><span>Strength</span></div>
+      <div class="asp-row"><span class="asp-num">1</span><div><div class="asp-pair">☽ Moon — ♂ Mars</div><div class="asp-bar"><div class="asp-fill" style="width:100%;background:var(--as-conj)"></div></div></div><span class="pill conj">Conj</span><span class="asp-orb">0°58'</span><span class="asp-str tight">★ Tight</span></div>
+      <div class="asp-row"><span class="asp-num">2</span><div><div class="asp-pair">☽ Moon — ♄ Saturn</div><div class="asp-bar"><div class="asp-fill" style="width:97%;background:var(--as-conj)"></div></div></div><span class="pill conj">Conj</span><span class="asp-orb">1°17'</span><span class="asp-str tight">★ Tight</span></div>
+      <div class="asp-row"><span class="asp-num">3</span><div><div class="asp-pair">♂ Mars — ♄ Saturn</div><div class="asp-bar"><div class="asp-fill" style="width:88%;background:var(--as-conj)"></div></div></div><span class="pill conj">Conj</span><span class="asp-orb">2°15'</span><span class="asp-str tight">★ Tight</span></div>
+      <div class="asp-row"><span class="asp-num">4</span><div><div class="asp-pair">♅ Uranus — ♆ Neptune</div><div class="asp-bar"><div class="asp-fill" style="width:85%;background:var(--as-conj)"></div></div></div><span class="pill conj">Conj</span><span class="asp-orb">2°30'</span><span class="asp-str tight">★ Tight</span></div>
+      <div class="asp-row"><span class="asp-num">5</span><div><div class="asp-pair">☉ Sun — ♆ Neptune</div><div class="asp-bar"><div class="asp-fill" style="width:80%;background:var(--as-sex)"></div></div></div><span class="pill sex">Sextile</span><span class="asp-orb">2°46'</span><span class="asp-str">Strong</span></div>
+      <div class="asp-row"><span class="asp-num">6</span><div><div class="asp-pair">♅ Uranus — ♇ Pluto</div><div class="asp-bar"><div class="asp-fill" style="width:78%;background:var(--as-sex)"></div></div></div><span class="pill sex">Sextile</span><span class="asp-orb">2°46'</span><span class="asp-str">Strong</span></div>
+      <div class="asp-row"><span class="asp-num">7</span><div><div class="asp-pair">☿ Mercury — ♇ Pluto</div><div class="asp-bar"><div class="asp-fill" style="width:72%;background:var(--as-sq)"></div></div></div><span class="pill sq">Square</span><span class="asp-orb">3°54'</span><span class="asp-str">Strong</span></div>
+      <div class="asp-row"><span class="asp-num">8</span><div><div class="asp-pair">♀ Venus — ♇ Pluto</div><div class="asp-bar"><div class="asp-fill" style="width:67%;background:var(--as-tri)"></div></div></div><span class="pill tri">Trine</span><span class="asp-orb">4°44'</span><span class="asp-str">Strong</span></div>
+      <div class="asp-row"><span class="asp-num">9</span><div><div class="asp-pair">♂ Mars — ♇ Pluto</div><div class="asp-bar"><div class="asp-fill" style="width:62%;background:var(--as-sq)"></div></div></div><span class="pill sq">Square</span><span class="asp-orb">4°37'</span><span class="asp-str">Strong</span></div>
+      <div class="asp-row"><span class="asp-num">10</span><div><div class="asp-pair">☽ Moon — ♇ Pluto</div><div class="asp-bar"><div class="asp-fill" style="width:58%;background:var(--as-sq)"></div></div></div><span class="pill sq">Square</span><span class="asp-orb">5°35'</span><span class="asp-str">Strong</span></div>
+      <div class="asp-row"><span class="asp-num">11</span><div><div class="asp-pair">♆ Neptune — ♇ Pluto</div><div class="asp-bar"><div class="asp-fill" style="width:55%;background:var(--as-sex)"></div></div></div><span class="pill sex">Sextile</span><span class="asp-orb">5°16'</span><span class="asp-str">Moderate</span></div>
+      <div class="asp-row"><span class="asp-num">12</span><div><div class="asp-pair">☉ Sun — ♃ Jupiter</div><div class="asp-bar"><div class="asp-fill" style="width:52%;background:var(--as-tri)"></div></div></div><span class="pill tri">Trine</span><span class="asp-orb">5°32'</span><span class="asp-str">Moderate</span></div>
+      <div class="asp-row"><span class="asp-num">13</span><div><div class="asp-pair">♄ Saturn — ♇ Pluto</div><div class="asp-bar"><div class="asp-fill" style="width:44%;background:var(--as-sq)"></div></div></div><span class="pill sq">Square</span><span class="asp-orb">6°52'</span><span class="asp-str">Moderate</span></div>
+      <div class="asp-row"><span class="asp-num">14</span><div><div class="asp-pair">☉ Sun — ♅ Uranus</div><div class="asp-bar"><div class="asp-fill" style="width:40%;background:var(--as-sex)"></div></div></div><span class="pill sex">Sextile</span><span class="asp-orb">5°15'</span><span class="asp-str">Moderate</span></div>
+      <div class="asp-row"><span class="asp-num">15</span><div><div class="asp-pair">♃ Jupiter — ♄ Saturn</div><div class="asp-bar"><div class="asp-fill" style="width:30%;background:var(--as-tri)"></div></div></div><span class="pill tri">Trine</span><span class="asp-orb">9°35'</span><span class="asp-str">Wide</span></div>
+      <div class="asp-row"><span class="asp-num">16</span><div><div class="asp-pair">☽ Moon — ♃ Jupiter</div><div class="asp-bar"><div class="asp-fill" style="width:25%;background:var(--as-tri)"></div></div></div><span class="pill tri">Trine</span><span class="asp-orb">10°52'</span><span class="asp-str">Wide</span></div>
+      <div class="asp-row"><span class="asp-num">17</span><div><div class="asp-pair">☉ Sun — ♇ Pluto</div><div class="asp-bar"><div class="asp-fill" style="width:22%;background:var(--as-tri)"></div></div></div><span class="pill tri">Trine</span><span class="asp-orb">8°01'</span><span class="asp-str">Wide</span></div>
+      <div class="asp-row"><span class="asp-num">18</span><div><div class="asp-pair">☿ Mercury — ♃ Jupiter</div><div class="asp-bar"><div class="asp-fill" style="width:18%;background:var(--as-sq)"></div></div></div><span class="pill sq">Square</span><span class="asp-orb">9°39'</span><span class="asp-str">Wide</span></div>
+      <div class="asp-row"><span class="asp-num">19</span><div><div class="asp-pair">☿ Mercury — ♂ Mars</div><div class="asp-bar"><div class="asp-fill" style="width:14%;background:var(--as-conj)"></div></div></div><span class="pill conj">Conj</span><span class="asp-orb">8°31'</span><span class="asp-str">Wide</span></div>
+      <div class="asp-row"><span class="asp-num">20</span><div><div class="asp-pair">☽ Moon — ☿ Mercury</div><div class="asp-bar"><div class="asp-fill" style="width:8%;background:var(--as-conj)"></div></div></div><span class="pill conj">Conj</span><span class="asp-orb">9°29'</span><span class="asp-str">Wide</span></div>
+      <div class="key-strip">
+        <span class="key-title">Type color</span>
+        <span class="key-item"><span class="key-dot" style="background:var(--as-conj)"></span>Conjunction</span>
+        <span class="key-item"><span class="key-dot" style="background:var(--as-tri)"></span>Trine</span>
+        <span class="key-item"><span class="key-dot" style="background:var(--as-sex)"></span>Sextile</span>
+        <span class="key-item"><span class="key-dot" style="background:var(--as-sq)"></span>Square</span>
+      </div>
+      <div class="callout"><p><strong>Zero oppositions.</strong> All tension is processed internally — primarily through 4 Pluto squares (Moon, Mercury, Mars, Saturn). No projection outward; adaptation is compelled from within.</p></div>
+    </div>
+  </section>
+
+  <!-- stelliums -->
+  <section class="group" id="stelliums">
+    <div class="group-label">Stelliums &amp; special configurations</div>
+    <div class="group-card">
+      <div class="config" id="cfg-mind">
+        <div class="config-title">Stellium 1 — Aquarius/Pisces, 1st/2nd house</div>
+        <div class="config-planets"><span class="config-chip">☽ Moon 3°Pis</span><span class="config-chip">☿ Mercury 24°Aqu</span><span class="config-chip">♂ Mars 2°Pis</span></div>
+        <div class="config-note">Emotion, mind, and will are wired together — feeling and thinking and acting arise from the same source and cannot be easily separated. Mercury in Aquarius gives this cluster a future-oriented, structurally unusual cast; Moon and Mars are in Pisces, dissolving boundaries between impulse and feeling.</div>
+      </div>
+      <div class="config" id="cfg-wound">
+        <div class="config-title">Stellium 2 — Pisces, 2nd house (core wound cluster)</div>
+        <div class="config-planets"><span class="config-chip">☽ Moon 3°Pis</span><span class="config-chip">♂ Mars 2°Pis</span><span class="config-chip">♄ Saturn 4°Pis</span></div>
+        <div class="config-note">The tightest, most consequential cluster. Emotion welded to discipline welded to force — all operating through the wound of self-worth. Saturn here is the demanding parent who is never satisfied; Mars is the rage that has nowhere safe to go; Moon is the feeling body that absorbs all of it.</div>
+      </div>
+      <div class="config" id="cfg-scorpio">
+        <div class="config-title">Scorpio 10th house cluster — Pluto/Jupiter/North Node</div>
+        <div class="config-planets"><span class="config-chip">♇ Pluto 28°Sco ℞</span><span class="config-chip">☊ N.Node 27°Sco ℞</span><span class="config-chip">♃ Jupiter 14°Sco ℞</span></div>
+        <div class="config-note">The public vocation is built on Scorpionic ground — investigation, transformation, the encounter with power and its shadow. All three planets retrograde: an inward orientation that nonetheless demands a public expression. The path forward (North Node) runs through the underworld (Pluto). Jupiter expands whatever Scorpio touches.</div>
+      </div>
+      <div class="config" id="cfg-uranep">
+        <div class="config-title">Generational — Uranus conjunct Neptune, Capricorn 12th (2°30')</div>
+        <div class="config-planets"><span class="config-chip">♅ Uranus 25°Cap</span><span class="config-chip">♆ Neptune 22°Cap</span></div>
+        <div class="config-note">The signature of an entire generation born to dissolve old structures and rebuild them in more aligned forms. In the 12th house, this generational energy operates through the hidden life, the unconscious, spiritual practice, and retreat. It rarely surfaces directly but shapes everything.</div>
+      </div>
+      <div class="callout"><p><strong>Chart signatures:</strong> Water 49.12% · 4 Pluto squares · Zero oppositions · 2nd house 36.95%</p></div>
+    </div>
+  </section>
+
+  <!-- stories -->
+  <section class="group" id="stories">
+    <div class="group-label">The 10 prominent stories</div>
+    <p class="group-intro">Each story reflects a primary archetypal theme derived from the chart's most powerful configurations. Interpretive narratives for discussion, not prediction. Symbol tiles follow the page color system; chips link to the evidence.</p>
+    <div class="group-card">
+
+      <div class="story">
+        <div class="story-head"><span class="sg water">♓</span><div class="story-titles"><div class="story-num">STORY 01</div><div class="story-title">The Piscean flood: soul submerged in water</div></div></div>
+        <div class="story-body"><strong>Sun, Moon, Mars, and Saturn all in Pisces</strong>, concentrated in the 2nd house. No chart with this proportion of Piscean emphasis has a "partial" relationship with dissolution — it is the operating system. Identity is permeable; boundaries between self and other are structurally thin. This is not weakness. It is a soul whose nature is oceanic, whose intelligence moves like water: around, under, through.</div>
+        <div class="refs"><a class="ref" href="#balance">Water 49.12%</a><a class="ref" href="#signs">Sign emphasis</a><a class="ref" href="#planets">Positions</a></div>
+      </div>
+
+      <div class="story">
+        <div class="story-head"><span class="sg">⌂</span><div class="story-titles"><div class="story-num">STORY 02</div><div class="story-title">The 2nd house as organizing wound and gift</div></div></div>
+        <div class="story-body">At <strong>36.95% of chart power</strong>, the 2nd house doesn't merely feature — it governs. The question "do I deserve to exist?" is not incidental to this life; it is its central axis. The spiritual gifts (Pluto's grace, Neptune's vision, Jupiter's expansion) all wait behind this gate. Until the self-worth wound is metabolized — not resolved, but inhabited consciously — the gifts remain inaccessible, perpetually felt but not fully landed.</div>
+        <div class="refs"><a class="ref" href="#power">House power</a><a class="ref" href="#cfg-wound">Wound cluster</a></div>
+      </div>
+
+      <div class="story">
+        <div class="story-head"><span class="sg">♇</span><div class="story-titles"><div class="story-num">STORY 03</div><div class="story-title">Pluto dominant: the invisible transformer</div></div></div>
+        <div class="story-body">Pluto receives <strong>8 major aspects</strong> — more than any other planet — and leads planet power rankings at <strong>13.17%</strong>. Yet it is retrograde in the 10th house, invisible until its work is complete. This is not someone whose power announces itself. It is someone whose presence reorganizes a room without anyone being able to say exactly how. The path of influence runs through transformation, not performance. The underworld is the career.</div>
+        <div class="refs"><a class="ref" href="#power">Power rankings</a><a class="ref" href="#aspects">Pluto aspects</a></div>
+      </div>
+
+      <div class="story">
+        <div class="story-head"><span class="sg water">♏</span><div class="story-titles"><div class="story-num">STORY 04</div><div class="story-title">Scorpio 10th house: fated identity through depth work</div></div></div>
+        <div class="story-body"><strong>Jupiter, Pluto, and the North Node all occupy Scorpio in the 10th house — all retrograde.</strong> The public identity is not built through conventional ascent. It emerges through encounters with what most people avoid: power, shadow, crisis, the taboo. The North Node here names the destiny explicitly: depth work is the calling. What is repressed in the collective is what this native must engage professionally.</div>
+        <div class="refs"><a class="ref" href="#cfg-scorpio">Scorpio cluster</a><a class="ref" href="#signs">Sign emphasis</a></div>
+      </div>
+
+      <div class="story">
+        <div class="story-head"><span class="sg air">♒</span><div class="story-titles"><div class="story-num">STORY 05</div><div class="story-title">Aquarius rising + Mercury 1st: mind from the future</div></div></div>
+        <div class="story-body">An Aquarian Ascendant with <strong>Mercury in Aquarius in the 1st house</strong> presents a persona that thinks in systems, arrives at conclusions others haven't reached yet, and can seem detached even while feeling deeply. The paradox: the inside is an ocean (Water dominant, 49.12%); the outside is a transmission tower. The difficulty is translation — the mind sees clearly but the emotional depth resists being reduced to language.</div>
+        <div class="refs"><a class="ref" href="#planets">Positions</a><a class="ref" href="#balance">Elements</a></div>
+      </div>
+
+      <div class="story">
+        <div class="story-head"><span class="sg conj multi">☽♂♄</span><div class="story-titles"><div class="story-num">STORY 06</div><div class="story-title">Moon–Mars–Saturn stellium: emotion welded to discipline and force</div></div></div>
+        <div class="story-body">The tightest stellium (<strong>Moon–Mars 0°58', Moon–Saturn 1°17', Mars–Saturn 2°15'</strong>) fuses three incompatible energies: the need to feel (Moon), the drive to act (Mars), and the imperative to restrain (Saturn). The result is an enormous internal pressure system — feeling immediately tested by discipline, impulse immediately checked by structure. This produces extraordinary capacity for sustained effort, and a difficulty simply feeling without immediately judging the feeling.</div>
+        <div class="refs"><a class="ref" href="#cfg-wound">Wound cluster</a><a class="ref" href="#aspects">Aspects 1–3</a></div>
+      </div>
+
+      <div class="story">
+        <div class="story-head"><span class="sg conj multi">♅♆</span><div class="story-titles"><div class="story-num">STORY 07</div><div class="story-title">Uranus–Neptune conjunction 12th: the hidden spiritual life</div></div></div>
+        <div class="story-body">The generational <strong>Uranus–Neptune conjunction (2°30')</strong> lands in the 12th house of hidden things, dissolution, and the unconscious. This is the signature of a vast, structurally unusual interior life that is almost never fully revealed — not from shame, but because it exceeds the available containers. The spiritual world is more real than the social one. The mystic is not a persona; it is the actual organizing principle of the psyche.</div>
+        <div class="refs"><a class="ref" href="#cfg-uranep">Generational config</a><a class="ref" href="#aspects">Aspect 4</a></div>
+      </div>
+
+      <div class="story">
+        <div class="story-head"><span class="sg sq">□</span><div class="story-titles"><div class="story-num">STORY 08</div><div class="story-title">Multiple Pluto squares: adaptation demanded by destiny</div></div></div>
+        <div class="story-body"><strong>Four planets square Pluto: Moon, Mercury, Mars, Saturn. Zero planets oppose anything.</strong> This means all tension is interior — there is no screen onto which difficulty can be projected. Every Pluto square is a demand for inner transformation: the emotional body must be remade (Moon–Pluto), the mind must face its own compulsions (Mercury–Pluto), the will must reckon with power (Mars–Pluto), the structure must be rebuilt from the ground up (Saturn–Pluto). This is the mechanism of evolution.</div>
+        <div class="refs"><a class="ref" href="#aspects">Aspects 7, 9, 10, 13</a></div>
+      </div>
+
+      <div class="story">
+        <div class="story-head"><span class="sg tri">△</span><div class="story-titles"><div class="story-num">STORY 09</div><div class="story-title">Sun trine Jupiter + Sun trine Pluto: grace within the intensity</div></div></div>
+        <div class="story-body">Amid the weight of the Pluto squares and the 2nd house concentration, two trines from the Sun offer structural grace. <strong>Sun trine Jupiter (5°32')</strong> opens a door toward expansion and philosophical meaning — the chart is not condemned to smallness. <strong>Sun trine Pluto (8°01')</strong> suggests the transformations demanded by Pluto are not purely hostile — the Sun moves with Pluto's current rather than against it. Intensity is the medium through which grace operates.</div>
+        <div class="refs"><a class="ref" href="#aspects">Aspects 12 &amp; 17</a></div>
+      </div>
+
+      <div class="story">
+        <div class="story-head"><span class="sg tri multi">♀△♇</span><div class="story-titles"><div class="story-num">STORY 10</div><div class="story-title">Venus in Aries trine Pluto: fierce, uncompromising love</div></div></div>
+        <div class="story-body"><strong>Venus in Aries (technically debilitated exoterically) in trine to Pluto</strong> produces a love that is neither gentle nor patient with superficiality. It wants contact at the level of soul. It will pursue. It has zero tolerance for performance. In relationship, it seeks depth or it exits. The form this takes practically: intense loyalty, the willingness to go first, an unwillingness to stay in arrangements that are merely convenient, and a love that can become obsessive when thwarted.</div>
+        <div class="refs"><a class="ref" href="#aspects">Aspect 8</a><a class="ref" href="#planets">Venus position</a></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- notable -->
+  <section class="group" id="notable">
+    <div class="group-label">Notable chart features</div>
+    <div class="group-card">
+      <div class="feat">2nd house at 36.95% power — Sun, Moon, Mars, Saturn all concentrated here. Self-worth is the organizing field of the entire incarnation.</div>
+      <div class="feat">Four planets in Pisces (Sun, Moon, Mars, Saturn) — Water dominance at 49.12%. The soul's primary mode is oceanic: permeable, receptive, borderless.</div>
+      <div class="feat">Pluto as most aspected planet (8 major aspects) and highest planet power (13.17%), retrograde in 10th house — invisible transformative force with public-facing destiny.</div>
+      <div class="feat">Four Pluto squares (Moon, Mercury, Mars, Saturn) with zero oppositions — all tension is internal. This chart cannot project its difficulties; it must metabolize them.</div>
+      <div class="feat">Scorpio 10th house cluster: Jupiter + Pluto + North Node, all retrograde — the karmic direction points toward depth work as professional calling.</div>
+      <div class="feat">Aquarius Ascendant with Mercury in Aquarius in 1st house — mind operates ahead of its time; the persona presents as analytical and detached while the emotional interior is vast.</div>
+      <div class="feat">Moon–Mars–Saturn stellium (tightest orbs in the chart: 0°58', 1°17', 2°15') — emotion fused to discipline fused to will in Pisces, generating extraordinary endurance and significant internal pressure.</div>
+      <div class="feat">Uranus–Neptune conjunction in Capricorn 12th house (orb 2°30') — generational signature of structural dissolution expressed through hidden spiritual life and the unconscious realm.</div>
+      <div class="feat">Sun trine Jupiter + Sun trine Pluto — two grace lines through the intensity. The chart is not without ease; the ease comes through accepting the depth rather than resisting it.</div>
+      <div class="feat">Venus in Aries trine Pluto — love that demands truth of contact. Incapable of surface-level connection; will either go deep or withdraw entirely.</div>
+      <div class="feat">Chiron in Virgo 8th house, opposite Saturn at 0°09' — the perfectionist wound activates at the threshold of intimacy. Healing runs through surrendering the audit, not completing it.</div>
+    </div>
+  </section>
+
+  <!-- codes -->
+  <section class="group" id="codes">
+    <div class="group-label">Cheat codes — how to thrive</div>
+    <p class="group-intro">Operational wisdom derived directly from the chart's architecture. Not aspirational — structural. These are the things the chart is already trying to do; lu's job is to stop blocking them. Chips link to the evidence.</p>
+    <div class="group-card">
+
+      <div class="code">
+        <div class="code-head"><span class="code-n">01</span><span class="code-title">The wound is the door. Stop trying to get past it.</span></div>
+        <div class="code-body">The 2nd house self-worth question is not in the way of the gifts — <strong>it is the mechanism through which the gifts arrive</strong>. Every time lu stays in the question "do I deserve this?" without flinching or resolving it prematurely, something unlocks. The practice is endurance, not resolution.</div>
+        <div class="refs"><a class="ref" href="#power">2nd house 36.95%</a><a class="ref" href="#cfg-wound">Wound cluster</a></div>
+      </div>
+
+      <div class="code">
+        <div class="code-head"><span class="code-n">02</span><span class="code-title">Solitude is infrastructure, not avoidance.</span></div>
+        <div class="code-body">Uranus–Neptune in the 12th requires significantly more alone time than most people. This is not depression or withdrawal — <strong>it is the chart's operating requirement</strong>. The interior life is where all real processing happens. Protect it structurally. Refuse to apologize for it.</div>
+        <div class="refs"><a class="ref" href="#cfg-uranep">Uranus–Neptune 12th</a><a class="ref" href="#power">12th house 16.28%</a></div>
+      </div>
+
+      <div class="code">
+        <div class="code-head"><span class="code-n">03</span><span class="code-title">The body is the instrument. Use it daily.</span></div>
+        <div class="code-body">The Moon–Mars–Saturn stellium generates internal pressure that has no natural outlet through thinking alone. <strong>Physical movement is not optional</strong> — exertion, rhythm, anything that gives Saturn a container and Mars somewhere to go. It is the single most effective pressure regulation system in this chart. Water helps literally.</div>
+        <div class="refs"><a class="ref" href="#cfg-wound">Stellium 0°58'–2°15'</a><a class="ref" href="#balance">Water 49.12%</a></div>
+      </div>
+
+      <div class="code">
+        <div class="code-head"><span class="code-n">04</span><span class="code-title">Taste is the Trojan horse. The depth rides in on the beauty.</span></div>
+        <div class="code-body">Venus trine Pluto means beauty and transformation are not competing values — <strong>beauty is the delivery mechanism for transformation</strong>. Venus sextile Ascendant means the aesthetic sense is how lu arrives in the world and is trusted on contact. The work can photograph beautifully and still rearrange something in the person encountering it. That's the point.</div>
+        <div class="refs"><a class="ref" href="#aspects">Venus trine Pluto</a><a class="ref" href="#cfg-scorpio">Scorpio 10th</a></div>
+      </div>
+
+      <div class="code">
+        <div class="code-head"><span class="code-n">05</span><span class="code-title">The right people will match the intensity. Stop dimming it.</span></div>
+        <div class="code-body">Venus in Aries trine Pluto wants soul-level contact. Arrangements that are merely comfortable corrode over time. The cheat code is not to learn to want less — <strong>it's to stop entering spaces where wanting-that-much is treated as a problem</strong>. The right people are relieved by the intensity. They were waiting for it.</div>
+        <div class="refs"><a class="ref" href="#aspects">Aspect 8</a><a class="ref" href="#aspects">Zero oppositions</a></div>
+      </div>
+
+      <div class="code">
+        <div class="code-head"><span class="code-n">06</span><span class="code-title">When you can't feel your way through, think.</span></div>
+        <div class="code-body">The mind is not separate from the spiritual life — it is the vehicle. Mercury in Aquarius in the 1st can map from above when the Pisces ocean becomes unnavigable. Systems thinking, pattern recognition, precise language: <strong>these are not escapes from depth. They are how this chart metabolizes depth.</strong> The Aquarian and the Piscean are the same person using different instruments.</div>
+        <div class="refs"><a class="ref" href="#planets">Mercury Aqu 1st</a><a class="ref" href="#cfg-mind">Stellium 1</a></div>
+      </div>
+
+      <div class="code">
+        <div class="code-head"><span class="code-n">07</span><span class="code-title">Other people are never the problem.</span></div>
+        <div class="code-body">Zero oppositions. There is no projection screen in this chart. When it feels like the difficulty is coming from someone else, <strong>that is the signal to look inward — every time, without exception</strong>. The four Pluto squares are all internal transformation demands. The revolution is always happening inside.</div>
+        <div class="refs"><a class="ref" href="#aspects">Zero oppositions</a><a class="ref" href="#aspects">4 Pluto squares</a></div>
+      </div>
+
+      <div class="code">
+        <div class="code-head"><span class="code-n">08</span><span class="code-title">Consistent structure over inspired bursts.</span></div>
+        <div class="code-body">Saturn rewards regularity, not intensity. The emotional body wants to surge and crash (Mars–Moon in Pisces). Saturn says: show up at the same time every day. The gifts — capacity, authority, craft — are released slowly, to those who kept showing up. <strong>Boring consistency is where Saturn hides its treasure.</strong></div>
+        <div class="refs"><a class="ref" href="#aspects">Aspects 2 &amp; 3</a><a class="ref" href="#planets">Saturn Pisces 2nd</a></div>
+      </div>
+
+      <div class="code">
+        <div class="code-head"><span class="code-n">09</span><span class="code-title">The grace is in acceptance, not effort.</span></div>
+        <div class="code-body">Sun trine Jupiter and Sun trine Pluto both activate when lu stops fighting the chart's fundamental nature. The expansion and the transformation are not obstacles — they are currents. When life intensifies, the cheat is: <strong>this is correct. Move with it.</strong> The grace comes through the intensity, not around it.</div>
+        <div class="refs"><a class="ref" href="#aspects">Aspects 12 &amp; 17</a></div>
+      </div>
+
+      <div class="code">
+        <div class="code-head"><span class="code-n">10</span><span class="code-title">Trust what arrives before you can name it.</span></div>
+        <div class="code-body">Mercury in Aquarius wants to name everything. The Pisces stellium knows things before language arrives. When something registers in the body or felt sense before the mind has caught up — <strong>trust the body first, name it later</strong>. The felt sense is faster and more accurate in this chart. Mercury's job is translation, not origination.</div>
+        <div class="refs"><a class="ref" href="#balance">Pisces dominance</a><a class="ref" href="#planets">Mercury Aqu</a></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- discussion -->
+  <section class="group" id="discussion">
+    <div class="group-label">Discussion prompts for astrologers</div>
+    <p class="group-intro">Questions designed to stimulate interpretive dialogue. No single correct answer — invitations to explore the chart's tensions and gifts.</p>
+    <div class="group-card">
+      <div class="prompt"><span class="prompt-n">1</span><div class="prompt-body">With 36.95% of chart power in the 2nd house, self-worth is not one theme among many — it is the organizing field. How does this manifest at different life stages? At what point does the wound shift from operating as limitation to operating as gift — and what facilitates that shift in a chart so heavily weighted in Pisces (dissolution) combined with Saturn (structure)?</div></div>
+      <div class="prompt"><span class="prompt-n">2</span><div class="prompt-body">Zero oppositions, four Pluto squares. What does it mean for a chart to have no external screen for its tensions? How does this shape the quality of lu's relationships — particularly in light of Venus in Aries trine Pluto, which suggests love that seeks depth but may struggle with mutuality?</div></div>
+      <div class="prompt"><span class="prompt-n">3</span><div class="prompt-body">The Scorpio 10th house cluster (Jupiter + Pluto + North Node, all retrograde) names depth work as the professional calling. What concrete domains might "the underworld" correspond to in contemporary life — and how does the Aquarius Ascendant (detached, systemic, future-oriented) serve as a vehicle for this Scorpionic vocation rather than contradicting it?</div></div>
+      <div class="prompt"><span class="prompt-n">4</span><div class="prompt-body">The Moon is esoterically debilitated in Pisces, yet the Moon–Mars–Saturn stellium makes the emotional body one of the most active and structurally central features of the chart. How do these two conditions coexist? Is the debilitation a permanent constraint, or is it a developmental challenge — and what would its conscious resolution look like?</div></div>
+      <div class="prompt"><span class="prompt-n">5</span><div class="prompt-body">Uranus–Neptune in the 12th house suggests a vast interior spiritual life that may never be fully externalized. Yet the North Node calls lu into public life (10th house). How does this native reconcile the hermit and the public figure? Is hiddenness a developmental stage or a permanent structural feature of this chart?</div></div>
+      <div class="prompt"><span class="prompt-n">6</span><div class="prompt-body">Chiron in Virgo in the 8th house sits in near-exact opposition to Saturn in Pisces in the 2nd (0°09'). The recent Saturn return activated both poles of this axis simultaneously. How does the perfectionist wound (Chiron/Virgo) interact with the self-worth structure (Saturn/2nd) — and what does healing look like when the wound activates precisely at the threshold of intimacy?</div></div>
+      <div class="callout"><p><strong>For further inquiry:</strong> consider the tension between the Aquarius Ascendant (air, fixed, universalizing, detached) and the Pisces stellium (water, mutable, dissolving, personal). The Ascendant is how lu arrives in a room; Pisces is what happens inside. The question of how to be simultaneously oceanic and precise, feeling and systemic — this is the central developmental arc. Mercury in Aquarius in the 1st house may be the most important bridge: a mind that can hold complexity without losing its structure, in service of a soul that runs deeper than most containers can hold.</p></div>
+    </div>
+  </section>
+
+  <!-- footer -->
+  <footer class="footer">
+    lu · natal chart reference<br>
+    <span class="mono">11 Mar 1994 04:10 SGT · Singapore · Placidus · Tropical</span><br><br>
+    Prepared for astrological discussion and education.<br>Interpretations are symbolic, not deterministic.
+  </footer>
+
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  /* ── data (from Astrolog 7.80 output; absolute ecliptic longitude) ── */
+  var ASC = 301.9;   /* 1°54' Aquarius */
+  var PLANETS = [
+    { n:'Sun',     g:'☉', lon:350.0167, deg:"20°01' Pisces",    house:'2nd'  },
+    { n:'Moon',    g:'☽', lon:333.6167, deg:"3°37' Pisces",     house:'2nd'  },
+    { n:'Mercury', g:'☿', lon:324.1333, deg:"24°08' Aquarius",  house:'1st'  },
+    { n:'Venus',   g:'♀', lon:2.7833,   deg:"2°47' Aries",      house:'2nd'  },
+    { n:'Mars',    g:'♂', lon:332.65,   deg:"2°39' Pisces",     house:'2nd'  },
+    { n:'Jupiter', g:'♃', lon:224.4833, deg:"14°29' Scorpio",   house:'10th', rx:true },
+    { n:'Saturn',  g:'♄', lon:334.9,    deg:"4°54' Pisces",     house:'2nd'  },
+    { n:'Uranus',  g:'♅', lon:295.2667, deg:"25°16' Capricorn", house:'12th' },
+    { n:'Neptune', g:'♆', lon:292.7833, deg:"22°47' Capricorn", house:'12th' },
+    { n:'Pluto',   g:'♇', lon:238.0333, deg:"28°02' Scorpio",   house:'10th', rx:true },
+    { n:'N. Node', g:'☊', lon:237.45,   deg:"27°27' Scorpio",   house:'10th', rx:true },
+    { n:'Chiron',  g:'⚷', lon:155.05,   deg:"5°03' Virgo",      house:'8th'  }
+  ];
+  var CUSPS = [301.9, 332.4833, 5.05, 36.95, 66.3167, 93.9, 121.9, 152.4833, 185.05, 216.95, 246.3167, 273.9];
+  /* [i, j, type, orb] — indices into PLANETS */
+  var ASPECTS = [
+    [1,4,'conj',"0°58'"], [1,6,'conj',"1°17'"], [4,6,'conj',"2°15'"], [7,8,'conj',"2°30'"],
+    [0,8,'sex',"2°46'"], [7,9,'sex',"2°46'"], [2,9,'sq',"3°54'"], [3,9,'tri',"4°44'"],
+    [4,9,'sq',"4°37'"], [1,9,'sq',"5°35'"], [8,9,'sex',"5°16'"], [0,5,'tri',"5°32'"],
+    [6,9,'sq',"6°52'"], [0,7,'sex',"5°15'"], [5,6,'tri',"9°35'"], [1,5,'tri',"10°52'"],
+    [0,9,'tri',"8°01'"], [2,5,'sq',"9°39'"], [2,4,'conj',"8°31'"], [1,2,'conj',"9°29'"],
+    [6,11,'opp',"0°09'"]
+  ];
+  var ASP_COLOR = { conj:'#EBB800', tri:'#34C759', sex:'#007AFF', sq:'#FF3B30', opp:'#AF52DE' };
+  var ASP_NAME  = { conj:'Conjunction', tri:'Trine', sex:'Sextile', sq:'Square', opp:'Opposition' };
+  var EL_FILL = ['#FF9500','#A2845E','#32ADE6','#30B0C7','#FF9500','#A2845E','#32ADE6','#30B0C7','#FF9500','#A2845E','#32ADE6','#30B0C7'];
+  var EL_TXT  = ['#C77700','#7A6244','#1786B8','#1D7F94','#C77700','#7A6244','#1786B8','#1D7F94','#C77700','#7A6244','#1786B8','#1D7F94'];
+  var SIGN_GLYPHS = ['♈','♉','♊','♋','♌','♍','♎','♏','♐','♑','♒','♓'];
+
+  var NS = 'http://www.w3.org/2000/svg';
+  var C = 180;
+  var svg = document.getElementById('wheelSvg');
+
+  function pt(lon, r) {
+    var th = (180 + (lon - ASC)) * Math.PI / 180;
+    return [C + r * Math.cos(th), C - r * Math.sin(th)];
+  }
+  function el(tag, attrs, parent) {
+    var e = document.createElementNS(NS, tag);
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    (parent || svg).appendChild(e);
+    return e;
+  }
+  function arcPath(lonA, lonB, r) {
+    var p1 = pt(lonA, r), p2 = pt(lonB, r);
+    return 'M' + p1[0].toFixed(2) + ' ' + p1[1].toFixed(2) +
+           ' A' + r + ' ' + r + ' 0 0 0 ' + p2[0].toFixed(2) + ' ' + p2[1].toFixed(2);
+  }
+
+  /* zodiac ring: element-tinted donut segments */
+  for (var s = 0; s < 12; s++) {
+    var A = s * 30, B = A + 30;
+    var o1 = pt(A, 174), o2 = pt(B, 174), i2 = pt(B, 158), i1 = pt(A, 158);
+    el('path', {
+      d: 'M' + o1[0].toFixed(2) + ' ' + o1[1].toFixed(2) +
+         ' A174 174 0 0 0 ' + o2[0].toFixed(2) + ' ' + o2[1].toFixed(2) +
+         ' L' + i2[0].toFixed(2) + ' ' + i2[1].toFixed(2) +
+         ' A158 158 0 0 1 ' + i1[0].toFixed(2) + ' ' + i1[1].toFixed(2) + ' Z',
+      fill: EL_FILL[s], 'fill-opacity': '0.10', stroke: '#E5E5EA', 'stroke-width': '0.75'
+    });
+    var gm = pt(A + 15, 166);
+    var t = el('text', {
+      x: gm[0].toFixed(2), y: gm[1].toFixed(2), 'text-anchor': 'middle',
+      'dominant-baseline': 'central', 'font-size': '11', fill: EL_TXT[s]
+    });
+    t.textContent = SIGN_GLYPHS[s];
+  }
+
+  /* degree ticks every 10° */
+  for (var d = 0; d < 360; d += 10) {
+    var t1 = pt(d, 158), t2 = pt(d, 154);
+    el('line', { x1: t1[0].toFixed(2), y1: t1[1].toFixed(2), x2: t2[0].toFixed(2), y2: t2[1].toFixed(2), stroke: '#D8D8DC', 'stroke-width': '0.75' });
+  }
+
+  /* rings */
+  el('circle', { cx: C, cy: C, r: 154, fill: 'none', stroke: '#E5E5EA', 'stroke-width': '0.75' });
+  el('circle', { cx: C, cy: C, r: 60, fill: 'none', stroke: '#E5E5EA', 'stroke-width': '0.75' });
+
+  /* house cusps + numbers */
+  var AXIS_LBL = { 0: 'ASC', 3: 'IC', 6: 'DSC', 9: 'MC' };
+  for (var h = 0; h < 12; h++) {
+    var axis = (h % 3 === 0);
+    var a1 = pt(CUSPS[h], 60), a2 = pt(CUSPS[h], 154);
+    el('line', {
+      x1: a1[0].toFixed(2), y1: a1[1].toFixed(2), x2: a2[0].toFixed(2), y2: a2[1].toFixed(2),
+      stroke: axis ? '#8A8A8E' : '#D9D9DE', 'stroke-width': axis ? '1.4' : '0.8'
+    });
+    if (axis) {
+      var lp = pt(CUSPS[h] + 6, 146);
+      var lt = el('text', {
+        x: lp[0].toFixed(2), y: lp[1].toFixed(2), 'text-anchor': 'middle', 'dominant-baseline': 'central',
+        'font-size': '7', 'font-weight': '700', fill: '#8A8A8E',
+        'font-family': "'SF Mono', ui-monospace, Menlo, monospace"
+      });
+      lt.textContent = AXIS_LBL[h];
+    }
+    var a = CUSPS[h], b = CUSPS[(h + 1) % 12];
+    if (b < a) b += 360;
+    var mp = pt((a + b) / 2, 69);
+    var ht = el('text', {
+      x: mp[0].toFixed(2), y: mp[1].toFixed(2), 'text-anchor': 'middle', 'dominant-baseline': 'central',
+      'font-size': '8', fill: '#C7C7CC', 'font-family': "'SF Mono', ui-monospace, Menlo, monospace"
+    });
+    ht.textContent = h + 1;
+  }
+
+  /* declump planet glyph positions (true degree keeps its tick) */
+  var SEP = 7;
+  var order = PLANETS.map(function(p, i) { return i; }).sort(function(a, b) { return PLANETS[a].lon - PLANETS[b].lon; });
+  var clusters = order.map(function(i) { return { list: [i], mean: PLANETS[i].lon }; });
+  var merged = true;
+  while (merged) {
+    merged = false;
+    for (var c = 0; c < clusters.length - 1; c++) {
+      var ca = clusters[c], cb = clusters[c + 1];
+      var endA = ca.mean + SEP * (ca.list.length - 1) / 2;
+      var startB = cb.mean - SEP * (cb.list.length - 1) / 2;
+      if (startB - endA < SEP) {
+        var all = ca.list.concat(cb.list);
+        var sum = 0;
+        all.forEach(function(i) { sum += PLANETS[i].lon; });
+        clusters.splice(c, 2, { list: all, mean: sum / all.length });
+        merged = true;
+        break;
+      }
+    }
+  }
+  var disp = {};
+  clusters.forEach(function(cl) {
+    var start = cl.mean - SEP * (cl.list.length - 1) / 2;
+    cl.list.forEach(function(i, k) { disp[i] = start + k * SEP; });
+  });
+
+  /* aspect lines (under planets) */
+  var aspGroup = el('g', {});
+  ASPECTS.forEach(function(a, idx) {
+    var p1 = pt(PLANETS[a[0]].lon, 58), p2 = pt(PLANETS[a[1]].lon, 58);
+    var ln = el('line', {
+      x1: p1[0].toFixed(2), y1: p1[1].toFixed(2), x2: p2[0].toFixed(2), y2: p2[1].toFixed(2),
+      stroke: ASP_COLOR[a[2]], 'stroke-width': '1', opacity: '0.35',
+      'class': 'asp-line ap' + a[0] + ' ap' + a[1]
+    }, aspGroup);
+    ln.setAttribute('data-idx', idx);
+  });
+
+  /* planets: tick at true degree, connector, glyph at fanned position */
+  var hits = el('g', {});
+  PLANETS.forEach(function(p, i) {
+    var t1 = pt(p.lon, 154), t2 = pt(p.lon, 148);
+    el('line', { x1: t1[0].toFixed(2), y1: t1[1].toFixed(2), x2: t2[0].toFixed(2), y2: t2[1].toFixed(2), stroke: '#1C1C1E', 'stroke-width': '1.1' });
+    var gp = pt(disp[i], 134);
+    if (Math.abs(disp[i] - p.lon) > 0.4) {
+      var c1 = pt(p.lon, 148), c2 = pt(disp[i], 141);
+      el('line', { x1: c1[0].toFixed(2), y1: c1[1].toFixed(2), x2: c2[0].toFixed(2), y2: c2[1].toFixed(2), stroke: '#C7C7CC', 'stroke-width': '0.6' });
+    }
+    var ring = el('circle', { cx: gp[0].toFixed(2), cy: gp[1].toFixed(2), r: '9.5', fill: 'none', stroke: '#007AFF', 'stroke-width': '1.4', opacity: '0', 'class': 'sel-ring', 'data-ring': i });
+    var g = el('text', {
+      x: gp[0].toFixed(2), y: gp[1].toFixed(2), 'text-anchor': 'middle', 'dominant-baseline': 'central',
+      'font-size': '12', 'font-weight': '600', fill: '#1C1C1E'
+    });
+    g.textContent = p.g;
+    if (p.rx) {
+      var rp = pt(disp[i], 122);
+      var rt = el('text', { x: rp[0].toFixed(2), y: rp[1].toFixed(2), 'text-anchor': 'middle', 'dominant-baseline': 'central', 'font-size': '6', fill: '#FF3B30', 'font-weight': '700' });
+      rt.textContent = '℞';
+    }
+    var hit = el('circle', { cx: gp[0].toFixed(2), cy: gp[1].toFixed(2), r: '12', fill: 'transparent', 'class': 'pl-hit', 'data-i': i }, hits);
+  });
+
+  /* interaction */
+  var info = document.getElementById('wheelInfo');
+  var selected = -1;
+
+  function houseClass(p) { return p.house; }
+
+  function select(i) {
+    selected = i;
+    var lines = svg.querySelectorAll('.asp-line');
+    lines.forEach(function(l) {
+      l.classList.remove('hi', 'lo');
+      if (i < 0) return;
+      if (l.classList.contains('ap' + i)) l.classList.add('hi');
+      else l.classList.add('lo');
+    });
+    svg.querySelectorAll('.sel-ring').forEach(function(r) {
+      r.setAttribute('opacity', (+r.getAttribute('data-ring') === i) ? '1' : '0');
+    });
+    if (i < 0) {
+      info.innerHTML = '<span class="wi-empty">Tap any planet to see its position and aspects.</span>';
+      return;
+    }
+    var p = PLANETS[i];
+    var html = '<div class="wi-head"><span class="wi-glyph">' + p.g + '</span>' +
+      '<span class="wi-name">' + p.n + (p.rx ? ' <span class="pill retro">℞</span>' : '') + '</span>' +
+      '<span class="wi-deg">' + p.deg + '</span>' +
+      '<span class="pill house">' + p.house + ' house</span></div>';
+    var chips = '';
+    ASPECTS.forEach(function(a) {
+      if (a[0] !== i && a[1] !== i) return;
+      var other = PLANETS[a[0] === i ? a[1] : a[0]];
+      chips += '<span class="ai-chip pill ' + a[2] + '" data-sel="' + (a[0] === i ? a[1] : a[0]) + '">' +
+               ASP_NAME[a[2]] + ' ' + other.g + ' ' + other.n + ' · ' + a[3] + '</span>';
+    });
+    html += '<div class="wi-asps">' + (chips || '<span class="wi-empty">No major aspects.</span>') + '</div>';
+    info.innerHTML = html;
+    info.querySelectorAll('.ai-chip').forEach(function(ch) {
+      ch.addEventListener('click', function() { select(+ch.getAttribute('data-sel')); });
+    });
+  }
+
+  hits.addEventListener('click', function(e) {
+    var t = e.target.closest('.pl-hit');
+    if (!t) return;
+    e.stopPropagation();
+    var i = +t.getAttribute('data-i');
+    select(i === selected ? -1 : i);
+  });
+  svg.addEventListener('click', function(e) {
+    if (!e.target.closest('.pl-hit')) select(-1);
+  });
+
+  /* bar animation */
+  document.addEventListener('DOMContentLoaded', function() {
+    var fills = document.querySelectorAll('.bar-fill, .asp-fill');
+    fills.forEach(function(f) {
+      var w = f.style.width;
+      f.style.width = '0';
+      setTimeout(function() { f.style.width = w; }, 80);
+    });
+  });
+})();
+</script>
+</body>
+</html>
