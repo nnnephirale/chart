@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 <meta name="theme-color" content="#F2F2F7" />
-<title>lu — natal chart</title>
+<title>Natal Chart Overview</title>
 <style>
   /*
     COLOR SYSTEM — color encodes data, never decoration.
@@ -145,6 +145,12 @@
   .asp-line.lo { opacity: 0.07; }
   .asp-line.hi { opacity: 0.95; stroke-width: 1.7; }
   .pl-hit { cursor: pointer; }
+  .row.tap { cursor: pointer; }
+  .row.tap:hover { background: var(--field); }
+  .row.tap:active { background: #ECECEF; }
+  .row.tap.sel { background: rgba(0,122,255,0.06); box-shadow: inset 3px 0 0 var(--blue); }
+  .p-go { font-family: var(--mono); font-size: 16px; line-height: 1; color: var(--faint); margin-left: 10px; flex-shrink: 0; transition: color 0.12s, transform 0.12s; }
+  .row.tap:hover .p-go, .row.tap.sel .p-go { color: var(--blue); transform: translateX(2px); }
 
   /* cusps */
   .cusp-grid { display: grid; grid-template-columns: repeat(3, 1fr); }
@@ -295,8 +301,8 @@
 
   <!-- header -->
   <header class="header">
-    <h1>lu</h1>
-    <div class="sub">Natal chart · 11 Mar 1994, 04:10 · Singapore</div>
+    <h1>Natal chart overview</h1>
+    <div class="sub">11 March 1994, 04:10 · Singapore</div>
   </header>
 
   <!-- birth data -->
@@ -312,7 +318,7 @@
     <div class="group-label">Birth chart</div>
     <div class="group-card">
       <div class="wheel-box"><svg id="wheelSvg" viewBox="0 0 360 360" role="img" aria-label="Interactive natal chart wheel"></svg></div>
-      <div class="wheel-info" id="wheelInfo"><span class="wi-empty">Tap any planet to see its position and aspects.</span></div>
+      <div class="wheel-info" id="wheelInfo"><span class="wi-empty">Tap any planet — on the wheel or in the list below — to see its position and aspects.</span></div>
       <div class="key-strip">
         <span class="key-title">Aspect line color</span>
         <span class="key-item"><span class="key-dot" style="background:var(--as-conj)"></span>Conjunction</span>
@@ -329,18 +335,18 @@
   <section class="group" id="planets">
     <div class="group-label">Planetary positions</div>
     <div class="group-card">
-      <div class="row"><span class="p-sym">☉</span><div class="p-name">Sun<span class="p-note">Ray 2 match</span></div><span class="pill water">Pisces</span><span class="pill house">2nd</span><span class="p-deg">20°01'</span></div>
-      <div class="row"><span class="p-sym">☽</span><div class="p-name">Moon<span class="p-note">Esot. debilitated</span></div><span class="pill water">Pisces</span><span class="pill house">2nd</span><span class="p-deg">3°37'</span></div>
-      <div class="row"><span class="p-sym">☿</span><div class="p-name">Mercury<span class="p-note">Mind from the future</span></div><span class="pill air">Aquarius</span><span class="pill house">1st</span><span class="p-deg">24°08'</span></div>
-      <div class="row"><span class="p-sym">♀</span><div class="p-name">Venus<span class="p-note">Exot. debilitated; near 3rd cusp</span></div><span class="pill fire">Aries</span><span class="pill house">2nd</span><span class="p-deg">2°47'</span></div>
-      <div class="row"><span class="p-sym">♂</span><div class="p-name">Mars<span class="p-note">Ray 6 match</span></div><span class="pill water">Pisces</span><span class="pill house">2nd</span><span class="p-deg">2°39'</span></div>
-      <div class="row"><span class="p-sym">♃</span><div class="p-name">Jupiter</div><span class="pill water">Scorpio</span><span class="pill house">10th</span><span class="pill retro">℞</span><span class="p-deg">14°29'</span></div>
-      <div class="row"><span class="p-sym">♄</span><div class="p-name">Saturn</div><span class="pill water">Pisces</span><span class="pill house">2nd</span><span class="p-deg">4°54'</span></div>
-      <div class="row"><span class="p-sym">♅</span><div class="p-name">Uranus<span class="p-note">Ray 7 match</span></div><span class="pill earth">Capricorn</span><span class="pill house">12th</span><span class="p-deg">25°16'</span></div>
-      <div class="row"><span class="p-sym">♆</span><div class="p-name">Neptune<span class="p-note">Esot. &amp; hierarch. debilitated</span></div><span class="pill earth">Capricorn</span><span class="pill house">12th</span><span class="p-deg">22°47'</span></div>
-      <div class="row"><span class="p-sym">♇</span><div class="p-name">Pluto<span class="p-note">Domicile ✓ — dominant</span></div><span class="pill water">Scorpio</span><span class="pill house">10th</span><span class="pill retro">℞</span><span class="p-deg">28°02'</span></div>
-      <div class="row"><span class="p-sym">☊</span><div class="p-name">N. Node<span class="p-note">Karmic axis — public</span></div><span class="pill water">Scorpio</span><span class="pill house">10th</span><span class="pill retro">℞</span><span class="p-deg">27°27'</span></div>
-      <div class="row"><span class="p-sym">⚷</span><div class="p-name">Chiron<span class="p-note">Opp. Saturn 0°09'</span></div><span class="pill earth">Virgo</span><span class="pill house">8th</span><span class="p-deg">5°03'</span></div>
+      <div class="row tap" data-pl="0"><span class="p-sym">☉</span><div class="p-name">Sun<span class="p-note">Ray 2 match</span></div><span class="pill water">Pisces</span><span class="pill house">2nd</span><span class="p-deg">20°01'</span><span class="p-go">›</span></div>
+      <div class="row tap" data-pl="1"><span class="p-sym">☽</span><div class="p-name">Moon<span class="p-note">Esot. debilitated</span></div><span class="pill water">Pisces</span><span class="pill house">2nd</span><span class="p-deg">3°37'</span><span class="p-go">›</span></div>
+      <div class="row tap" data-pl="2"><span class="p-sym">☿</span><div class="p-name">Mercury<span class="p-note">Mind from the future</span></div><span class="pill air">Aquarius</span><span class="pill house">1st</span><span class="p-deg">24°08'</span><span class="p-go">›</span></div>
+      <div class="row tap" data-pl="3"><span class="p-sym">♀</span><div class="p-name">Venus<span class="p-note">Exot. debilitated; near 3rd cusp</span></div><span class="pill fire">Aries</span><span class="pill house">2nd</span><span class="p-deg">2°47'</span><span class="p-go">›</span></div>
+      <div class="row tap" data-pl="4"><span class="p-sym">♂</span><div class="p-name">Mars<span class="p-note">Ray 6 match</span></div><span class="pill water">Pisces</span><span class="pill house">2nd</span><span class="p-deg">2°39'</span><span class="p-go">›</span></div>
+      <div class="row tap" data-pl="5"><span class="p-sym">♃</span><div class="p-name">Jupiter</div><span class="pill water">Scorpio</span><span class="pill house">10th</span><span class="pill retro">℞</span><span class="p-deg">14°29'</span><span class="p-go">›</span></div>
+      <div class="row tap" data-pl="6"><span class="p-sym">♄</span><div class="p-name">Saturn</div><span class="pill water">Pisces</span><span class="pill house">2nd</span><span class="p-deg">4°54'</span><span class="p-go">›</span></div>
+      <div class="row tap" data-pl="7"><span class="p-sym">♅</span><div class="p-name">Uranus<span class="p-note">Ray 7 match</span></div><span class="pill earth">Capricorn</span><span class="pill house">12th</span><span class="p-deg">25°16'</span><span class="p-go">›</span></div>
+      <div class="row tap" data-pl="8"><span class="p-sym">♆</span><div class="p-name">Neptune<span class="p-note">Esot. &amp; hierarch. debilitated</span></div><span class="pill earth">Capricorn</span><span class="pill house">12th</span><span class="p-deg">22°47'</span><span class="p-go">›</span></div>
+      <div class="row tap" data-pl="9"><span class="p-sym">♇</span><div class="p-name">Pluto<span class="p-note">Domicile ✓ — dominant</span></div><span class="pill water">Scorpio</span><span class="pill house">10th</span><span class="pill retro">℞</span><span class="p-deg">28°02'</span><span class="p-go">›</span></div>
+      <div class="row tap" data-pl="10"><span class="p-sym">☊</span><div class="p-name">N. Node<span class="p-note">Karmic axis — public</span></div><span class="pill water">Scorpio</span><span class="pill house">10th</span><span class="pill retro">℞</span><span class="p-deg">27°27'</span><span class="p-go">›</span></div>
+      <div class="row tap" data-pl="11"><span class="p-sym">⚷</span><div class="p-name">Chiron<span class="p-note">Opp. Saturn 0°09'</span></div><span class="pill earth">Virgo</span><span class="pill house">8th</span><span class="p-deg">5°03'</span><span class="p-go">›</span></div>
       <div class="row"><span class="p-sym">↑</span><div class="p-name">ASC<span class="p-note">Fixed air rising</span></div><span class="pill air">Aquarius</span><span class="pill house">1st</span><span class="p-deg">1°54'</span></div>
       <div class="row"><span class="p-sym">⌖</span><div class="p-name">MC<span class="p-note">Fixed water vocation</span></div><span class="pill water">Scorpio</span><span class="pill house">10th</span><span class="p-deg">6°57'</span></div>
       <div class="key-strip">
@@ -611,12 +617,12 @@
   <!-- codes -->
   <section class="group" id="codes">
     <div class="group-label">Cheat codes — how to thrive</div>
-    <p class="group-intro">Operational wisdom derived directly from the chart's architecture. Not aspirational — structural. These are the things the chart is already trying to do; lu's job is to stop blocking them. Chips link to the evidence.</p>
+    <p class="group-intro">Operational wisdom derived directly from the chart's architecture. Not aspirational — structural. These are the things the chart is already trying to do; your job is to stop blocking them. Chips link to the evidence.</p>
     <div class="group-card">
 
       <div class="code">
         <div class="code-head"><span class="code-n">01</span><span class="code-title">The wound is the door. Stop trying to get past it.</span></div>
-        <div class="code-body">The 2nd house self-worth question is not in the way of the gifts — <strong>it is the mechanism through which the gifts arrive</strong>. Every time lu stays in the question "do I deserve this?" without flinching or resolving it prematurely, something unlocks. The practice is endurance, not resolution.</div>
+        <div class="code-body">The 2nd house self-worth question is not in the way of the gifts — <strong>it is the mechanism through which the gifts arrive</strong>. Every time you stay in the question "do I deserve this?" without flinching or resolving it prematurely, something unlocks. The practice is endurance, not resolution.</div>
         <div class="refs"><a class="ref" href="#power">2nd house 36.95%</a><a class="ref" href="#cfg-wound">Wound cluster</a></div>
       </div>
 
@@ -634,7 +640,7 @@
 
       <div class="code">
         <div class="code-head"><span class="code-n">04</span><span class="code-title">Taste is the Trojan horse. The depth rides in on the beauty.</span></div>
-        <div class="code-body">Venus trine Pluto means beauty and transformation are not competing values — <strong>beauty is the delivery mechanism for transformation</strong>. Venus sextile Ascendant means the aesthetic sense is how lu arrives in the world and is trusted on contact. The work can photograph beautifully and still rearrange something in the person encountering it. That's the point.</div>
+        <div class="code-body">Venus trine Pluto means beauty and transformation are not competing values — <strong>beauty is the delivery mechanism for transformation</strong>. Venus sextile Ascendant means the aesthetic sense is how you arrive in the world and are trusted on contact. The work can photograph beautifully and still rearrange something in the person encountering it. That's the point.</div>
         <div class="refs"><a class="ref" href="#aspects">Venus trine Pluto</a><a class="ref" href="#cfg-scorpio">Scorpio 10th</a></div>
       </div>
 
@@ -664,7 +670,7 @@
 
       <div class="code">
         <div class="code-head"><span class="code-n">09</span><span class="code-title">The grace is in acceptance, not effort.</span></div>
-        <div class="code-body">Sun trine Jupiter and Sun trine Pluto both activate when lu stops fighting the chart's fundamental nature. The expansion and the transformation are not obstacles — they are currents. When life intensifies, the cheat is: <strong>this is correct. Move with it.</strong> The grace comes through the intensity, not around it.</div>
+        <div class="code-body">Sun trine Jupiter and Sun trine Pluto both activate when you stop fighting the chart's fundamental nature. The expansion and the transformation are not obstacles — they are currents. When life intensifies, the cheat is: <strong>this is correct. Move with it.</strong> The grace comes through the intensity, not around it.</div>
         <div class="refs"><a class="ref" href="#aspects">Aspects 12 &amp; 17</a></div>
       </div>
 
@@ -683,18 +689,18 @@
     <p class="group-intro">Questions designed to stimulate interpretive dialogue. No single correct answer — invitations to explore the chart's tensions and gifts.</p>
     <div class="group-card">
       <div class="prompt"><span class="prompt-n">1</span><div class="prompt-body">With 36.95% of chart power in the 2nd house, self-worth is not one theme among many — it is the organizing field. How does this manifest at different life stages? At what point does the wound shift from operating as limitation to operating as gift — and what facilitates that shift in a chart so heavily weighted in Pisces (dissolution) combined with Saturn (structure)?</div></div>
-      <div class="prompt"><span class="prompt-n">2</span><div class="prompt-body">Zero oppositions, four Pluto squares. What does it mean for a chart to have no external screen for its tensions? How does this shape the quality of lu's relationships — particularly in light of Venus in Aries trine Pluto, which suggests love that seeks depth but may struggle with mutuality?</div></div>
+      <div class="prompt"><span class="prompt-n">2</span><div class="prompt-body">Zero oppositions, four Pluto squares. What does it mean for a chart to have no external screen for its tensions? How does this shape the quality of your relationships — particularly in light of Venus in Aries trine Pluto, which suggests love that seeks depth but may struggle with mutuality?</div></div>
       <div class="prompt"><span class="prompt-n">3</span><div class="prompt-body">The Scorpio 10th house cluster (Jupiter + Pluto + North Node, all retrograde) names depth work as the professional calling. What concrete domains might "the underworld" correspond to in contemporary life — and how does the Aquarius Ascendant (detached, systemic, future-oriented) serve as a vehicle for this Scorpionic vocation rather than contradicting it?</div></div>
       <div class="prompt"><span class="prompt-n">4</span><div class="prompt-body">The Moon is esoterically debilitated in Pisces, yet the Moon–Mars–Saturn stellium makes the emotional body one of the most active and structurally central features of the chart. How do these two conditions coexist? Is the debilitation a permanent constraint, or is it a developmental challenge — and what would its conscious resolution look like?</div></div>
-      <div class="prompt"><span class="prompt-n">5</span><div class="prompt-body">Uranus–Neptune in the 12th house suggests a vast interior spiritual life that may never be fully externalized. Yet the North Node calls lu into public life (10th house). How does this native reconcile the hermit and the public figure? Is hiddenness a developmental stage or a permanent structural feature of this chart?</div></div>
+      <div class="prompt"><span class="prompt-n">5</span><div class="prompt-body">Uranus–Neptune in the 12th house suggests a vast interior spiritual life that may never be fully externalized. Yet the North Node calls you into public life (10th house). How do you reconcile the hermit and the public figure? Is hiddenness a developmental stage or a permanent structural feature of this chart?</div></div>
       <div class="prompt"><span class="prompt-n">6</span><div class="prompt-body">Chiron in Virgo in the 8th house sits in near-exact opposition to Saturn in Pisces in the 2nd (0°09'). The recent Saturn return activated both poles of this axis simultaneously. How does the perfectionist wound (Chiron/Virgo) interact with the self-worth structure (Saturn/2nd) — and what does healing look like when the wound activates precisely at the threshold of intimacy?</div></div>
-      <div class="callout"><p><strong>For further inquiry:</strong> consider the tension between the Aquarius Ascendant (air, fixed, universalizing, detached) and the Pisces stellium (water, mutable, dissolving, personal). The Ascendant is how lu arrives in a room; Pisces is what happens inside. The question of how to be simultaneously oceanic and precise, feeling and systemic — this is the central developmental arc. Mercury in Aquarius in the 1st house may be the most important bridge: a mind that can hold complexity without losing its structure, in service of a soul that runs deeper than most containers can hold.</p></div>
+      <div class="callout"><p><strong>For further inquiry:</strong> consider the tension between the Aquarius Ascendant (air, fixed, universalizing, detached) and the Pisces stellium (water, mutable, dissolving, personal). The Ascendant is how you arrive in a room; Pisces is what happens inside. The question of how to be simultaneously oceanic and precise, feeling and systemic — this is the central developmental arc. Mercury in Aquarius in the 1st house may be the most important bridge: a mind that can hold complexity without losing its structure, in service of a soul that runs deeper than most containers can hold.</p></div>
     </div>
   </section>
 
   <!-- footer -->
   <footer class="footer">
-    lu · natal chart reference<br>
+    Natal chart reference<br>
     <span class="mono">11 Mar 1994 04:10 SGT · Singapore · Placidus · Tropical</span><br><br>
     Prepared for astrological discussion and education.<br>Interpretations are symbolic, not deterministic.
   </footer>
@@ -874,7 +880,7 @@
       var rt = el('text', { x: rp[0].toFixed(2), y: rp[1].toFixed(2), 'text-anchor': 'middle', 'dominant-baseline': 'central', 'font-size': '6', fill: '#FF3B30', 'font-weight': '700' });
       rt.textContent = '℞';
     }
-    var hit = el('circle', { cx: gp[0].toFixed(2), cy: gp[1].toFixed(2), r: '12', fill: 'transparent', 'class': 'pl-hit', 'data-i': i }, hits);
+    var hit = el('circle', { cx: gp[0].toFixed(2), cy: gp[1].toFixed(2), r: '14', fill: 'transparent', 'class': 'pl-hit', 'data-i': i }, hits);
   });
 
   /* interaction */
@@ -895,8 +901,11 @@
     svg.querySelectorAll('.sel-ring').forEach(function(r) {
       r.setAttribute('opacity', (+r.getAttribute('data-ring') === i) ? '1' : '0');
     });
+    document.querySelectorAll('.row.tap[data-pl]').forEach(function(r) {
+      r.classList.toggle('sel', +r.getAttribute('data-pl') === i);
+    });
     if (i < 0) {
-      info.innerHTML = '<span class="wi-empty">Tap any planet to see its position and aspects.</span>';
+      info.innerHTML = '<span class="wi-empty">Tap any planet — on the wheel or in the list below — to see its position and aspects.</span>';
       return;
     }
     var p = PLANETS[i];
@@ -927,6 +936,15 @@
   });
   svg.addEventListener('click', function(e) {
     if (!e.target.closest('.pl-hit')) select(-1);
+  });
+
+  /* planet list rows: select in wheel + scroll up to it */
+  document.querySelectorAll('.row.tap[data-pl]').forEach(function(r) {
+    r.addEventListener('click', function() {
+      var i = +r.getAttribute('data-pl');
+      document.getElementById('wheel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      select(i);
+    });
   });
 
   /* bar animation */
