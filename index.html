@@ -54,12 +54,19 @@
 
   /* header */
   .header {
-    position: sticky; top: 0; z-index: 10;
-    background: rgba(242,242,247,0.85);
-    -webkit-backdrop-filter: blur(12px);
-    backdrop-filter: blur(12px);
-    padding: calc(env(safe-area-inset-top) + 24px) 0 14px;
+    position: sticky; top: 0; z-index: 20;
+    background: rgba(247,247,250,0.68);
+    -webkit-backdrop-filter: blur(22px) saturate(180%);
+    backdrop-filter: blur(22px) saturate(180%);
+    padding: calc(env(safe-area-inset-top) + 24px) 20px 14px;
+    margin: 0 -20px;
+    border-bottom: 1px solid transparent;
+    transition: transform 0.32s cubic-bezier(0.16,1,0.3,1), border-color 0.25s ease;
+    will-change: transform;
   }
+  .header > * { max-width: 640px; margin-left: auto; margin-right: auto; }
+  .header.hidden { transform: translateY(-100%); }
+  .header.scrolled { border-bottom-color: rgba(0,0,0,0.06); }
   .header h1 { font-size: 22px; font-weight: 700; margin: 0; letter-spacing: -0.3px; }
   .header .sub { font-size: 13px; color: var(--subtle); margin-top: 3px; }
 
@@ -100,7 +107,12 @@
   .row + .row { border-top: 1px solid var(--hairline); }
 
   /* planets */
-  .p-sym { font-size: 17px; width: 24px; text-align: center; flex-shrink: 0; }
+  .p-sym {
+    font-size: 17px; width: 24px; height: 22px; flex-shrink: 0;
+    display: inline-flex; align-items: center; justify-content: center; line-height: 1;
+    font-family: 'Apple Symbols','Segoe UI Symbol','Noto Sans Symbols 2',sans-serif;
+    font-variant-emoji: text;
+  }
   .p-name { font-size: 15px; font-weight: 500; width: 74px; flex-shrink: 0; }
   .p-deg { font-family: var(--mono); font-size: 12px; color: var(--subtle); margin-left: auto; white-space: nowrap; }
   .p-note { font-size: 12px; color: var(--faint); display: block; margin-top: 2px; }
@@ -149,7 +161,7 @@
     background: var(--field); border: 1px solid var(--hairline); border-radius: 999px;
     padding: 7px 12px; cursor: pointer; transition: background 0.15s, border-color 0.15s, color 0.15s;
   }
-  .pp .g { font-size: 14px; line-height: 1; }
+  .pp .g { font-size: 14px; line-height: 1; font-family: 'Apple Symbols','Segoe UI Symbol','Noto Sans Symbols 2',sans-serif; font-variant-emoji: text; }
   .pp.on { background: rgba(0,122,255,0.10); border-color: rgba(0,122,255,0.4); color: var(--blue); }
   @media (max-width: 640px) {
     .planet-pills {
@@ -160,7 +172,7 @@
   }
   .wi-empty { font-size: 13px; color: var(--faint); }
   .wi-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-  .wi-glyph { font-size: 18px; }
+  .wi-glyph { font-size: 18px; font-family: 'Apple Symbols','Segoe UI Symbol','Noto Sans Symbols 2',sans-serif; font-variant-emoji: text; }
   .wi-name { font-size: 15px; font-weight: 600; }
   .wi-deg { font-family: var(--mono); font-size: 12px; color: var(--subtle); }
   .wi-asps { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
@@ -174,12 +186,6 @@
   .asp-line.lo { opacity: 0.07; }
   .asp-line.hi { opacity: 0.95; stroke-width: 1.7; }
   .pl-hit { cursor: pointer; }
-  .row.tap { cursor: pointer; }
-  .row.tap:hover { background: var(--field); }
-  .row.tap:active { background: #ECECEF; }
-  .row.tap.sel { background: rgba(0,122,255,0.06); box-shadow: inset 3px 0 0 var(--blue); }
-  .p-go { font-family: var(--mono); font-size: 16px; line-height: 1; color: var(--faint); margin-left: 10px; flex-shrink: 0; transition: color 0.12s, transform 0.12s; }
-  .row.tap:hover .p-go, .row.tap.sel .p-go { color: var(--blue); transform: translateX(2px); }
 
   /* cusps */
   .cusp-grid { display: grid; grid-template-columns: repeat(3, 1fr); }
@@ -348,7 +354,7 @@
     <div class="group-card">
       <div class="wheel-box"><svg id="wheelSvg" viewBox="0 0 360 360" role="img" aria-label="Interactive natal chart wheel"></svg></div>
       <div class="planet-pills" id="planetPills"></div>
-      <div class="wheel-info" id="wheelInfo"><span class="wi-empty">Tap any planet — on the wheel or in the list below — to see its position and aspects.</span></div>
+      <div class="wheel-info" id="wheelInfo"><span class="wi-empty">Tap any planet to see its position and aspects.</span></div>
       <div class="key-strip">
         <span class="key-title">Aspect line color</span>
         <span class="key-item"><span class="key-dot" style="background:var(--as-conj)"></span>Conjunction</span>
@@ -365,18 +371,18 @@
   <section class="group" id="planets">
     <div class="group-label">Planetary positions</div>
     <div class="group-card">
-      <div class="row tap" data-pl="0"><span class="p-sym">☉</span><div class="p-name">Sun<span class="p-note">Ray 2 match</span></div><span class="pill water">Pisces</span><span class="pill house">2nd</span><span class="p-deg">20°01'</span><span class="p-go">›</span></div>
-      <div class="row tap" data-pl="1"><span class="p-sym">☽</span><div class="p-name">Moon<span class="p-note">Esot. debilitated</span></div><span class="pill water">Pisces</span><span class="pill house">2nd</span><span class="p-deg">3°37'</span><span class="p-go">›</span></div>
-      <div class="row tap" data-pl="2"><span class="p-sym">☿</span><div class="p-name">Mercury<span class="p-note">Mind from the future</span></div><span class="pill air">Aquarius</span><span class="pill house">1st</span><span class="p-deg">24°08'</span><span class="p-go">›</span></div>
-      <div class="row tap" data-pl="3"><span class="p-sym">♀</span><div class="p-name">Venus<span class="p-note">Exot. debilitated; near 3rd cusp</span></div><span class="pill fire">Aries</span><span class="pill house">2nd</span><span class="p-deg">2°47'</span><span class="p-go">›</span></div>
-      <div class="row tap" data-pl="4"><span class="p-sym">♂</span><div class="p-name">Mars<span class="p-note">Ray 6 match</span></div><span class="pill water">Pisces</span><span class="pill house">2nd</span><span class="p-deg">2°39'</span><span class="p-go">›</span></div>
-      <div class="row tap" data-pl="5"><span class="p-sym">♃</span><div class="p-name">Jupiter</div><span class="pill water">Scorpio</span><span class="pill house">10th</span><span class="pill retro">℞</span><span class="p-deg">14°29'</span><span class="p-go">›</span></div>
-      <div class="row tap" data-pl="6"><span class="p-sym">♄</span><div class="p-name">Saturn</div><span class="pill water">Pisces</span><span class="pill house">2nd</span><span class="p-deg">4°54'</span><span class="p-go">›</span></div>
-      <div class="row tap" data-pl="7"><span class="p-sym">♅</span><div class="p-name">Uranus<span class="p-note">Ray 7 match</span></div><span class="pill earth">Capricorn</span><span class="pill house">12th</span><span class="p-deg">25°16'</span><span class="p-go">›</span></div>
-      <div class="row tap" data-pl="8"><span class="p-sym">♆</span><div class="p-name">Neptune<span class="p-note">Esot. &amp; hierarch. debilitated</span></div><span class="pill earth">Capricorn</span><span class="pill house">12th</span><span class="p-deg">22°47'</span><span class="p-go">›</span></div>
-      <div class="row tap" data-pl="9"><span class="p-sym">♇</span><div class="p-name">Pluto<span class="p-note">Domicile ✓ — dominant</span></div><span class="pill water">Scorpio</span><span class="pill house">10th</span><span class="pill retro">℞</span><span class="p-deg">28°02'</span><span class="p-go">›</span></div>
-      <div class="row tap" data-pl="10"><span class="p-sym">☊</span><div class="p-name">N. Node<span class="p-note">Karmic axis — public</span></div><span class="pill water">Scorpio</span><span class="pill house">10th</span><span class="pill retro">℞</span><span class="p-deg">27°27'</span><span class="p-go">›</span></div>
-      <div class="row tap" data-pl="11"><span class="p-sym">⚷</span><div class="p-name">Chiron<span class="p-note">Opp. Saturn 0°09'</span></div><span class="pill earth">Virgo</span><span class="pill house">8th</span><span class="p-deg">5°03'</span><span class="p-go">›</span></div>
+      <div class="row"><span class="p-sym">☉</span><div class="p-name">Sun<span class="p-note">Ray 2 match</span></div><span class="pill water">Pisces</span><span class="pill house">2nd</span><span class="p-deg">20°01'</span></div>
+      <div class="row"><span class="p-sym">☽</span><div class="p-name">Moon<span class="p-note">Esot. debilitated</span></div><span class="pill water">Pisces</span><span class="pill house">2nd</span><span class="p-deg">3°37'</span></div>
+      <div class="row"><span class="p-sym">☿</span><div class="p-name">Mercury<span class="p-note">Mind from the future</span></div><span class="pill air">Aquarius</span><span class="pill house">1st</span><span class="p-deg">24°08'</span></div>
+      <div class="row"><span class="p-sym">♀</span><div class="p-name">Venus<span class="p-note">Exot. debilitated; near 3rd cusp</span></div><span class="pill fire">Aries</span><span class="pill house">2nd</span><span class="p-deg">2°47'</span></div>
+      <div class="row"><span class="p-sym">♂</span><div class="p-name">Mars<span class="p-note">Ray 6 match</span></div><span class="pill water">Pisces</span><span class="pill house">2nd</span><span class="p-deg">2°39'</span></div>
+      <div class="row"><span class="p-sym">♃</span><div class="p-name">Jupiter</div><span class="pill water">Scorpio</span><span class="pill house">10th</span><span class="pill retro">℞</span><span class="p-deg">14°29'</span></div>
+      <div class="row"><span class="p-sym">♄</span><div class="p-name">Saturn</div><span class="pill water">Pisces</span><span class="pill house">2nd</span><span class="p-deg">4°54'</span></div>
+      <div class="row"><span class="p-sym">♅</span><div class="p-name">Uranus<span class="p-note">Ray 7 match</span></div><span class="pill earth">Capricorn</span><span class="pill house">12th</span><span class="p-deg">25°16'</span></div>
+      <div class="row"><span class="p-sym">♆</span><div class="p-name">Neptune<span class="p-note">Esot. &amp; hierarch. debilitated</span></div><span class="pill earth">Capricorn</span><span class="pill house">12th</span><span class="p-deg">22°47'</span></div>
+      <div class="row"><span class="p-sym">♇</span><div class="p-name">Pluto<span class="p-note">Domicile ✓ — dominant</span></div><span class="pill water">Scorpio</span><span class="pill house">10th</span><span class="pill retro">℞</span><span class="p-deg">28°02'</span></div>
+      <div class="row"><span class="p-sym">☊</span><div class="p-name">N. Node<span class="p-note">Karmic axis — public</span></div><span class="pill water">Scorpio</span><span class="pill house">10th</span><span class="pill retro">℞</span><span class="p-deg">27°27'</span></div>
+      <div class="row"><span class="p-sym">⚷</span><div class="p-name">Chiron<span class="p-note">Opp. Saturn 0°09'</span></div><span class="pill earth">Virgo</span><span class="pill house">8th</span><span class="p-deg">5°03'</span></div>
       <div class="row"><span class="p-sym">↑</span><div class="p-name">ASC<span class="p-note">Fixed air rising</span></div><span class="pill air">Aquarius</span><span class="pill house">1st</span><span class="p-deg">1°54'</span></div>
       <div class="row"><span class="p-sym">⌖</span><div class="p-name">MC<span class="p-note">Fixed water vocation</span></div><span class="pill water">Scorpio</span><span class="pill house">10th</span><span class="p-deg">6°57'</span></div>
       <div class="key-strip">
@@ -933,14 +939,11 @@
     svg.querySelectorAll('.sel-ring').forEach(function(r) {
       r.setAttribute('opacity', (+r.getAttribute('data-ring') === i) ? '1' : '0');
     });
-    document.querySelectorAll('.row.tap[data-pl]').forEach(function(r) {
-      r.classList.toggle('sel', +r.getAttribute('data-pl') === i);
-    });
     document.querySelectorAll('.pp').forEach(function(b) {
       b.classList.toggle('on', +b.getAttribute('data-i') === i);
     });
     if (i < 0) {
-      info.innerHTML = '<span class="wi-empty">Tap any planet — on the wheel or in the list below — to see its position and aspects.</span>';
+      info.innerHTML = '<span class="wi-empty">Tap any planet to see its position and aspects.</span>';
       return;
     }
     var p = PLANETS[i];
@@ -1004,14 +1007,21 @@
     pillsBox.appendChild(b);
   });
 
-  /* planet list rows: select in wheel + scroll up to it */
-  document.querySelectorAll('.row.tap[data-pl]').forEach(function(r) {
-    r.addEventListener('click', function() {
-      var i = +r.getAttribute('data-pl');
-      document.getElementById('wheel').scrollIntoView({ behavior: 'smooth', block: 'start' });
-      select(i);
-    });
-  });
+
+  /* header: hide on scroll down, reveal on scroll up */
+  (function() {
+    var header = document.querySelector('.header');
+    if (!header) return;
+    var lastY = window.pageYOffset;
+    window.addEventListener('scroll', function() {
+      var y = window.pageYOffset;
+      header.classList.toggle('scrolled', y > 4);
+      if (y < 64) { header.classList.remove('hidden'); }
+      else if (y - lastY > 6) { header.classList.add('hidden'); }
+      else if (lastY - y > 6) { header.classList.remove('hidden'); }
+      lastY = y;
+    }, { passive: true });
+  })();
 
   /* bar animation */
   document.addEventListener('DOMContentLoaded', function() {
