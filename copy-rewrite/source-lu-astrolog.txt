@@ -1,0 +1,120 @@
+Lu's astro.com "delineated Walter Pullen" (Astrolog 7.80) output, pasted 2026-10-02.
+Only the sections the rewrite uses are kept here. Left out on purpose: midpoints, astro-map line crossings,
+Arabic parts, planetary moons, rise/set times, the monthly ephemeris, the esoteric ray section and the
+Mean/True node raw tables. The original paste had them; they're out of scope for hobbyist copy.
+
+NOTE: Chiron is NOT in this output. Chiron 5°03' Virgo, 8th house, opposite Saturn 0°09' comes from the
+older lu-chart.html. Ask the user where Chiron comes from before building new charts.
+
+==== BODIES (sign + house delineations) ====
+
+Sun in Pisces and 2nd House: lu's spirit, ego, image of self, and sense of aliveness is imaginative, other
+  worldly, impressionable, and seeks transcendence of self. Most often this manifests in the area of life
+  dealing with self image, self worth, and material security.
+Moon in Pisces and 2nd House: lu's emotional nature, moods, feelings, and caring tendencies is very
+  imaginative, other worldly, impressionable, and seeks transcendence of self. Most often this manifests in
+  the area of life dealing with self image, self worth, and material security.
+Mercury in Aquarius and 1st House: lu's thoughts, intellect, and communicative activity is progressive,
+  erratic, revolutionary, idealistic, humanitarian, inventive, and desires individuality. Most often this
+  manifests in the area of life dealing with establishment of personal identity.
+Venus in Aries and 2nd House: lu's creativity, tendencies for affection and calmness, and relationship needs
+  is very forceful, energetic, direct, courageous, and seeks adventure and challenge. Most often this
+  manifests in the area of life dealing with self image, self worth, and material security. This bit plays
+  only a minor part in their psyche.
+Mars in Pisces and 2nd House: lu's will, energy, activity, and aggressive, assertive tendencies is very
+  imaginative, other worldly, impressionable, and seeks transcendence of self. Most often this manifests in
+  the area of life dealing with self image, self worth, and material security.
+Retrograde Jupiter in Scorpio and 10th House: lu's enthusiastic, faithful, wise, expansive, spontaneous
+  nature is penetrating, suspicious, introspective, and desires to transform and remove outer masks. Most
+  often this manifests in an independent, backward, introverted manner, and in the area of life dealing with
+  career, social stature, and destiny.
+Saturn in Pisces and 2nd House: lu's part of mind that is disciplined, respectful, and solitary is very
+  imaginative, other worldly, impressionable, and seeks transcendence of self. Most often this manifests in
+  the area of life dealing with self image, self worth, and material security.
+Uranus in Capricorn and 12th House: lu's individuality, desires for change, and tendency to go against social
+  norms is industrious, practical, disciplined, and works for solitude and personal integrity. Most often
+  this manifests in the area of life dealing with things that disrupt or cause disassociation with the
+  personality.
+Neptune in Capricorn and 12th House: lu's intuitive, spiritual, compassionate, psychic nature is industrious,
+  practical, disciplined, and works for solitude and personal integrity. Most often this manifests in the
+  area of life dealing with things that disrupt or cause disassociation with the personality. It is
+  difficult for them to express this part of themselves.
+Retrograde Pluto in Scorpio and 10th House: lu's destiny, and capacity to transform the self and the outer
+  world is penetrating, suspicious, introspective, and desires to transform and remove outer masks. Most
+  often this manifests in an independent, backward, introverted manner, and in the area of life dealing with
+  career, social stature, and destiny. This is a major part of their psyche!
+Retrograde North Node in Scorpio and 10th House: lu's karmic goals, and best direction of evolutionary growth
+  is penetrating, suspicious, introspective, and desires to transform and remove outer masks. Most often
+  this manifests in the area of life dealing with career, social stature, and destiny.
+Ascendant in Aquarius and 1st House: lu's personality and outward appearance, as projected to the world is
+  very progressive, erratic, revolutionary, idealistic, humanitarian, inventive, and desires individuality.
+  Most often this manifests in the area of life dealing with establishment of personal identity. It is
+  difficult for them to express this part of themselves.
+Midheaven in Scorpio and 10th House: lu's view as seen in the eyes of others, reputation, and social standing
+  is very penetrating, suspicious, introspective, and desires to transform and remove outer masks. Most often
+  this manifests in the area of life dealing with career, social stature, and destiny. It is difficult for
+  them to express this part of themselves.
+
+==== CHART (Placidus, tropical, geocentric) ====
+Fri 11 Mar 1994 4:10:00, Singapore, Zone h8e, 103:51'00E 1:16'00N
+Cusps: 1 1Aqu54'42" · 2 2Pis29'31" · 3 5Ari03'00" · 4 6Tau57'37" · 5 6Gem19'22" · 6 3Can54'19"
+       7 1Leo54'42" · 8 2Vir29'31" · 9 5Lib03'00" · 10 6Sco57'37" · 11 6Sag19'22" · 12 3Cap54'19"
+Positions: Sun 20Pis01'27" (2) · Moon 3Pis37'38" (2) · Mercury 24Aqu08'52" (1) · Venus 2Ari47'06" (2)
+           Mars 2Pis39'34" (2) · Jupiter 14Sco29'27" R (10) · Saturn 4Pis54'36" (2)
+           Uranus 25Cap16'52" (12) · Neptune 22Cap47'19" (12) · Pluto 28Sco02'50" R (10)
+           North Node 27Sco27'05" R (10)
+Stellium-3 with Moon 3Pis37, Mercury 24Aqu08, Mars 2Pis39
+Stellium-3 with Moon 3Pis37, Mars 2Pis39, Saturn 4Pis54
+
+==== ASPECTS, ranked by power (Astrolog's own list) ====
+ 1 Uranus Con Neptune  (orb 2°29')  power 84.46
+ 2 Uranus Sex Pluto    (2°45')      40.42
+ 3 Mars Con Saturn     (2°15')      33.90
+ 4 Saturn Squ Pluto    (6°51')      27.45
+ 5 Mars Squ Pluto      (4°36')      26.94
+ 6 Mercury Squ Pluto   (3°53')      12.20
+ 7 Neptune Sex Pluto   (5°15')      10.42
+ 8 Sun Sex Neptune     (2°45')      10.21
+ 9 Venus Tri Pluto     (4°44')       8.88
+10 Moon Con Saturn     (1°16')       7.73
+11 Sun Tri Jupiter     (5°31')       5.59
+12 Sun Tri Pluto       (8°01')       5.07
+13 Moon Squ Pluto      (5°34')       4.93
+14 Moon Con Mars       (0°58')       4.56
+15 Sun Sex Uranus      (5°15')       3.73
+16 Jupiter Tri Saturn  (9°34')       1.65
+17 Mercury Con Mars    (8°30')       1.49
+18 Mercury Squ Jupiter (9°39')       0.41
+19 Moon Con Mercury    (9°28')       0.28
+20 Moon Tri Jupiter    (10°51')      0.06
+Counts: Con 6 · Opp 0 · Squ 5 · Tri 5 · Sex 4
+Aspects per body: Sun 4 · Moon 5 · Mercury 4 · Venus 1 · Mars 4 · Jupiter 4 · Saturn 4 · Uranus 3 · Neptune 3
+                  Pluto 8 · North Node 0 · Asc 0 · MC 0
+
+Astrolog's one-line aspect delineations follow one template:
+  Conjunct: "X is (always/somewhat) connected and fused together with Y. Both parts are prominent in their psyche."
+  Trine:    "X is (somewhat) in harmony with Y."
+  Sextile:  "X has (some) opportunity for growth, exchange, and harmony in relation with Y."
+  Square:   "X is (somewhat) in conflict with Y. Adaptation is required by both sides."
+Planet phrases it plugs in:
+  Sun = spirit, ego, image of self, and sense of aliveness · Moon = emotional nature, moods, feelings, and caring
+  tendencies · Mercury = thoughts, intellect, and communicative activity · Venus = creativity, tendencies for
+  affection and calmness, and relationship needs · Mars = will, energy, activity, and aggressive, assertive
+  tendencies · Jupiter = enthusiastic, faithful, wise, expansive, spontaneous nature · Saturn = part of mind that
+  is disciplined, respectful, and solitary · Uranus = individuality, desires for change, and tendency to go against
+  social norms · Neptune = intuitive, spiritual, compassionate, psychic nature · Pluto = destiny, and capacity to
+  transform the self and the outer world · North Node = karmic goals, and best direction of evolutionary growth
+
+==== POWER TABLES ====
+Planet power (position + aspects = total, rank, %):
+  Sun 44.7 (10) 5.50% · Moon 53.4 (8) 6.56% · Mercury 40.1 (11) 4.93% · Venus 75.7 (6) 9.31%
+  Mars 79.8 (5) 9.82% · Jupiter 82.2 (3) 10.11% · Saturn 81.1 (4) 9.98% · Uranus 55.2 (7) 6.79%
+  Neptune 86.6 (2) 10.66% · Pluto 107.1 (1) 13.17% · North Node 22.0 (13) 2.71%
+  Ascendant 45.0 (9) 5.54% · Midheaven 40.0 (12) 4.92%
+Sign power: Scorpio 23.58% (1) · Pisces 23.31% (2) · Capricorn 13.96% (3) · Aquarius 11.96% (4)
+  Aries 9.97% (5) · Sagittarius 3.44% · Taurus 3.16% · Libra 3.16% · Cancer 2.23% · Leo 1.87%
+  Gemini 1.68% · Virgo 1.68%
+Element: Fire 15.27% · Earth 18.81% · Air 16.80% · Water 49.12%
+Mode: Cardinal 29.33% · Fixed 40.57% · Mutable 30.10%
+House power: 2nd 36.95% (1) · 10th 28.00% (2) · 12th 16.28% (3) · 1st 10.19% (4) · every other house 1.07%
+House mode: Angular 40.34% · Succedent 40.16% · Cadent 19.50%

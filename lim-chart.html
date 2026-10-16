@@ -1,0 +1,2046 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Astrological Chart — lim</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* ── Reset & Base ── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #0a0e1a;
+    --bg2:       #0f1525;
+    --bg3:       #141c30;
+    --card:      #111827;
+    --card2:     #162035;
+    --gold:      #c9a84c;
+    --gold-dim:  #8a6f32;
+    --gold-glow: rgba(201,168,76,0.15);
+    --purple:    #7b5ea7;
+    --purple-dim:#4a3970;
+    --teal:      #4ecdc4;
+    --teal-dim:  #2a7a76;
+    --text:      #dde4f0;
+    --text-dim:  #8a9ab8;
+    --border:    rgba(201,168,76,0.18);
+    --border2:   rgba(255,255,255,0.06);
+    --conjunct:  #c9a84c;
+    --trine:     #4caf78;
+    --sextile:   #5aaddf;
+    --square:    #e06a5a;
+    --oppose:    #9b6de0;
+    --water:     #4ecdc4;
+    --earth:     #8bc34a;
+    --air:       #aec6e8;
+    --fire:      #f4845f;
+    --cardinal:  #c9a84c;
+    --fixed:     #9b6de0;
+    --mutable:   #4ecdc4;
+    --r1: #e06a5a;
+    --r3: #aec6e8;
+    --r7: #c9a84c;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* ── Starfield background ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image:
+      radial-gradient(1px 1px at 12% 8%,  rgba(255,255,255,0.7) 0%, transparent 100%),
+      radial-gradient(1px 1px at 28% 22%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 43% 5%,  rgba(255,255,255,0.6) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 57% 18%,rgba(201,168,76,0.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 71% 33%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 88% 11%, rgba(255,255,255,0.7) 0%, transparent 100%),
+      radial-gradient(1px 1px at 6%  47%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 19% 61%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 34% 77%,rgba(78,205,196,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 52% 55%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 65% 70%, rgba(255,255,255,0.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 80% 52%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 93% 67%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 7%  83%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 23% 91%,rgba(123,94,167,0.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 46% 88%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 59% 94%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 75% 85%, rgba(255,255,255,0.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 91% 79%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(2px 2px at 38% 42%, rgba(201,168,76,0.4) 0%, transparent 100%);
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(ellipse 80% 60% at 20% 20%, rgba(123,94,167,0.06) 0%, transparent 70%),
+      radial-gradient(ellipse 60% 40% at 80% 80%, rgba(78,205,196,0.05) 0%, transparent 70%),
+      radial-gradient(ellipse 100% 50% at 50% 100%, rgba(10,14,26,0.8) 0%, transparent 100%);
+  }
+
+  /* ── Layout ── */
+  .page-wrap {
+    position: relative;
+    z-index: 1;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+
+  /* ── Section cards ── */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem 2.2rem;
+    margin-bottom: 2rem;
+    box-shadow:
+      0 4px 24px rgba(0,0,0,0.5),
+      inset 0 1px 0 rgba(255,255,255,0.04);
+    backdrop-filter: blur(4px);
+  }
+
+  .card-inner {
+    background: var(--card2);
+    border: 1px solid var(--border2);
+    border-radius: 8px;
+    padding: 1.4rem 1.6rem;
+  }
+
+  /* ── Typography ── */
+  h1, h2, h3, h4 { font-family: 'Cinzel', serif; letter-spacing: 0.04em; }
+
+  .section-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    opacity: 0.7;
+    margin-bottom: 0.4rem;
+  }
+
+  .section-title {
+    font-family: 'Cinzel', serif;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--gold);
+    margin-bottom: 1.4rem;
+    padding-bottom: 0.7rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .section-title .icon {
+    font-size: 1rem;
+    opacity: 0.8;
+  }
+
+  /* ── Chart Header ── */
+  .chart-header {
+    text-align: center;
+    padding: 3rem 2rem;
+    background: linear-gradient(160deg, #0f1a30 0%, #0a0e1a 60%, #101828 100%);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .chart-header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 70% 60% at 50% -10%, rgba(201,168,76,0.12) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 30% at 80% 110%, rgba(123,94,167,0.1) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .chart-name {
+    font-family: 'Cinzel', serif;
+    font-size: 3.5rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, #e8c96a 0%, #c9a84c 40%, #a07c38 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 0.3rem;
+    position: relative;
+  }
+
+  .chart-subtitle {
+    font-family: 'Cinzel', serif;
+    font-size: 0.9rem;
+    color: var(--text-dim);
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    margin-bottom: 2rem;
+    position: relative;
+  }
+
+  .chart-meta-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    max-width: 800px;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  .meta-item {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border2);
+    border-radius: 8px;
+    padding: 0.9rem 1.1rem;
+    text-align: left;
+  }
+
+  .meta-label {
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gold);
+    opacity: 0.7;
+    margin-bottom: 0.3rem;
+  }
+
+  .meta-value {
+    font-size: 0.88rem;
+    color: var(--text);
+    font-weight: 400;
+  }
+
+  /* ── Tables ── */
+  .styled-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+  }
+
+  .styled-table thead th {
+    font-family: 'Cinzel', serif;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold);
+    background: rgba(201,168,76,0.08);
+    padding: 0.8rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .styled-table tbody tr {
+    border-bottom: 1px solid var(--border2);
+    transition: background 0.15s;
+  }
+
+  .styled-table tbody tr:nth-child(even) {
+    background: rgba(255,255,255,0.018);
+  }
+
+  .styled-table tbody tr:hover {
+    background: rgba(201,168,76,0.05);
+  }
+
+  .styled-table tbody td {
+    padding: 0.7rem 1rem;
+    color: var(--text);
+    vertical-align: middle;
+  }
+
+  .planet-name {
+    font-weight: 600;
+    color: var(--gold);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .planet-symbol {
+    font-size: 1.1rem;
+    opacity: 0.9;
+  }
+
+  .sign-badge {
+    display: inline-block;
+    padding: 0.15rem 0.55rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: rgba(123,94,167,0.2);
+    color: #b49ee0;
+    border: 1px solid rgba(123,94,167,0.3);
+  }
+
+  .retro-badge {
+    display: inline-block;
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    background: rgba(224,106,90,0.15);
+    color: #e06a5a;
+    border: 1px solid rgba(224,106,90,0.3);
+    letter-spacing: 0.05em;
+  }
+
+  .house-num {
+    font-weight: 600;
+    color: var(--teal);
+  }
+
+  /* ── Power Bar Chart ── */
+  .power-bar-row {
+    display: grid;
+    grid-template-columns: 130px 1fr 70px;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.45rem 0;
+    border-bottom: 1px solid var(--border2);
+  }
+
+  .power-bar-row:last-child { border-bottom: none; }
+
+  .power-bar-label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .power-rank {
+    font-size: 0.65rem;
+    color: var(--gold);
+    font-weight: 700;
+    background: rgba(201,168,76,0.1);
+    border: 1px solid rgba(201,168,76,0.2);
+    border-radius: 3px;
+    padding: 0.05rem 0.3rem;
+    min-width: 22px;
+    text-align: center;
+  }
+
+  .power-bar-track {
+    background: rgba(255,255,255,0.05);
+    border-radius: 3px;
+    height: 8px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .power-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    background: linear-gradient(90deg, var(--gold-dim) 0%, var(--gold) 100%);
+    box-shadow: 0 0 6px rgba(201,168,76,0.4);
+    transition: width 0.8s ease;
+  }
+
+  .power-bar-value {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--gold);
+    text-align: right;
+  }
+
+  /* ── Element/Mode Donut ── */
+  .balance-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+
+  @media (max-width: 600px) {
+    .balance-grid { grid-template-columns: 1fr; }
+  }
+
+  .balance-section h4 {
+    font-family: 'Cinzel', serif;
+    font-size: 0.85rem;
+    color: var(--gold);
+    margin-bottom: 1rem;
+    letter-spacing: 0.08em;
+  }
+
+  .donut-wrap {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .donut-legend {
+    flex: 1;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .legend-label {
+    font-size: 0.8rem;
+    color: var(--text);
+    flex: 1;
+  }
+
+  .legend-pct {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-dim);
+  }
+
+  /* ── Sign Emphasis ── */
+  .sign-bar-row {
+    display: grid;
+    grid-template-columns: 110px 1fr 90px 60px;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.45rem 0;
+    border-bottom: 1px solid var(--border2);
+  }
+
+  .sign-bar-row:last-child { border-bottom: none; }
+
+  .sign-bar-label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--purple);
+  }
+
+  .sign-bar-fill {
+    height: 8px;
+    border-radius: 3px;
+    background: linear-gradient(90deg, var(--purple-dim) 0%, var(--purple) 100%);
+    box-shadow: 0 0 5px rgba(123,94,167,0.4);
+  }
+
+  .sign-bar-power {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text);
+    text-align: right;
+  }
+
+  .sign-bar-pct {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    text-align: right;
+  }
+
+  /* ── Aspects ── */
+  .aspect-row {
+    display: grid;
+    grid-template-columns: 30px 1fr 90px 70px 80px;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.55rem 0.6rem;
+    border-radius: 6px;
+    margin-bottom: 0.3rem;
+    border: 1px solid transparent;
+    transition: background 0.15s;
+  }
+
+  .aspect-row:hover {
+    background: rgba(255,255,255,0.025);
+    border-color: var(--border2);
+  }
+
+  .aspect-num {
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    font-weight: 600;
+    text-align: center;
+  }
+
+  .aspect-planets {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .aspect-type-badge {
+    display: inline-block;
+    padding: 0.18rem 0.55rem;
+    border-radius: 4px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .asp-conjunct { background: rgba(201,168,76,0.15); color: var(--conjunct); border: 1px solid rgba(201,168,76,0.3); }
+  .asp-trine    { background: rgba(76,175,120,0.15); color: var(--trine);    border: 1px solid rgba(76,175,120,0.3); }
+  .asp-sextile  { background: rgba(90,173,223,0.15); color: var(--sextile);  border: 1px solid rgba(90,173,223,0.3); }
+  .asp-square   { background: rgba(224,106,90,0.15); color: var(--square);   border: 1px solid rgba(224,106,90,0.3); }
+  .asp-oppose   { background: rgba(155,109,224,0.15);color: var(--oppose);   border: 1px solid rgba(155,109,224,0.3); }
+
+  .aspect-orb {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .aspect-power {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--text);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Power bar mini inside aspect */
+  .aspect-power-bar {
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(255,255,255,0.05);
+    margin-top: 3px;
+    overflow: hidden;
+  }
+
+  .aspect-power-fill {
+    height: 100%;
+    border-radius: 2px;
+    background: linear-gradient(90deg, #4a3970 0%, var(--purple) 100%);
+  }
+
+  /* ── Grand Config ── */
+  .grand-config-card {
+    background: rgba(78,205,196,0.05);
+    border: 1px solid rgba(78,205,196,0.2);
+    border-radius: 10px;
+    padding: 1.2rem 1.5rem;
+    margin-bottom: 1rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .grand-config-card::before {
+    content: '';
+    position: absolute;
+    top: -30px;
+    right: -30px;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(78,205,196,0.1) 0%, transparent 70%);
+  }
+
+  .grand-config-title {
+    font-family: 'Cinzel', serif;
+    font-size: 1rem;
+    color: var(--teal);
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+  }
+
+  .grand-config-planets {
+    font-size: 0.88rem;
+    color: var(--text);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .config-planet {
+    background: rgba(78,205,196,0.1);
+    border: 1px solid rgba(78,205,196,0.25);
+    border-radius: 6px;
+    padding: 0.2rem 0.6rem;
+    font-size: 0.82rem;
+    color: var(--teal);
+    font-weight: 600;
+  }
+
+  .config-arrow {
+    color: var(--text-dim);
+    font-size: 0.9rem;
+  }
+
+  .grand-config-note {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    font-style: italic;
+  }
+
+  /* ── Story Cards ── */
+  .stories-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 1.2rem;
+  }
+
+  .story-card {
+    background: var(--card2);
+    border: 1px solid var(--border2);
+    border-radius: 10px;
+    padding: 1.3rem 1.5rem;
+    border-left: 3px solid var(--gold);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .story-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+  }
+
+  .story-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.02) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .story-card.border-pluto   { border-left-color: #9b6de0; }
+  .story-card.border-water   { border-left-color: #4ecdc4; }
+  .story-card.border-saturn  { border-left-color: #8bc34a; }
+  .story-card.border-aries   { border-left-color: #e06a5a; }
+  .story-card.border-cap     { border-left-color: #aec6e8; }
+  .story-card.border-8th     { border-left-color: #c9a84c; }
+  .story-card.border-mars    { border-left-color: #e06a5a; }
+  .story-card.border-pisces  { border-left-color: #4ecdc4; }
+  .story-card.border-ray7    { border-left-color: #c9a84c; }
+  .story-card.border-jupiter { border-left-color: #8bc34a; }
+
+  .story-num {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    opacity: 0.6;
+    margin-bottom: 0.4rem;
+  }
+
+  .story-title {
+    font-family: 'Cinzel', serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 0.7rem;
+    line-height: 1.4;
+  }
+
+  .story-body {
+    font-size: 0.83rem;
+    color: var(--text-dim);
+    line-height: 1.65;
+  }
+
+  /* ── Ray Summary ── */
+  .ray-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .ray-item {
+    background: rgba(123,94,167,0.07);
+    border: 1px solid rgba(123,94,167,0.2);
+    border-radius: 8px;
+    padding: 0.9rem 1.1rem;
+  }
+
+  .ray-item-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--purple);
+    margin-bottom: 0.5rem;
+  }
+
+  .ray-pcts {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .ray-pct-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .ray-badge {
+    font-size: 0.72rem;
+    font-weight: 800;
+    padding: 0.1rem 0.4rem;
+    border-radius: 3px;
+    min-width: 28px;
+    text-align: center;
+  }
+
+  .ray-1 { background: rgba(224,106,90,0.2); color: #e06a5a; border: 1px solid rgba(224,106,90,0.3); }
+  .ray-3 { background: rgba(174,198,232,0.15); color: #aec6e8; border: 1px solid rgba(174,198,232,0.3); }
+  .ray-4 { background: rgba(78,205,196,0.15); color: #4ecdc4; border: 1px solid rgba(78,205,196,0.3); }
+  .ray-5 { background: rgba(76,175,120,0.15); color: #4caf78; border: 1px solid rgba(76,175,120,0.3); }
+  .ray-7 { background: rgba(201,168,76,0.15); color: #c9a84c; border: 1px solid rgba(201,168,76,0.3); }
+
+  .ray-pct-bar {
+    flex: 1;
+    height: 5px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .ray-pct-fill {
+    height: 100%;
+    border-radius: 3px;
+  }
+
+  .ray-pct-val {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-dim);
+    min-width: 32px;
+    text-align: right;
+  }
+
+  /* ── Key Themes ── */
+  .theme-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-top: 1rem;
+  }
+
+  .theme-pill {
+    padding: 0.35rem 0.9rem;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+  }
+
+  .pill-r7 { background: rgba(201,168,76,0.12); color: var(--gold); border: 1px solid rgba(201,168,76,0.3); }
+  .pill-r1 { background: rgba(224,106,90,0.12); color: #e06a5a; border: 1px solid rgba(224,106,90,0.3); }
+  .pill-r3 { background: rgba(174,198,232,0.1); color: #aec6e8; border: 1px solid rgba(174,198,232,0.25); }
+
+  /* ── Notable Features ── */
+  .feature-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .feature-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.7rem;
+    font-size: 0.88rem;
+    color: var(--text);
+    padding: 0.5rem 0.6rem;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    transition: background 0.15s;
+  }
+
+  .feature-list li:hover {
+    background: rgba(255,255,255,0.025);
+    border-color: var(--border2);
+  }
+
+  .feature-list li::before {
+    content: '◆';
+    color: var(--gold);
+    font-size: 0.55rem;
+    margin-top: 0.35rem;
+    flex-shrink: 0;
+  }
+
+  /* ── Discussion Prompts ── */
+  .prompt-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    counter-reset: prompt-counter;
+  }
+
+  .prompt-list li {
+    counter-increment: prompt-counter;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1rem 1.2rem;
+    background: rgba(123,94,167,0.06);
+    border: 1px solid rgba(123,94,167,0.15);
+    border-radius: 8px;
+    font-size: 0.88rem;
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  .prompt-list li::before {
+    content: counter(prompt-counter);
+    font-family: 'Cinzel', serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--purple);
+    background: rgba(123,94,167,0.15);
+    border: 1px solid rgba(123,94,167,0.3);
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 0.1rem;
+  }
+
+  /* ── Divider ── */
+  .gold-divider {
+    width: 60px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    margin: 1.2rem 0;
+  }
+
+  /* ── House Cusps Grid ── */
+  .cusps-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 0.7rem;
+  }
+
+  .cusp-item {
+    background: rgba(255,255,255,0.025);
+    border: 1px solid var(--border2);
+    border-radius: 8px;
+    padding: 0.7rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  .cusp-house {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--teal);
+  }
+
+  .cusp-deg {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text);
+    font-family: 'Cinzel', serif;
+    letter-spacing: 0.03em;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 768px) {
+    .chart-name { font-size: 2.4rem; }
+    .card { padding: 1.4rem 1.2rem; }
+    .stories-grid { grid-template-columns: 1fr; }
+    .aspect-row { grid-template-columns: 24px 1fr 70px 55px; }
+    .aspect-power { display: none; }
+    .styled-table thead th,
+    .styled-table tbody td { padding: 0.55rem 0.6rem; font-size: 0.8rem; }
+  }
+
+  /* ── TOC Nav ── */
+  .toc {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem 2rem;
+    margin-bottom: 2rem;
+  }
+
+  .toc-title {
+    font-family: 'Cinzel', serif;
+    font-size: 0.85rem;
+    color: var(--gold);
+    letter-spacing: 0.1em;
+    margin-bottom: 0.9rem;
+    text-transform: uppercase;
+  }
+
+  .toc-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 0.35rem;
+    list-style: none;
+  }
+
+  .toc-list li a {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    text-decoration: none;
+    transition: color 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .toc-list li a:hover { color: var(--gold); }
+
+  .toc-list li a::before {
+    content: '›';
+    color: var(--gold);
+    opacity: 0.5;
+  }
+
+  /* ── Scrollbar ── */
+  ::-webkit-scrollbar { width: 6px; background: var(--bg2); }
+  ::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 3px; }
+
+  /* ── Donut SVG ── */
+  .donut-svg {
+    flex-shrink: 0;
+  }
+
+  /* Footer */
+  .page-footer {
+    text-align: center;
+    padding: 2rem 0 1rem;
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    opacity: 0.5;
+    letter-spacing: 0.08em;
+  }
+
+  .aspect-header {
+    display: grid;
+    grid-template-columns: 30px 1fr 90px 70px 80px;
+    gap: 0.8rem;
+    padding: 0.4rem 0.6rem;
+    margin-bottom: 0.4rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .aspect-header span {
+    font-family: 'Cinzel', serif;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--gold);
+    opacity: 0.7;
+  }
+
+  .aspect-header span:last-child,
+  .aspect-header span:nth-child(4) { text-align: right; }
+  .aspect-header span:nth-child(3) { text-align: center; }
+</style>
+</head>
+<body>
+<div class="page-wrap">
+
+  <!-- ════════════════════════════════════════════ -->
+  <!-- SECTION 1: CHART HEADER -->
+  <!-- ════════════════════════════════════════════ -->
+  <header class="chart-header" id="header">
+    <div class="chart-name">lim</div>
+    <div class="chart-subtitle">Natal Chart Reference Document</div>
+    <div class="chart-meta-grid">
+      <div class="meta-item">
+        <div class="meta-label">Date &amp; Time</div>
+        <div class="meta-value">Thursday, 5 November 1992<br>17:45:00 (Zone h8e)</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Location</div>
+        <div class="meta-value">Singapore, SGP<br>103°51'E, 1°16'N</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">House System</div>
+        <div class="meta-value">Placidus</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Zodiac</div>
+        <div class="meta-value">Tropical, Geocentric</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Table of Contents -->
+  <nav class="toc">
+    <div class="toc-title">Contents</div>
+    <ul class="toc-list">
+      <li><a href="#planets">Planetary Positions</a></li>
+      <li><a href="#cusps">House Cusps</a></li>
+      <li><a href="#power">Power Rankings</a></li>
+      <li><a href="#balance">Elemental &amp; Modal Balance</a></li>
+      <li><a href="#signs">Sign Emphasis</a></li>
+      <li><a href="#aspects">Aspects</a></li>
+      <li><a href="#grand">Grand Configurations</a></li>
+      <li><a href="#stories">The 10 Prominent Stories</a></li>
+      <li><a href="#rays">Esoteric / Ray Summary</a></li>
+      <li><a href="#notable">Notable Features</a></li>
+      <li><a href="#discussion">Discussion Prompts</a></li>
+    </ul>
+  </nav>
+
+  <!-- ════════════════════════════════════════════ -->
+  <!-- SECTION 2: PLANETARY POSITIONS -->
+  <!-- ════════════════════════════════════════════ -->
+  <section class="card" id="planets">
+    <div class="section-label">Section 2</div>
+    <h2 class="section-title"><span class="icon">✦</span> Planetary Positions</h2>
+    <div style="overflow-x:auto;">
+    <table class="styled-table">
+      <thead>
+        <tr>
+          <th>Planet</th>
+          <th>Sign</th>
+          <th>Degree</th>
+          <th>House</th>
+          <th>Status</th>
+          <th>Latitude</th>
+          <th>Note</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="planet-name"><span class="planet-symbol">☉</span> Sun</span></td>
+          <td><span class="sign-badge">Scorpio</span></td>
+          <td>13°14'</td>
+          <td><span class="house-num">7th</span></td>
+          <td>—</td>
+          <td>0°00'</td>
+          <td style="color:var(--text-dim);font-size:0.78rem;">Detriment sign ✗</td>
+        </tr>
+        <tr>
+          <td><span class="planet-name"><span class="planet-symbol">☽</span> Moon</span></td>
+          <td><span class="sign-badge">Pisces</span></td>
+          <td>16°08'</td>
+          <td><span class="house-num">11th</span></td>
+          <td>—</td>
+          <td>—</td>
+          <td style="color:var(--text-dim);font-size:0.78rem;">Esot. debilitated</td>
+        </tr>
+        <tr>
+          <td><span class="planet-name"><span class="planet-symbol">☿</span> Mercury</span></td>
+          <td><span class="sign-badge">Sagittarius</span></td>
+          <td>6°06'</td>
+          <td><span class="house-num">8th</span></td>
+          <td><span class="retro-badge">℞</span></td>
+          <td>—</td>
+          <td style="color:var(--text-dim);font-size:0.78rem;">Detriment + Retro</td>
+        </tr>
+        <tr>
+          <td><span class="planet-name"><span class="planet-symbol">♀</span> Venus</span></td>
+          <td><span class="sign-badge">Sagittarius</span></td>
+          <td>20°12'</td>
+          <td><span class="house-num">8th</span></td>
+          <td>—</td>
+          <td>—</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td><span class="planet-name"><span class="planet-symbol">♂</span> Mars</span></td>
+          <td><span class="sign-badge">Cancer</span></td>
+          <td>24°12'</td>
+          <td><span class="house-num">4th</span></td>
+          <td>—</td>
+          <td>—</td>
+          <td style="color:var(--text-dim);font-size:0.78rem;">Fall sign ✗</td>
+        </tr>
+        <tr>
+          <td><span class="planet-name"><span class="planet-symbol">♃</span> Jupiter</span></td>
+          <td><span class="sign-badge">Libra</span></td>
+          <td>5°14'</td>
+          <td><span class="house-num">6th</span></td>
+          <td>—</td>
+          <td>—</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td><span class="planet-name"><span class="planet-symbol">♄</span> Saturn</span></td>
+          <td><span class="sign-badge">Aquarius</span></td>
+          <td>12°10'</td>
+          <td><span class="house-num">10th</span></td>
+          <td>—</td>
+          <td>—</td>
+          <td style="color:#4caf78;font-size:0.78rem;">Domicile ✓</td>
+        </tr>
+        <tr>
+          <td><span class="planet-name"><span class="planet-symbol">♅</span> Uranus</span></td>
+          <td><span class="sign-badge">Capricorn</span></td>
+          <td>14°49'</td>
+          <td><span class="house-num">9th</span></td>
+          <td>—</td>
+          <td>—</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td><span class="planet-name"><span class="planet-symbol">♆</span> Neptune</span></td>
+          <td><span class="sign-badge">Capricorn</span></td>
+          <td>16°35'</td>
+          <td><span class="house-num">9th</span></td>
+          <td>—</td>
+          <td>—</td>
+          <td style="color:var(--text-dim);font-size:0.78rem;">Generational conj.</td>
+        </tr>
+        <tr>
+          <td><span class="planet-name"><span class="planet-symbol">♇</span> Pluto</span></td>
+          <td><span class="sign-badge">Scorpio</span></td>
+          <td>22°28'</td>
+          <td><span class="house-num">7th</span></td>
+          <td>—</td>
+          <td>—</td>
+          <td style="color:#4caf78;font-size:0.78rem;">Domicile ✓</td>
+        </tr>
+        <tr>
+          <td><span class="planet-name"><span class="planet-symbol">☊</span> N. Node</span></td>
+          <td><span class="sign-badge">Sagittarius</span></td>
+          <td>23°25'</td>
+          <td><span class="house-num">8th</span></td>
+          <td><span class="retro-badge">℞</span></td>
+          <td>—</td>
+          <td style="color:var(--text-dim);font-size:0.78rem;">Karmic axis</td>
+        </tr>
+        <tr style="background:rgba(201,168,76,0.04);">
+          <td><span class="planet-name" style="color:var(--teal);">ASC</span></td>
+          <td><span class="sign-badge" style="background:rgba(78,205,196,0.15);color:var(--teal);border-color:rgba(78,205,196,0.3);">Aries</span></td>
+          <td>27°09'</td>
+          <td><span class="house-num">1st</span></td>
+          <td>—</td>
+          <td>—</td>
+          <td style="color:var(--text-dim);font-size:0.78rem;">Cardinal Fire Rising</td>
+        </tr>
+        <tr style="background:rgba(201,168,76,0.04);">
+          <td><span class="planet-name" style="color:var(--teal);">MC</span></td>
+          <td><span class="sign-badge" style="background:rgba(78,205,196,0.15);color:var(--teal);border-color:rgba(78,205,196,0.3);">Capricorn</span></td>
+          <td>23°08'</td>
+          <td><span class="house-num">10th</span></td>
+          <td>—</td>
+          <td>—</td>
+          <td style="color:var(--text-dim);font-size:0.78rem;">Cardinal Earth Vocation</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════ -->
+  <!-- SECTION 3: HOUSE CUSPS -->
+  <!-- ════════════════════════════════════════════ -->
+  <section class="card" id="cusps">
+    <div class="section-label">Section 3</div>
+    <h2 class="section-title"><span class="icon">⌂</span> House Cusps — Placidus</h2>
+    <div class="cusps-grid">
+      <div class="cusp-item">
+        <div class="cusp-house">1st House — ASC</div>
+        <div class="cusp-deg">27° Ari 09'</div>
+      </div>
+      <div class="cusp-item">
+        <div class="cusp-house">2nd House</div>
+        <div class="cusp-deg">27° Tau 32'</div>
+      </div>
+      <div class="cusp-item">
+        <div class="cusp-house">3rd House</div>
+        <div class="cusp-deg">25° Gem 33'</div>
+      </div>
+      <div class="cusp-item">
+        <div class="cusp-house">4th House — IC</div>
+        <div class="cusp-deg">23° Can 08'</div>
+      </div>
+      <div class="cusp-item">
+        <div class="cusp-house">5th House</div>
+        <div class="cusp-deg">22° Leo 30'</div>
+      </div>
+      <div class="cusp-item">
+        <div class="cusp-house">6th House</div>
+        <div class="cusp-deg">24° Vir 29'</div>
+      </div>
+      <div class="cusp-item">
+        <div class="cusp-house">7th House — DSC</div>
+        <div class="cusp-deg">27° Lib 09'</div>
+      </div>
+      <div class="cusp-item">
+        <div class="cusp-house">8th House</div>
+        <div class="cusp-deg">27° Sco 32'</div>
+      </div>
+      <div class="cusp-item">
+        <div class="cusp-house">9th House</div>
+        <div class="cusp-deg">25° Sag 33'</div>
+      </div>
+      <div class="cusp-item">
+        <div class="cusp-house">10th House — MC</div>
+        <div class="cusp-deg">23° Cap 08'</div>
+      </div>
+      <div class="cusp-item">
+        <div class="cusp-house">11th House</div>
+        <div class="cusp-deg">22° Aqu 30'</div>
+      </div>
+      <div class="cusp-item">
+        <div class="cusp-house">12th House</div>
+        <div class="cusp-deg">24° Pis 29'</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════ -->
+  <!-- SECTION 4: POWER RANKINGS -->
+  <!-- ════════════════════════════════════════════ -->
+  <section class="card" id="power">
+    <div class="section-label">Section 4</div>
+    <h2 class="section-title"><span class="icon">⚡</span> Power Rankings</h2>
+    <p style="font-size:0.82rem;color:var(--text-dim);margin-bottom:1.4rem;">Normalized planetary strength by position, aspects, and house placement. Scale: 0–131.</p>
+
+    <div style="display:flex;flex-direction:column;gap:0.15rem;">
+
+      <div class="power-bar-row">
+        <div class="power-bar-label"><span class="power-rank">1</span> ♄ Saturn</div>
+        <div class="power-bar-track"><div class="power-bar-fill" style="width:100%"></div></div>
+        <div class="power-bar-value">131.0</div>
+      </div>
+      <div class="power-bar-row">
+        <div class="power-bar-label"><span class="power-rank">2</span> ♂ Mars</div>
+        <div class="power-bar-track"><div class="power-bar-fill" style="width:72.4%"></div></div>
+        <div class="power-bar-value">94.9</div>
+      </div>
+      <div class="power-bar-row">
+        <div class="power-bar-label"><span class="power-rank">3</span> ♇ Pluto</div>
+        <div class="power-bar-track"><div class="power-bar-fill" style="width:60.8%"></div></div>
+        <div class="power-bar-value">79.7</div>
+      </div>
+      <div class="power-bar-row">
+        <div class="power-bar-label"><span class="power-rank">4</span> ☽ Moon</div>
+        <div class="power-bar-track"><div class="power-bar-fill" style="width:60.3%"></div></div>
+        <div class="power-bar-value">79.0</div>
+      </div>
+      <div class="power-bar-row">
+        <div class="power-bar-label"><span class="power-rank">5</span> ASC</div>
+        <div class="power-bar-track"><div class="power-bar-fill" style="width:49.6%"></div></div>
+        <div class="power-bar-value">65.0</div>
+      </div>
+      <div class="power-bar-row">
+        <div class="power-bar-label"><span class="power-rank">6</span> ☉ Sun</div>
+        <div class="power-bar-track"><div class="power-bar-fill" style="width:48.1%"></div></div>
+        <div class="power-bar-value">63.0</div>
+      </div>
+      <div class="power-bar-row">
+        <div class="power-bar-label"><span class="power-rank">7</span> ♅ Uranus</div>
+        <div class="power-bar-track"><div class="power-bar-fill" style="width:47.8%"></div></div>
+        <div class="power-bar-value">62.6</div>
+      </div>
+      <div class="power-bar-row">
+        <div class="power-bar-label"><span class="power-rank">8</span> MC</div>
+        <div class="power-bar-track"><div class="power-bar-fill" style="width:45.8%"></div></div>
+        <div class="power-bar-value">60.0</div>
+      </div>
+      <div class="power-bar-row">
+        <div class="power-bar-label"><span class="power-rank">9</span> ♆ Neptune</div>
+        <div class="power-bar-track"><div class="power-bar-fill" style="width:42.9%"></div></div>
+        <div class="power-bar-value">56.2</div>
+      </div>
+      <div class="power-bar-row">
+        <div class="power-bar-label"><span class="power-rank">10</span> ♃ Jupiter</div>
+        <div class="power-bar-track"><div class="power-bar-fill" style="width:40.7%"></div></div>
+        <div class="power-bar-value">53.3</div>
+      </div>
+      <div class="power-bar-row">
+        <div class="power-bar-label"><span class="power-rank">11</span> ♀ Venus</div>
+        <div class="power-bar-track"><div class="power-bar-fill" style="width:40.2%"></div></div>
+        <div class="power-bar-value">52.6</div>
+      </div>
+      <div class="power-bar-row">
+        <div class="power-bar-label"><span class="power-rank">12</span> ☿ Mercury</div>
+        <div class="power-bar-track"><div class="power-bar-fill" style="width:16.7%;background:linear-gradient(90deg,#4a3a1e,#8a6f32);"></div></div>
+        <div class="power-bar-value" style="color:var(--text-dim);">21.9</div>
+      </div>
+      <div class="power-bar-row">
+        <div class="power-bar-label"><span class="power-rank">13</span> ☊ N.Node</div>
+        <div class="power-bar-track"><div class="power-bar-fill" style="width:5.3%;background:linear-gradient(90deg,#2a2a2a,#555);"></div></div>
+        <div class="power-bar-value" style="color:var(--text-dim);">7.0</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════ -->
+  <!-- SECTION 5: ELEMENTAL & MODAL BALANCE -->
+  <!-- ════════════════════════════════════════════ -->
+  <section class="card" id="balance">
+    <div class="section-label">Section 5</div>
+    <h2 class="section-title"><span class="icon">◉</span> Elemental &amp; Modal Balance</h2>
+    <div class="balance-grid">
+
+      <!-- Elements -->
+      <div class="balance-section">
+        <h4>Elements</h4>
+        <div class="donut-wrap">
+          <!-- SVG Donut for Elements -->
+          <svg class="donut-svg" width="120" height="120" viewBox="0 0 120 120">
+            <circle cx="60" cy="60" r="46" fill="none" stroke="#1a2035" stroke-width="22"/>
+            <!-- Water 34.64% = 124.7deg -->
+            <circle cx="60" cy="60" r="46" fill="none" stroke="#4ecdc4" stroke-width="22"
+              stroke-dasharray="288.77 0" stroke-dashoffset="0"
+              transform="rotate(-90 60 60)"
+              style="stroke-dasharray: calc(34.64 * 2.8877) calc(100 * 2.8877); stroke-dashoffset: 0;"/>
+            <!-- Earth 22.06% -->
+            <circle cx="60" cy="60" r="46" fill="none" stroke="#8bc34a" stroke-width="22"
+              transform="rotate(-90 60 60)"
+              style="stroke-dasharray: calc(22.06 * 2.8877) calc(100 * 2.8877); stroke-dashoffset: calc(-34.64 * 2.8877);"/>
+            <!-- Air 22.80% -->
+            <circle cx="60" cy="60" r="46" fill="none" stroke="#aec6e8" stroke-width="22"
+              transform="rotate(-90 60 60)"
+              style="stroke-dasharray: calc(22.80 * 2.8877) calc(100 * 2.8877); stroke-dashoffset: calc(-(34.64 + 22.06) * 2.8877);"/>
+            <!-- Fire 20.50% -->
+            <circle cx="60" cy="60" r="46" fill="none" stroke="#f4845f" stroke-width="22"
+              transform="rotate(-90 60 60)"
+              style="stroke-dasharray: calc(20.50 * 2.8877) calc(100 * 2.8877); stroke-dashoffset: calc(-(34.64 + 22.06 + 22.80) * 2.8877);"/>
+            <text x="60" y="55" text-anchor="middle" fill="#c9a84c" font-family="Cinzel,serif" font-size="9" font-weight="600">ELEMENTS</text>
+            <text x="60" y="68" text-anchor="middle" fill="#8a9ab8" font-family="Inter,sans-serif" font-size="7.5">by power</text>
+          </svg>
+          <div class="donut-legend">
+            <div class="legend-item">
+              <div class="legend-dot" style="background:#4ecdc4;box-shadow:0 0 6px rgba(78,205,196,0.4)"></div>
+              <span class="legend-label">Water</span>
+              <span class="legend-pct">34.64%</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-dot" style="background:#8bc34a;box-shadow:0 0 6px rgba(139,195,74,0.4)"></div>
+              <span class="legend-label">Air</span>
+              <span class="legend-pct">22.80%</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-dot" style="background:#aec6e8;box-shadow:0 0 6px rgba(174,198,232,0.4)"></div>
+              <span class="legend-label">Earth</span>
+              <span class="legend-pct">22.06%</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-dot" style="background:#f4845f;box-shadow:0 0 6px rgba(244,132,95,0.4)"></div>
+              <span class="legend-label">Fire</span>
+              <span class="legend-pct">20.50%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modes -->
+      <div class="balance-section">
+        <h4>Modes (Qualities)</h4>
+        <div class="donut-wrap">
+          <svg class="donut-svg" width="120" height="120" viewBox="0 0 120 120">
+            <circle cx="60" cy="60" r="46" fill="none" stroke="#1a2035" stroke-width="22"/>
+            <!-- Cardinal 44.25% -->
+            <circle cx="60" cy="60" r="46" fill="none" stroke="#c9a84c" stroke-width="22"
+              transform="rotate(-90 60 60)"
+              style="stroke-dasharray: calc(44.25 * 2.8877) calc(100 * 2.8877); stroke-dashoffset: 0;"/>
+            <!-- Fixed 37.26% -->
+            <circle cx="60" cy="60" r="46" fill="none" stroke="#9b6de0" stroke-width="22"
+              transform="rotate(-90 60 60)"
+              style="stroke-dasharray: calc(37.26 * 2.8877) calc(100 * 2.8877); stroke-dashoffset: calc(-44.25 * 2.8877);"/>
+            <!-- Mutable 18.49% -->
+            <circle cx="60" cy="60" r="46" fill="none" stroke="#4ecdc4" stroke-width="22"
+              transform="rotate(-90 60 60)"
+              style="stroke-dasharray: calc(18.49 * 2.8877) calc(100 * 2.8877); stroke-dashoffset: calc(-(44.25 + 37.26) * 2.8877);"/>
+            <text x="60" y="55" text-anchor="middle" fill="#c9a84c" font-family="Cinzel,serif" font-size="9" font-weight="600">MODES</text>
+            <text x="60" y="68" text-anchor="middle" fill="#8a9ab8" font-family="Inter,sans-serif" font-size="7.5">by power</text>
+          </svg>
+          <div class="donut-legend">
+            <div class="legend-item">
+              <div class="legend-dot" style="background:#c9a84c;box-shadow:0 0 6px rgba(201,168,76,0.4)"></div>
+              <span class="legend-label">Cardinal</span>
+              <span class="legend-pct">44.25%</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-dot" style="background:#9b6de0;box-shadow:0 0 6px rgba(155,109,224,0.4)"></div>
+              <span class="legend-label">Fixed</span>
+              <span class="legend-pct">37.26%</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-dot" style="background:#4ecdc4;box-shadow:0 0 6px rgba(78,205,196,0.4)"></div>
+              <span class="legend-label">Mutable</span>
+              <span class="legend-pct">18.49%</span>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:1rem;padding:0.8rem;background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.15);border-radius:6px;">
+          <p style="font-size:0.78rem;color:var(--text-dim);">
+            <strong style="color:var(--gold);">Dominant Cardinal (44.25%):</strong> Initiating, action-oriented, crisis-driven growth. Aries ASC + Capricorn MC axis underpins this emphasis.
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════ -->
+  <!-- SECTION 6: SIGN EMPHASIS -->
+  <!-- ════════════════════════════════════════════ -->
+  <section class="card" id="signs">
+    <div class="section-label">Section 6</div>
+    <h2 class="section-title"><span class="icon">♑</span> Sign Emphasis — Top 6</h2>
+    <div style="display:flex;flex-direction:column;gap:0.2rem;">
+
+      <div class="sign-bar-row">
+        <div class="sign-bar-label">♑ Capricorn</div>
+        <div class="power-bar-track"><div class="sign-bar-fill" style="width:100%;height:8px;border-radius:3px;background:linear-gradient(90deg,#4a3970,#9b6de0);box-shadow:0 0 5px rgba(155,109,224,0.35);"></div></div>
+        <div class="sign-bar-power">156.8</div>
+        <div class="sign-bar-pct">18.98%</div>
+      </div>
+      <div class="sign-bar-row">
+        <div class="sign-bar-label">♒ Aquarius</div>
+        <div class="power-bar-track"><div class="sign-bar-fill" style="width:86.5%;height:8px;border-radius:3px;background:linear-gradient(90deg,#2a5070,#5aaddf);box-shadow:0 0 5px rgba(90,173,223,0.35);"></div></div>
+        <div class="sign-bar-power">135.6</div>
+        <div class="sign-bar-pct">16.42%</div>
+      </div>
+      <div class="sign-bar-row">
+        <div class="sign-bar-label">♏ Scorpio</div>
+        <div class="power-bar-track"><div class="sign-bar-fill" style="width:84.6%;height:8px;border-radius:3px;background:linear-gradient(90deg,#4a1530,#c93060);box-shadow:0 0 5px rgba(201,48,96,0.35);"></div></div>
+        <div class="sign-bar-power">132.7</div>
+        <div class="sign-bar-pct">16.06%</div>
+      </div>
+      <div class="sign-bar-row">
+        <div class="sign-bar-label">♈ Aries</div>
+        <div class="power-bar-track"><div class="sign-bar-fill" style="width:56.1%;height:8px;border-radius:3px;background:linear-gradient(90deg,#6a1a0a,#e06a5a);box-shadow:0 0 5px rgba(224,106,90,0.35);"></div></div>
+        <div class="sign-bar-power">87.9</div>
+        <div class="sign-bar-pct">10.64%</div>
+      </div>
+      <div class="sign-bar-row">
+        <div class="sign-bar-label">♓ Pisces</div>
+        <div class="power-bar-track"><div class="sign-bar-fill" style="width:49.7%;height:8px;border-radius:3px;background:linear-gradient(90deg,#1a4060,#4ecdc4);box-shadow:0 0 5px rgba(78,205,196,0.35);"></div></div>
+        <div class="sign-bar-power">77.9</div>
+        <div class="sign-bar-pct">9.42%</div>
+      </div>
+      <div class="sign-bar-row">
+        <div class="sign-bar-label">♋ Cancer</div>
+        <div class="power-bar-track"><div class="sign-bar-fill" style="width:48.2%;height:8px;border-radius:3px;background:linear-gradient(90deg,#1a3060,#5a8adf);box-shadow:0 0 5px rgba(90,138,223,0.35);"></div></div>
+        <div class="sign-bar-power">75.6</div>
+        <div class="sign-bar-pct">9.15%</div>
+      </div>
+
+    </div>
+    <p style="font-size:0.78rem;color:var(--text-dim);margin-top:1rem;">Note: Capricorn leads by power (Saturn in 10th + Uranus/Neptune stellium), despite Sun/Pluto in Scorpio. The chart operates as a Capricorn-inflected Scorpio chart.</p>
+  </section>
+
+  <!-- ════════════════════════════════════════════ -->
+  <!-- SECTION 7: ASPECTS TABLE -->
+  <!-- ════════════════════════════════════════════ -->
+  <section class="card" id="aspects">
+    <div class="section-label">Section 7</div>
+    <h2 class="section-title"><span class="icon">⟡</span> Aspects — Color-Coded</h2>
+
+    <div class="aspect-header">
+      <span>#</span>
+      <span>Aspect</span>
+      <span>Type</span>
+      <span style="text-align:center;">Orb</span>
+      <span style="text-align:right;">Power</span>
+    </div>
+
+    <!-- 1 Uranus Conjunct Neptune -->
+    <div class="aspect-row">
+      <div class="aspect-num">1</div>
+      <div>
+        <div class="aspect-planets">♅ Uranus — ♆ Neptune</div>
+        <div class="aspect-power-bar"><div class="aspect-power-fill" style="width:100%;background:linear-gradient(90deg,#8a6f32,#c9a84c);"></div></div>
+      </div>
+      <div><span class="aspect-type-badge asp-conjunct">Conjunction</span></div>
+      <div class="aspect-orb">1°45'</div>
+      <div class="aspect-power">92.71</div>
+    </div>
+    <!-- 2 Mars Trine Pluto -->
+    <div class="aspect-row">
+      <div class="aspect-num">2</div>
+      <div>
+        <div class="aspect-planets">♂ Mars — ♇ Pluto</div>
+        <div class="aspect-power-bar"><div class="aspect-power-fill" style="width:33.5%;background:linear-gradient(90deg,#1a4a2a,#4caf78);"></div></div>
+      </div>
+      <div><span class="aspect-type-badge asp-trine">Trine</span></div>
+      <div class="aspect-orb">1°43'</div>
+      <div class="aspect-power">31.02</div>
+    </div>
+    <!-- 3 Sun Square Saturn -->
+    <div class="aspect-row">
+      <div class="aspect-num">3</div>
+      <div>
+        <div class="aspect-planets">☉ Sun — ♄ Saturn</div>
+        <div class="aspect-power-bar"><div class="aspect-power-fill" style="width:17.1%;background:linear-gradient(90deg,#6a1a0a,#e06a5a);"></div></div>
+      </div>
+      <div><span class="aspect-type-badge asp-square">Square</span></div>
+      <div class="aspect-orb">1°04'</div>
+      <div class="aspect-power">15.80</div>
+    </div>
+    <!-- 4 Jupiter Trine Saturn -->
+    <div class="aspect-row">
+      <div class="aspect-num">4</div>
+      <div>
+        <div class="aspect-planets">♃ Jupiter — ♄ Saturn</div>
+        <div class="aspect-power-bar"><div class="aspect-power-fill" style="width:13.1%;background:linear-gradient(90deg,#1a4a2a,#4caf78);"></div></div>
+      </div>
+      <div><span class="aspect-type-badge asp-trine">Trine</span></div>
+      <div class="aspect-orb">6°55'</div>
+      <div class="aspect-power">12.09</div>
+    </div>
+    <!-- 5 Sun Sextile Uranus -->
+    <div class="aspect-row">
+      <div class="aspect-num">5</div>
+      <div>
+        <div class="aspect-planets">☉ Sun — ♅ Uranus</div>
+        <div class="aspect-power-bar"><div class="aspect-power-fill" style="width:12.5%;background:linear-gradient(90deg,#1a3060,#5aaddf);"></div></div>
+      </div>
+      <div><span class="aspect-type-badge asp-sextile">Sextile</span></div>
+      <div class="aspect-orb">1°35'</div>
+      <div class="aspect-power">11.58</div>
+    </div>
+    <!-- 6 Mars Opposite Neptune -->
+    <div class="aspect-row">
+      <div class="aspect-num">6</div>
+      <div>
+        <div class="aspect-planets">♂ Mars — ♆ Neptune</div>
+        <div class="aspect-power-bar"><div class="aspect-power-fill" style="width:11.6%;background:linear-gradient(90deg,#3a1a60,#9b6de0);"></div></div>
+      </div>
+      <div><span class="aspect-type-badge asp-oppose">Opposition</span></div>
+      <div class="aspect-orb">7°37'</div>
+      <div class="aspect-power">10.70</div>
+    </div>
+    <!-- 7 Sun Sextile Neptune -->
+    <div class="aspect-row">
+      <div class="aspect-num">7</div>
+      <div>
+        <div class="aspect-planets">☉ Sun — ♆ Neptune</div>
+        <div class="aspect-power-bar"><div class="aspect-power-fill" style="width:9.5%;background:linear-gradient(90deg,#1a3060,#5aaddf);"></div></div>
+      </div>
+      <div><span class="aspect-type-badge asp-sextile">Sextile</span></div>
+      <div class="aspect-orb">3°21'</div>
+      <div class="aspect-power">8.79</div>
+    </div>
+    <!-- 8 Mercury Sextile Jupiter -->
+    <div class="aspect-row">
+      <div class="aspect-num">8</div>
+      <div>
+        <div class="aspect-planets">☿ Mercury — ♃ Jupiter</div>
+        <div class="aspect-power-bar"><div class="aspect-power-fill" style="width:8.3%;background:linear-gradient(90deg,#1a3060,#5aaddf);"></div></div>
+      </div>
+      <div><span class="aspect-type-badge asp-sextile">Sextile</span></div>
+      <div class="aspect-orb">0°52'</div>
+      <div class="aspect-power">7.70</div>
+    </div>
+    <!-- 9 Moon Sextile Neptune -->
+    <div class="aspect-row">
+      <div class="aspect-num">9</div>
+      <div>
+        <div class="aspect-planets">☽ Moon — ♆ Neptune</div>
+        <div class="aspect-power-bar"><div class="aspect-power-fill" style="width:6.8%;background:linear-gradient(90deg,#1a3060,#5aaddf);"></div></div>
+      </div>
+      <div><span class="aspect-type-badge asp-sextile">Sextile</span></div>
+      <div class="aspect-orb">0°26'</div>
+      <div class="aspect-power">6.32</div>
+    </div>
+    <!-- 10 Sun Conjunct Pluto -->
+    <div class="aspect-row">
+      <div class="aspect-num">10</div>
+      <div>
+        <div class="aspect-planets">☉ Sun — ♇ Pluto</div>
+        <div class="aspect-power-bar"><div class="aspect-power-fill" style="width:5.4%;background:linear-gradient(90deg,#8a6f32,#c9a84c);"></div></div>
+      </div>
+      <div><span class="aspect-type-badge asp-conjunct">Conjunction</span></div>
+      <div class="aspect-orb">9°14'</div>
+      <div class="aspect-power">4.98</div>
+    </div>
+    <!-- 11 Moon Sextile Uranus -->
+    <div class="aspect-row">
+      <div class="aspect-num">11</div>
+      <div>
+        <div class="aspect-planets">☽ Moon — ♅ Uranus</div>
+        <div class="aspect-power-bar"><div class="aspect-power-fill" style="width:5.3%;background:linear-gradient(90deg,#1a3060,#5aaddf);"></div></div>
+      </div>
+      <div><span class="aspect-type-badge asp-sextile">Sextile</span></div>
+      <div class="aspect-orb">1°18'</div>
+      <div class="aspect-power">4.87</div>
+    </div>
+    <!-- 12 Moon Trine Pluto -->
+    <div class="aspect-row">
+      <div class="aspect-num">12</div>
+      <div>
+        <div class="aspect-planets">☽ Moon — ♇ Pluto</div>
+        <div class="aspect-power-bar"><div class="aspect-power-fill" style="width:3.4%;background:linear-gradient(90deg,#1a4a2a,#4caf78);"></div></div>
+      </div>
+      <div><span class="aspect-type-badge asp-trine">Trine</span></div>
+      <div class="aspect-orb">6°20'</div>
+      <div class="aspect-power">3.18</div>
+    </div>
+    <!-- 13 Mars Opposite Uranus -->
+    <div class="aspect-row">
+      <div class="aspect-num">13</div>
+      <div>
+        <div class="aspect-planets">♂ Mars — ♅ Uranus</div>
+        <div class="aspect-power-bar"><div class="aspect-power-fill" style="width:2.7%;background:linear-gradient(90deg,#3a1a60,#9b6de0);"></div></div>
+      </div>
+      <div><span class="aspect-type-badge asp-oppose">Opposition</span></div>
+      <div class="aspect-orb">9°22'</div>
+      <div class="aspect-power">2.48</div>
+    </div>
+    <!-- 14 Jupiter Square Uranus -->
+    <div class="aspect-row">
+      <div class="aspect-num">14</div>
+      <div>
+        <div class="aspect-planets">♃ Jupiter — ♅ Uranus</div>
+        <div class="aspect-power-bar"><div class="aspect-power-fill" style="width:2.6%;background:linear-gradient(90deg,#6a1a0a,#e06a5a);"></div></div>
+      </div>
+      <div><span class="aspect-type-badge asp-square">Square</span></div>
+      <div class="aspect-orb">9°35'</div>
+      <div class="aspect-power">2.45</div>
+    </div>
+    <!-- 15 Neptune Sextile Pluto -->
+    <div class="aspect-row">
+      <div class="aspect-num">15</div>
+      <div>
+        <div class="aspect-planets">♆ Neptune — ♇ Pluto</div>
+        <div class="aspect-power-bar"><div class="aspect-power-fill" style="width:1.6%;background:linear-gradient(90deg,#1a3060,#5aaddf);"></div></div>
+      </div>
+      <div><span class="aspect-type-badge asp-sextile">Sextile</span></div>
+      <div class="aspect-orb">5°53'</div>
+      <div class="aspect-power">1.52</div>
+    </div>
+    <!-- 16 Sun Trine Moon -->
+    <div class="aspect-row">
+      <div class="aspect-num">16</div>
+      <div>
+        <div class="aspect-planets">☉ Sun — ☽ Moon</div>
+        <div class="aspect-power-bar"><div class="aspect-power-fill" style="width:1.2%;background:linear-gradient(90deg,#1a4a2a,#4caf78);"></div></div>
+      </div>
+      <div><span class="aspect-type-badge asp-trine">Trine</span></div>
+      <div class="aspect-orb">2°54'</div>
+      <div class="aspect-power">1.14</div>
+    </div>
+    <!-- 17 Moon Square Venus -->
+    <div class="aspect-row">
+      <div class="aspect-num">17</div>
+      <div>
+        <div class="aspect-planets">☽ Moon — ♀ Venus</div>
+        <div class="aspect-power-bar"><div class="aspect-power-fill" style="width:1.2%;background:linear-gradient(90deg,#6a1a0a,#e06a5a);"></div></div>
+      </div>
+      <div><span class="aspect-type-badge asp-square">Square</span></div>
+      <div class="aspect-orb">4°03'</div>
+      <div class="aspect-power">1.14</div>
+    </div>
+    <!-- 18 Moon Trine Mars -->
+    <div class="aspect-row">
+      <div class="aspect-num">18</div>
+      <div>
+        <div class="aspect-planets">☽ Moon — ♂ Mars</div>
+        <div class="aspect-power-bar"><div class="aspect-power-fill" style="width:0.9%;background:linear-gradient(90deg,#1a4a2a,#4caf78);"></div></div>
+      </div>
+      <div><span class="aspect-type-badge asp-trine">Trine</span></div>
+      <div class="aspect-orb">8°04'</div>
+      <div class="aspect-power">0.80</div>
+    </div>
+    <!-- 19 Moon Square Mercury -->
+    <div class="aspect-row">
+      <div class="aspect-num">19</div>
+      <div>
+        <div class="aspect-planets">☽ Moon — ☿ Mercury</div>
+        <div class="aspect-power-bar"><div class="aspect-power-fill" style="width:0.15%;background:linear-gradient(90deg,#6a1a0a,#e06a5a);"></div></div>
+      </div>
+      <div><span class="aspect-type-badge asp-square">Square</span></div>
+      <div class="aspect-orb">10°02'</div>
+      <div class="aspect-power">0.14</div>
+    </div>
+    <!-- 20 Sun Trine Mars -->
+    <div class="aspect-row">
+      <div class="aspect-num">20</div>
+      <div>
+        <div class="aspect-planets">☉ Sun — ♂ Mars</div>
+        <div class="aspect-power-bar"><div class="aspect-power-fill" style="width:0.02%;background:linear-gradient(90deg,#1a4a2a,#4caf78);"></div></div>
+      </div>
+      <div><span class="aspect-type-badge asp-trine">Trine</span></div>
+      <div class="aspect-orb">10°58'</div>
+      <div class="aspect-power">0.02</div>
+    </div>
+
+    <!-- Legend -->
+    <div style="margin-top:1.4rem;padding-top:1rem;border-top:1px solid var(--border2);display:flex;flex-wrap:wrap;gap:0.6rem;">
+      <span class="aspect-type-badge asp-conjunct">Conjunction = Gold</span>
+      <span class="aspect-type-badge asp-trine">Trine = Emerald</span>
+      <span class="aspect-type-badge asp-sextile">Sextile = Sky Blue</span>
+      <span class="aspect-type-badge asp-square">Square = Coral</span>
+      <span class="aspect-type-badge asp-oppose">Opposition = Violet</span>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════ -->
+  <!-- SECTION 8: GRAND CONFIGURATIONS -->
+  <!-- ════════════════════════════════════════════ -->
+  <section class="card" id="grand">
+    <div class="section-label">Section 8</div>
+    <h2 class="section-title"><span class="icon">△</span> Grand Configurations</h2>
+
+    <div class="grand-config-card">
+      <div class="grand-config-title">Grand Trine #1 — Water Element</div>
+      <div class="grand-config-planets">
+        <span class="config-planet">☉ Sun 13°Sco</span>
+        <span class="config-arrow">△</span>
+        <span class="config-planet">☽ Moon 16°Pis</span>
+        <span class="config-arrow">△</span>
+        <span class="config-planet">♂ Mars 24°Can</span>
+      </div>
+      <div class="grand-config-note">
+        A self-completing circuit of water energy: emotional depth, intuitive power, and instinctive action form a self-sustaining triangle. Easy flow between identity, feeling, and will — with the shadow of over-enclosure.
+      </div>
+    </div>
+
+    <div class="grand-config-card">
+      <div class="grand-config-title">Grand Trine #2 — Water Element</div>
+      <div class="grand-config-planets">
+        <span class="config-planet">☽ Moon 16°Pis</span>
+        <span class="config-arrow">△</span>
+        <span class="config-planet">♂ Mars 24°Can</span>
+        <span class="config-arrow">△</span>
+        <span class="config-planet">♇ Pluto 22°Sco</span>
+      </div>
+      <div class="grand-config-note">
+        Pluto enters the water circuit, amplifying depth and transformative power. The Moon-Mars axis serves both trines, creating a sustained inner world of formidable emotional intensity.
+      </div>
+    </div>
+
+    <div class="card-inner" style="margin-top:1rem;">
+      <p style="font-size:0.85rem;color:var(--text-dim);margin-bottom:0.5rem;">
+        <strong style="color:var(--teal);">Kite-Like Configuration:</strong> The two Grand Trines share the Moon–Mars axis, interlocking into a rare double water Grand Trine. Sun and Pluto occupy the same sign (Scorpio) and house (7th), functioning as near-parallel focal points. The result is a chart that is profoundly self-contained in the emotional realm — exceptional inner resource, but potentially resistant to external input.
+      </p>
+      <div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.8rem;">
+        <span style="font-size:0.75rem;background:rgba(78,205,196,0.08);border:1px solid rgba(78,205,196,0.2);color:var(--teal);padding:0.2rem 0.7rem;border-radius:4px;">Water: 34.64%</span>
+        <span style="font-size:0.75rem;background:rgba(78,205,196,0.08);border:1px solid rgba(78,205,196,0.2);color:var(--teal);padding:0.2rem 0.7rem;border-radius:4px;">6 Planets in Water Signs</span>
+        <span style="font-size:0.75rem;background:rgba(78,205,196,0.08);border:1px solid rgba(78,205,196,0.2);color:var(--teal);padding:0.2rem 0.7rem;border-radius:4px;">2 Water Trines</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════ -->
+  <!-- SECTION 9: THE 10 PROMINENT STORIES -->
+  <!-- ════════════════════════════════════════════ -->
+  <section class="card" id="stories">
+    <div class="section-label">Section 9</div>
+    <h2 class="section-title"><span class="icon">✦</span> The 10 Prominent Stories</h2>
+    <p style="font-size:0.82rem;color:var(--text-dim);margin-bottom:1.5rem;">Each story reflects a primary archetypal theme derived from the chart's most powerful configurations. These are interpretive narratives for discussion, not prediction.</p>
+
+    <div class="stories-grid">
+
+      <div class="story-card border-pluto">
+        <div class="story-num">Story 01</div>
+        <div class="story-title">The Warrior Who Must Face Themselves</div>
+        <div class="story-body">
+          Sun–Pluto Conjunction in Scorpio, 7th House. Self and transformation are fused; the deepest aspects of identity are encountered through the mirrors that other people provide. Every significant relationship becomes a crucible. Power dynamics, hidden motives, and regenerative crisis are not obstacles — they are the method. The ego must be repeatedly willing to dissolve in order to emerge.
+        </div>
+      </div>
+
+      <div class="story-card border-water">
+        <div class="story-num">Story 02</div>
+        <div class="story-title">The Grand Trine of Water: A Soul Born Already Resourced</div>
+        <div class="story-body">
+          Two interlocking Grand Trines (Sun–Moon–Mars and Moon–Mars–Pluto) create an exceptional circuit of emotional fluency and intuitive ease. This native arrives with inner reservoirs already full. The gift is natural empathic attunement and instinctive knowing. The shadow is self-contained insularity — the inner world so complete it can resist nourishment from outside itself.
+        </div>
+      </div>
+
+      <div class="story-card border-saturn">
+        <div class="story-num">Story 03</div>
+        <div class="story-title">The Saturn Square: The Wound That Builds the Spine</div>
+        <div class="story-body">
+          Sun Square Saturn — the highest-power aspect given Saturn's chart dominance. Perpetual testing of ego by inner authority. There is a quality of never feeling entirely adequate to one's own standards, of public performance being scrutinized, of learning to build structure precisely where there is internal collapse. Forged through crisis of self-presentation into structural mastery and genuine authority.
+        </div>
+      </div>
+
+      <div class="story-card border-aries">
+        <div class="story-num">Story 04</div>
+        <div class="story-title">The Ascendant Paradox: Aries Armor Over Scorpio Depth</div>
+        <div class="story-body">
+          Aries Rising presents fire to the world — assertive, direct, impulsive in first impression. Yet the dominant chart signature is water: Scorpio, Pisces, Cancer. The world meets a warrior; the mystic is rarely seen immediately. This creates a fascinating paradox: the persona is cardinal and initiating, while the soul is receptive, hidden, and oceanic. The armor both protects and isolates.
+        </div>
+      </div>
+
+      <div class="story-card border-cap">
+        <div class="story-num">Story 05</div>
+        <div class="story-title">The Capricorn Midheaven Stellium: Destined for Institutional Weight</div>
+        <div class="story-body">
+          Uranus and Neptune conjunct in Capricorn in the 9th house, with the Midheaven at 23° Capricorn. The vocation carries a generational signature: use establishment structures to dismantle what no longer serves. This is not merely personal ambition — it is participation in a historical shift. The calling involves being inside systems large enough to be worth transforming.
+        </div>
+      </div>
+
+      <div class="story-card border-8th">
+        <div class="story-num">Story 06</div>
+        <div class="story-title">The 8th House Cluster: A Life Oriented Toward Invisible Realms</div>
+        <div class="story-body">
+          Mercury, Venus, and North Node all occupy Sagittarius in the 8th house. The karmic direction — the North Node's call — points toward meaning-making in liminal territory: death, the occult, hidden depths, shared resources, and taboo inquiry. Mercury retrograde here suggests thought that moves inward before outward; Venus here desires depth, not surface. The philosophical must become visceral.
+        </div>
+      </div>
+
+      <div class="story-card border-mars">
+        <div class="story-num">Story 07</div>
+        <div class="story-title">Mars in Cancer: The Difficult Body, The Defended Interior</div>
+        <div class="story-body">
+          Mars in fall in Cancer, in the 4th house of roots, opposing Uranus and Neptune across the Cancer-Capricorn axis. Will is protective, inward-facing, and often expressed through caretaking or its inverse — withdrawal. The body carries the accumulated weight of emotional history. There is perpetual tension between the fortress (Cancer) and the ocean (Neptune), between action and dissolution.
+        </div>
+      </div>
+
+      <div class="story-card border-pisces">
+        <div class="story-num">Story 08</div>
+        <div class="story-title">The Pisces Moon: The Longing for the Collective</div>
+        <div class="story-body">
+          Moon in Pisces in the 11th house — esoterically debilitated, traditionally exalted. Emotional fulfillment is bound not to one person but to a sense of belonging to humanity itself. There is an inherent longing to merge with something larger. The danger is boundary dissolution — absorbing collective pain without discrimination. The gift is radical compassion and the capacity to feel what others cannot name.
+        </div>
+      </div>
+
+      <div class="story-card border-ray7">
+        <div class="story-num">Story 09</div>
+        <div class="story-title">The Ray 7 Signature: Ordered Magic, Structure as Spiritual Practice</div>
+        <div class="story-body">
+          With Ray 7 dominant at the soul level (33%), the Midheaven, Uranus, and Capricorn all carrying Ray 7 expression, the vocation involves bringing sacred order into material structures. Ray 7 is the ray of ceremony, right relationship between spirit and matter, and the magic that emerges when form is treated as sacred. Life itself becomes ritual; organization becomes an act of devotion.
+        </div>
+      </div>
+
+      <div class="story-card border-jupiter">
+        <div class="story-num">Story 10</div>
+        <div class="story-title">Jupiter in Libra / 6th + Mercury–Jupiter Sextile: The Sage in Service</div>
+        <div class="story-body">
+          Jupiter in Libra in the 6th house, in tight sextile with Mercury. Wisdom is most alive when it is given away practically, in service contexts, through dialogue and daily application. The capacity for mediation, synthesis, and teaching is strong. Most generative when functioning as a conduit — not accumulating wisdom privately but transmitting it. The calling is to be a bridge between philosophical inquiry and lived practice.
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════ -->
+  <!-- SECTION 10: ESOTERIC / RAY SUMMARY -->
+  <!-- ════════════════════════════════════════════ -->
+  <section class="card" id="rays">
+    <div class="section-label">Section 10</div>
+    <h2 class="section-title"><span class="icon">✧</span> Esoteric / Ray Summary</h2>
+    <p style="font-size:0.82rem;color:var(--text-dim);margin-bottom:1.5rem;">Ray weightings derived from sign and planet rulerships following the esoteric tradition of Alice Bailey / D.K. Percentages represent approximate ray composition at each level.</p>
+
+    <div class="ray-grid">
+
+      <div class="ray-item">
+        <div class="ray-item-label">Soul Ray</div>
+        <div class="ray-pcts">
+          <div class="ray-pct-row">
+            <span class="ray-badge ray-7">R7</span>
+            <div class="ray-pct-bar"><div class="ray-pct-fill" style="width:66%;background:#c9a84c;"></div></div>
+            <span class="ray-pct-val">33%</span>
+          </div>
+          <div class="ray-pct-row">
+            <span class="ray-badge ray-1">R1</span>
+            <div class="ray-pct-bar"><div class="ray-pct-fill" style="width:60%;background:#e06a5a;"></div></div>
+            <span class="ray-pct-val">30%</span>
+          </div>
+          <div class="ray-pct-row">
+            <span class="ray-badge ray-3">R3</span>
+            <div class="ray-pct-bar"><div class="ray-pct-fill" style="width:32%;background:#aec6e8;"></div></div>
+            <span class="ray-pct-val">16%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="ray-item">
+        <div class="ray-item-label">Personality Ray</div>
+        <div class="ray-pcts">
+          <div class="ray-pct-row">
+            <span class="ray-badge ray-3">R3</span>
+            <div class="ray-pct-bar"><div class="ray-pct-fill" style="width:44%;background:#aec6e8;"></div></div>
+            <span class="ray-pct-val">22%</span>
+          </div>
+          <div class="ray-pct-row">
+            <span class="ray-badge ray-4">R4</span>
+            <div class="ray-pct-bar"><div class="ray-pct-fill" style="width:42%;background:#4ecdc4;"></div></div>
+            <span class="ray-pct-val">21%</span>
+          </div>
+          <div class="ray-pct-row">
+            <span class="ray-badge ray-7">R7</span>
+            <div class="ray-pct-bar"><div class="ray-pct-fill" style="width:42%;background:#c9a84c;"></div></div>
+            <span class="ray-pct-val">21%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="ray-item">
+        <div class="ray-item-label">Mental Ray</div>
+        <div class="ray-pcts">
+          <div class="ray-pct-row">
+            <span class="ray-badge ray-5">R5</span>
+            <div class="ray-pct-bar"><div class="ray-pct-fill" style="width:96%;background:#4caf78;"></div></div>
+            <span class="ray-pct-val">48%</span>
+          </div>
+          <div class="ray-pct-row">
+            <span class="ray-badge ray-4">R4</span>
+            <div class="ray-pct-bar"><div class="ray-pct-fill" style="width:48%;background:#4ecdc4;"></div></div>
+            <span class="ray-pct-val">24%</span>
+          </div>
+          <div class="ray-pct-row">
+            <span class="ray-badge ray-3">R3</span>
+            <div class="ray-pct-bar"><div class="ray-pct-fill" style="width:32%;background:#aec6e8;"></div></div>
+            <span class="ray-pct-val">16%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="ray-item">
+        <div class="ray-item-label">Ascendant Ray</div>
+        <div class="ray-pcts">
+          <div class="ray-pct-row">
+            <span class="ray-badge ray-1">R1</span>
+            <div class="ray-pct-bar"><div class="ray-pct-fill" style="width:100%;background:#e06a5a;"></div></div>
+            <span class="ray-pct-val">50%</span>
+          </div>
+          <div class="ray-pct-row">
+            <span class="ray-badge ray-7">R7</span>
+            <div class="ray-pct-bar"><div class="ray-pct-fill" style="width:28%;background:#c9a84c;"></div></div>
+            <span class="ray-pct-val">14%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="ray-item">
+        <div class="ray-item-label">Physical Ray</div>
+        <div class="ray-pcts">
+          <div class="ray-pct-row">
+            <span class="ray-badge ray-7">R7</span>
+            <div class="ray-pct-bar"><div class="ray-pct-fill" style="width:70%;background:#c9a84c;"></div></div>
+            <span class="ray-pct-val">35%</span>
+          </div>
+          <div class="ray-pct-row">
+            <span class="ray-badge ray-3">R3</span>
+            <div class="ray-pct-bar"><div class="ray-pct-fill" style="width:68%;background:#aec6e8;"></div></div>
+            <span class="ray-pct-val">34%</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="gold-divider"></div>
+
+    <h4 style="font-family:'Cinzel',serif;font-size:0.88rem;color:var(--text-dim);margin-bottom:0.6rem;letter-spacing:0.08em;">Key Ray Themes</h4>
+    <div class="theme-pills">
+      <span class="theme-pill pill-r7">Ray 7 — Order / Ceremonial Magic</span>
+      <span class="theme-pill pill-r1">Ray 1 — Will / Power / Destruction</span>
+      <span class="theme-pill pill-r3">Ray 3 — Active Intelligence / Adaptability</span>
+    </div>
+
+    <div class="card-inner" style="margin-top:1.2rem;">
+      <p style="font-size:0.83rem;color:var(--text-dim);line-height:1.65;">
+        <strong style="color:var(--gold);">Synthesis:</strong> The dominant Ray 7 at Soul level (33%) combines with Ray 1 (30%) to produce a profile oriented toward bringing disciplined order and purposeful will into material manifestation. Ray 3 (Intelligence) acts as the adaptive bridge — the mind capable of navigating complexity. The Ray 5 dominance at the mental level (48%) suggests a scientist's precision of thought, potentially in tension with the more mystical Soul rays. Reconciling this empirical mental nature with the water-dominant emotional body is a key developmental theme.
+      </p>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════ -->
+  <!-- SECTION 11: NOTABLE FEATURES -->
+  <!-- ════════════════════════════════════════════ -->
+  <section class="card" id="notable">
+    <div class="section-label">Section 11</div>
+    <h2 class="section-title"><span class="icon">◆</span> Notable Chart Features</h2>
+
+    <ul class="feature-list">
+      <li><span>Scorpio stellium: Sun + Pluto conjunct in the 7th house — identity and transformation fused in the relationship sector</span></li>
+      <li><span>Double Grand Trine in Water signs — Sun/Moon/Mars and Moon/Mars/Pluto, sharing the Moon-Mars axis</span></li>
+      <li><span>Uranus–Neptune conjunction in Capricorn (generational, orb 1°45') expressed in 9th house — the philosophy of an entire era channeled through one chart</span></li>
+      <li><span>Saturn is the highest-power planet by chart position (131.0), located in domicile Aquarius in the 10th house — authority through crisis</span></li>
+      <li><span>Aries Ascendant with Capricorn Midheaven — both Cardinal signs form the ASC/MC axis; Cardinal mode dominates at 44.25%</span></li>
+      <li><span>Mercury retrograde at birth in Sagittarius (detriment) — inward-turning, philosophical mind that processes before communicating</span></li>
+      <li><span>North Node retrograde in Sagittarius / 8th house — karmic pull toward esoteric inquiry, hidden truths, and cross-cultural philosophical depth</span></li>
+      <li><span>Mars in Cancer (fall) in the 4th, opposing both Uranus and Neptune — the will is protective and psychically permeable; action-taking is emotionally conditioned</span></li>
+      <li><span>Moon esoterically debilitated in Pisces / 11th house — compassion without form; the emotional body seeks collective belonging over personal attachment</span></li>
+      <li><span>Capricorn leads sign emphasis (156.8 / 18.98%) driven by Saturn in 10th and Uranus/Neptune — a Capricorn-inflected chart wearing Scorpio</span></li>
+    </ul>
+  </section>
+
+  <!-- ════════════════════════════════════════════ -->
+  <!-- SECTION 12: DISCUSSION PROMPTS -->
+  <!-- ════════════════════════════════════════════ -->
+  <section class="card" id="discussion">
+    <div class="section-label">Section 12</div>
+    <h2 class="section-title"><span class="icon">❧</span> Discussion Prompts for Astrologers</h2>
+    <p style="font-size:0.82rem;color:var(--text-dim);margin-bottom:1.4rem;">Questions designed to stimulate interpretive dialogue. These have no single correct answer — they are invitations to explore the chart's tensions and gifts.</p>
+
+    <ol class="prompt-list">
+      <li>How does the Aries Ascendant mask function as both a portal and a defense for this chart's dominant water signature? When does the warrior persona serve the soul, and when does it prevent the soul from being encountered?</li>
+      <li>The Sun–Pluto conjunction in Scorpio in the 7th: does lim primarily attract transformative relationships, or transform others through relationship — and is there a meaningful distinction in this chart?</li>
+      <li>With Saturn as the chart's highest-power planet squaring the Sun, what is the quality of the relationship between ambition and self-worth? How does failure — or the fear of it — function as a teacher here?</li>
+      <li>How might the double Grand Trine in water be both a profound gift and a structural limitation? What does it mean for a chart to be this self-sufficient emotionally — what must be consciously cultivated from the outside?</li>
+      <li>The North Node in Sagittarius / 8th house suggests a karmic calling toward philosophical inquiry into hidden truths — death, the occult, liminal crossings. What life experiences might activate this calling? How does Mercury retrograde in the same house and sign modify the path toward that North Node?</li>
+      <li>With Ray 7 dominant at the soul level (33%), alongside Uranus, Capricorn, and the Midheaven all carrying Ray 7 expression, how does lim's vocation involve bringing sacred order into material structures? Where do you see this Ray 7 principle already expressing in the nativity?</li>
+    </ol>
+
+    <div class="card-inner" style="margin-top:1.4rem;">
+      <p style="font-size:0.82rem;color:var(--text-dim);">
+        <strong style="color:var(--gold);">For Further Inquiry:</strong> Consider the tension between Mercury retrograde in Sagittarius (broad philosophical overview, internalized) and the Ray 5 mental dominance (precise, scientific, empirical). How does this native bridge the gap between intuitive knowing and rigorous analysis? The 8th house stellium in Sagittarius — Mercury, Venus, North Node — invites extended study of what it means to seek meaning in places others consider taboo or inaccessible.
+      </p>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════ -->
+  <!-- FOOTER -->
+  <!-- ════════════════════════════════════════════ -->
+  <footer class="page-footer">
+    <div class="gold-divider" style="margin:0 auto 1rem;"></div>
+    Natal Chart Reference — lim &nbsp;·&nbsp; 5 November 1992, 17:45 SGT &nbsp;·&nbsp; Singapore
+    <br>Placidus Houses &nbsp;·&nbsp; Tropical Zodiac &nbsp;·&nbsp; Geocentric
+    <br><br>
+    This document is prepared for astrological discussion and education. Interpretations are symbolic, not deterministic.
+  </footer>
+
+</div>
+
+<!-- ── Animate bars on load ── -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Small animation delay to let bars render visually
+    const fills = document.querySelectorAll('.power-bar-fill, .sign-bar-fill, .aspect-power-fill, .ray-pct-fill');
+    fills.forEach(function(el) {
+      var w = el.style.width;
+      el.style.width = '0';
+      setTimeout(function() { el.style.width = w; }, 100);
+    });
+  });
+</script>
+
+</body>
+</html>
