@@ -268,6 +268,22 @@
 
   /* ---------- tables & grids below ---------- */
   .tbl { padding: 8px; }
+  .ph { position: relative; display: grid; grid-template-columns: 170px minmax(0, 1fr) 84px; grid-template-rows: repeat(var(--rows), auto); border-radius: 12px; transition: background .2s var(--ease); }
+  .ph + .ph { box-shadow: 0 -1px 0 var(--hair); }
+  .ph:hover { background: var(--wash); box-shadow: none; }
+  .ph:hover + .ph { box-shadow: none; }
+  .ph-s { grid-column: 1; display: flex; align-items: flex-start; gap: 8px; padding: 16px 0 12px 14px; font: 300 13px/1.3 var(--mono); color: var(--ink); }
+  .ph-s .dot { margin-top: 5px; flex: none; }
+  .ph-p { grid-column: 2; display: flex; flex-direction: column; padding: 4px 0; }
+  .ph-n { grid-column: 3; grid-row: 1 / span var(--rows); align-self: start; text-align: right; padding: 12px 18px 0 0; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+  .ph-n b { font: 300 22px/1 var(--serif, 'Instrument Serif'), serif; font-weight: 400; color: var(--ink-2); }
+  .ph-n span { font: 300 11px/1 var(--mono); color: var(--ink-4, var(--ink-3)); }
+  .pr { position: relative; display: grid; grid-template-columns: 28px 120px minmax(0, 1fr) 90px; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 12px; }
+  .pr .sym { font-size: 18px; text-align: center; }
+  .pr .nm { font: 400 14px/1.3 var(--sans); color: var(--ink); }
+  .pr .nt { font: 300 12.5px/1.45 var(--sans); color: var(--ink-3); }
+  .pr .dg { font: 300 12.5px/1 var(--mono); color: var(--ink-2); text-align: right; transition: opacity .2s var(--ease); }
+  .pr .show { right: 4px; }
   .tr { position: relative; display: grid; grid-template-columns: 28px 150px 140px 150px 1fr 110px; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 12px; transition: background .2s var(--ease); }
   .tr + .tr { box-shadow: 0 -1px 0 var(--hair); }
   .tr:hover { background: var(--wash); box-shadow: none; }
@@ -303,7 +319,7 @@
   .m-x:active { transform: scale(.94); }
   .show { position: absolute; right: 10px; top: 50%; translate: 0 -50%; opacity: 0; transition: opacity .2s var(--ease), background .2s; border: 0; border-radius: 999px; background: #fff; box-shadow: 0 0 0 .5px rgba(0,0,0,.1), 0 2px 8px -2px rgba(0,0,0,.12); padding: 5px 10px; font: 300 11.5px/1 var(--mono); color: var(--ink-2); cursor: pointer; }
   .show:active { scale: .98; }
-  @media (hover: hover) { .tr:hover .show, .acell:hover .show { opacity: 1; } .tr:hover .dg { opacity: 0; } }
+  @media (hover: hover) { .tr:hover .show, .acell:hover .show, .pr:hover .show { opacity: 1; } .tr:hover .dg, .pr:hover .dg { opacity: 0; } }
 
   .houses { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
   .hcard { position: relative; padding: 16px 16px 14px; cursor: default; }
@@ -405,6 +421,12 @@
     .tr { grid-template-columns: 28px 130px 120px 130px 1fr 90px; }
   }
   @media (max-width: 960px) {
+    .ph { grid-template-columns: 96px minmax(0, 1fr) 52px; }
+    .ph-s { padding: 14px 0 10px 12px; }
+    .ph-n { padding-right: 12px; }
+    .ph-n span { display: none; }
+    .pr { grid-template-columns: 24px 1fr auto; padding: 10px 8px; }
+    .pr .nt { display: none; }
     .hero-grid { grid-template-columns: minmax(0, 1fr); }
     .insp .glass-in { height: 560px; }
     .houses { grid-template-columns: repeat(3, 1fr); }
@@ -1910,9 +1932,18 @@
 
   /* ───────── sections below ───────── */
   const showBtn = (f) => `<button class="show" data-show="${f}" aria-label="Show on chart">Show on chart</button>`;
-  $('#plTable').innerHTML = PLANETS.map((p) => { const s = SIGNS[p.sign]; return `<div class="tr"><span class="sym">${T(p.g)}</span><span class="nm">${p.n}</span><span class="tag"><span class="dot" style="background:${EL[s.el]}"></span>${s.n}</span><span class="tag hide-sm">${ORD(p.house)} · ${HOUSES[p.house - 1]}</span><span class="nt">${p.note}</span><span class="dg">${p.deg}${p.rx ? '<span class="rx">℞</span>' : ''}</span>${showBtn('planet:' + p.i)}</div>`; }).join('') +
-    `<div class="tr"><span class="sym" style="font-family:var(--mono);font-size:11px">ASC</span><span class="nm">Ascendant</span><span class="tag"><span class="dot" style="background:${EL.air}"></span>Aquarius</span><span class="tag hide-sm">1st · Self</span><span class="nt">${CONTENT.pnotes.ASC || ''}</span><span class="dg">1°54'</span>${showBtn('angle:0')}</div>` +
-    `<div class="tr"><span class="sym" style="font-family:var(--mono);font-size:11px">MC</span><span class="nm">Midheaven</span><span class="tag"><span class="dot" style="background:${EL.water}"></span>Scorpio</span><span class="tag hide-sm">10th · Calling</span><span class="nt">${CONTENT.pnotes.MC || ''}</span><span class="dg">6°57'</span>${showBtn('angle:1')}</div>`;
+  // Placements, Costar-style: one block per house (1st to 12th); inside it each sign leads, then the planets in that sign, with the house on the right
+  $('#plTable').innerHTML = HOUSES.map((hn, hi) => {
+    const items = [...houseOf(hi).map((p) => ({ ...p, kind: 'planet' })), ...ANGLES.filter((x) => x.house === hi + 1).map((x) => ({ ...x, kind: 'angle' }))];
+    if (!items.length) return '';
+    const start = CUSPS[hi], rel = (x) => ((x.lon - start) % 360 + 360) % 360;
+    items.sort((x, y) => rel(x) - rel(y));
+    const groups = [];
+    items.forEach((x) => { const g = groups.find((q) => q.sign === x.sign); g ? g.items.push(x) : groups.push({ sign: x.sign, items: [x] }); });
+    const row = (x) => `<div class="pr"><span class="sym"${x.kind === 'angle' ? ' style="font-family:var(--mono);font-size:11px"' : ''}>${x.kind === 'angle' ? x.a : T(x.g)}</span><span class="nm">${x.n}</span><span class="nt">${x.note}</span><span class="dg">${x.deg}${x.rx ? '<span class="rx">℞</span>' : ''}</span>${showBtn((x.kind === 'angle' ? 'angle:' : 'planet:') + x.i)}</div>`;
+    return `<div class="ph" style="--rows:${groups.length}">` + groups.map((g) => { const sg = SIGNS[g.sign]; return `<div class="ph-s"><span class="dot" style="background:${EL[sg.el]}"></span>${sg.n}</div><div class="ph-p">${g.items.map(row).join('')}</div>`; }).join('') +
+      `<div class="ph-n"><b>${hi + 1}</b><span>${hn}</span></div></div>`;
+  }).join('');
 
   $('#houseCards').innerHTML = HOUSES.map((h, i) => { const ps = houseOf(i), s = houseSign(i); return `<div class="card hcard lift reveal" style="--d:${(i % 4) * .04}s"><div class="n">${ORD(i + 1)}${AXIS[i] ? ' · ' + AXIS[i] : ''}</div><div class="th">${h}</div><div class="cs"><span class="sym" style="color:${EL[s.el]}">${T(s.g)}</span>${CUSP_TXT[i]}</div><div class="pls">${ps.map((p) => `<span class="sym" title="${p.n}">${T(p.g)}</span>`).join('') || '<span class="empty-mu" style="font:300 12px var(--mono)">empty</span>'}</div>${showBtn('house:' + i)}</div>`; }).join('');
 
