@@ -17,7 +17,7 @@ Rewrite every explanation on `lu-chart-desktop.html` so casual to semi-serious a
 
 ## Writing rules (all confirmed by the user)
 
-The user's voice now lives in the shared `writing-voice` skill (dotclaude). Load it with `humanizer` for every draft; it overrides the older "simple and short" reading of the rules below.
+The user's voice now lives in the shared `writing-voice` skill (dotclaude); copies of it and the humanizer sit in `rules/`, next to `rules/writing.md`, the general version of the rules below. Refresh the copies when the skills change. Load it with `humanizer` for every draft; it overrides the older "simple and short" reading of the rules below.
 
 - **Reader:** casual to semi-serious hobbyists. A middle schooler must understand it easily, nothing more complex.
 - **Address the reader as "you".**
@@ -74,10 +74,12 @@ The draft files (`01-planets.md`, `02-signs.md`, `03-page-sections.md`) were del
 
 ## Open questions
 
+- **Lilith's aspects** (answered 2026-10-19). astro.com computes none: with Chiron and Lilith switched on, its power table scores 0.0 aspects for Chiron, Lilith, the node, Asc and MC alike. Computed from the page's positions: Uranus square 1°43', Mercury sextile 2°51' (wider: Neptune square 4°12', Asc square 4°55'). Waiting on the user: add the two tight ones to `ASPECTS` and the grid, and approve the Lilith and Chiron card samples.
+- **Which power table** (2026-10-19). The second paste's planet table includes Chiron and Lilith and moves Mars from 5th to 2nd (10.29%, just ahead of Neptune) and the Sun from 10th of 13 to 11th of 15. The page still uses the first table. The new sign, element and house tables weren't pasted, so switching only the planet table would mix two settings.
 
 ## Known data issues
 
-- **Chiron isn't in the astro.com output.** The page's Chiron (5°03' Virgo) came from the older `lu-chart.html`; a printed ephemeris confirms it. Ask where it should come from for new charts.
+- **Chiron and Lilith come from astro.com** once they're switched on in the chart settings (second paste, 2026-10-19). It confirms Chiron in Virgo in the 8th, and retrograde, which the page now shows. Ask for the same settings when pasting new charts.
 - **Mars sits about 10′ past the 2nd-house cusp,** and Venus 2°16' before the 3rd, so a slightly different birth time would move them.
 - **astro.com lists no aspects to the angles or the nodes.** The closest it leaves out: Venus sextile Ascendant 0°53', Saturn trine MC 2°03', Chiron sextile MC 1°54'. Not on the page yet.
 - **Open with the user:** how gently to handle the mother/early-home theme that three Moon aspects point to (currently left out), and whether to use evolutionary-astrology "soul" language for the node (currently not used).

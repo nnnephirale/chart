@@ -78,7 +78,7 @@
 
   /* ---------- sections ---------- */
   .sec { margin-top: 112px; }
-  .sec:first-child { margin-top: 0; }
+  #chart.sec { margin-top: 0; }
   .sec-head { margin-bottom: 22px; max-width: 640px; }
   .sec-head .t-small { margin: 10px 0 0; }
   .card { background: var(--card); border-radius: var(--r-card); box-shadow: 0 0 0 1px var(--hair), var(--shadow); }
@@ -138,6 +138,11 @@
   .seg.sm button { padding: 4px 10px; font-size: 12px; }
 
   /* ---------- wheel svg ---------- */
+  /* phones: the wheel's camera glides to whatever is locked (after Lemniscate's spread guidance) */
+  #wheel.zoomed { overflow: hidden; -webkit-mask: linear-gradient(90deg, transparent, #000 12px, #000 calc(100% - 12px), transparent), linear-gradient(transparent, #000 12px, #000 calc(100% - 12px), transparent); -webkit-mask-composite: source-in; mask-composite: intersect; }
+  .zb { flex: 0 0 auto; display: grid; place-items: center; width: 36px; height: 36px; border: 0; border-radius: 999px; background: none; color: var(--ink-3); cursor: pointer; -webkit-tap-highlight-color: transparent; transition: background .2s var(--ease), color .2s var(--ease), opacity .3s var(--ease), transform .16s var(--ease); }
+  .zb svg { width: 14px; height: 14px; }
+  .zb:active { transform: scale(.94); }
   #wheel text { font-family: var(--mono); }
   #wheel .gsym { font-family: var(--sym); }
   .z-seg { transition: fill-opacity .3s var(--ease); fill-opacity: .18; }
@@ -477,7 +482,7 @@
     .rail:hover .lb, .rail:focus-within .lb { opacity: 1; transition-duration: .25s; transition-delay: .08s; }
     .rail .dot { left: auto; right: 3px; }
     .sec { max-width: 1120px; margin-left: auto; margin-right: auto; padding: 0 56px; }
-    main > footer { max-width: 1120px; margin-left: auto; margin-right: auto; padding-left: 56px; padding-right: 56px; }
+    main footer { max-width: 1120px; margin-left: auto; margin-right: auto; padding-left: 56px; padding-right: 56px; }
     #chart { max-width: none; padding: 0; margin-top: 0; }
     #chart .hero-head.off-plate { display: none; }
     .plate { margin: 12px; height: calc(100vh - 24px); min-height: 680px; border-radius: 28px; padding: 26px 28px 28px; display: flex; flex-direction: column; }
@@ -492,6 +497,93 @@
     .wheel-wrap { position: relative; min-height: 0; padding: 0; margin: 8px 0; }
     #wheel { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; }
     #chart .note { max-width: 1120px; margin: 18px auto 0; padding: 0 56px; }
+  }
+
+  /* ---------- phone (≤960px): the chart is its own full screen; everything else waits in sheets ---------- */
+  .read-btn, .minfo, .mtabs-wrap, .sheet-bar, .scrim, .msheet, .rest-bar, .rest-meta { display: none; }
+  #rest { display: contents; }
+  @media (max-width: 960px) {
+    .page { padding: 0; }
+    #chart { position: fixed; inset: 0; z-index: 5; height: 100vh; height: 100dvh; margin: 0; display: flex; flex-direction: column; }
+    #chart .hero-head.off-plate, #wheelNote, #chart .legend { display: none; }
+    #chart .reveal { opacity: 1; transform: none; }
+    #chart .plate { flex: 1; min-height: 0; margin: 0; border-radius: 0; display: flex; flex-direction: column; padding: calc(env(safe-area-inset-top) + 8px) 10px calc(env(safe-area-inset-bottom) + 10px); }
+    .hero-head.on-plate { display: flex; flex-direction: row; align-items: center; justify-content: space-between; gap: 12px; margin: 2px 6px 10px; position: relative; color: #fff; }
+    .hero-head.on-plate .t-label { color: rgba(255,255,255,.62); }
+    .hero-head.on-plate h1 { font-size: 26px; margin-top: 4px; color: #fff; }
+    .hero-head.on-plate .hero-meta { display: none; }
+    .read-btn { display: inline-flex; align-items: center; gap: 7px; height: 34px; padding: 0 14px; border: 0; border-radius: 999px; background: rgba(255,255,255,.16); box-shadow: inset 0 0 0 1px rgba(255,255,255,.34); color: #fff; font: 300 12.5px/1 var(--mono); cursor: pointer; -webkit-tap-highlight-color: transparent; transition: background .2s var(--ease), transform .16s var(--ease); }
+    .read-btn:active { transform: scale(.98); background: rgba(255,255,255,.24); }
+    .read-btn svg { width: 12px; height: 12px; }
+    .hero-grid { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 0; }
+    .wheel-card { flex: 1; min-height: 0; }
+    .wheel-card .glass-in { height: 100%; display: flex; flex-direction: column; padding: 10px 12px 0; }
+    /* the wheel takes only the height it needs (a square at full width) and gives way first on short screens */
+    .wheel-wrap { position: relative; flex: 0 1 auto; width: 100%; aspect-ratio: 1 / 1; min-height: 220px; padding: 0; margin: 6px 0 4px; }
+    #wheel { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+
+    /* what's in focus, right under the wheel: name and stepper, position, tag, three lines, More */
+    .minfo { display: flex; flex-direction: column; flex: 1 0 150px; min-height: 150px; padding: 8px 4px 8px 8px; box-shadow: 0 -1px 0 var(--hair); }
+    .mi-in { position: relative; display: flex; flex-direction: column; min-height: 0; flex: 1; animation: el-in .25s ease-out; }
+    .mi-top { display: flex; align-items: center; gap: 2px; }
+    .mi-name { flex: 0 1 auto; margin-right: auto; min-width: 0; display: flex; align-items: center; gap: 8px; height: 38px; padding: 0; border: 0; background: none; color: var(--ink); cursor: pointer; text-align: left; -webkit-tap-highlight-color: transparent; transition: transform .16s var(--ease); }
+    .mi-name:active { transform: scale(.98); }
+    .mi-name .sym { font-size: 19px; line-height: 1; }
+    .mi-name b { font: 400 23px/1.1 var(--serif); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .mi-name svg { flex: 0 0 auto; width: 11px; height: 11px; color: var(--ink-3); }
+    .mi-pos { font: 300 12px/1.5 var(--mono); color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 4px; }
+    .mi-body { position: relative; flex: 1; min-height: 0; margin-top: 4px; padding: 0 4px 0 0; border: 0; background: none; color: inherit; text-align: left; cursor: pointer; overflow: hidden; -webkit-tap-highlight-color: transparent; }
+    .mi-tag { display: block; font: 300 12.5px/1.5 var(--sans); color: var(--ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .mi-tag:empty { display: none; }
+    /* three lines at least; a taller screen shows more, faded where the card takes over */
+    .mi-text { display: block; font: 300 13.5px/1.5 var(--sans); color: var(--ink-2); }
+    .mi-body { -webkit-mask-image: linear-gradient(#000 calc(100% - 22px), transparent); mask-image: linear-gradient(#000 calc(100% - 22px), transparent); }
+    .minfo:not(.pinned) .mi-body { -webkit-mask-image: none; mask-image: none; }
+    .minfo:not(.pinned) .mi-text { color: var(--ink-3); }
+    .mi-more { position: absolute; right: 4px; bottom: 0; z-index: 1; border: 0; padding: 0 0 0 40px; cursor: pointer; background: linear-gradient(90deg, rgba(255,255,255,0), #fff 45%); font: 400 12.5px/1.6 var(--mono); color: var(--ink); }
+    .minfo:not(.pinned) .mi-more { display: none; }
+
+    /* mode tabs along the bottom, by the thumb */
+    .mtabs-wrap { display: block; flex: 0 0 auto; margin: 0 -12px; padding: 0 20px; box-shadow: 0 -1px 0 var(--hair); }
+    #mtabs { justify-content: space-between; gap: 14px; box-shadow: none; }
+    #mtabs button { padding: 15px 0 14px; font-size: 12.5px; }
+    #mtabs .loz { bottom: 8px; }
+
+    /* sheets: the More card (the inspector) and the index rise from the bottom over a dimmed chart */
+    .scrim { display: block; position: fixed; inset: 0; z-index: 25; background: rgba(0,0,0,.4); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); opacity: 0; visibility: hidden; transition: opacity .3s var(--ease), visibility 0s .3s; }
+    .scrim.on { opacity: 1; visibility: visible; transition-delay: 0s; }
+    .insp, .msheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; height: 86vh; height: 86dvh; display: flex; flex-direction: column; padding: 0 0 env(safe-area-inset-bottom); border-radius: 22px 22px 0 0; background: #fff; box-shadow: 0 -12px 48px rgba(0,0,0,.16), 0 -2px 8px rgba(0,0,0,.05); transform: translateY(calc(100% + 64px)); visibility: hidden; transition: transform .5s var(--ease), visibility 0s .5s; }
+    .insp.open, .msheet.open { transform: none; visibility: visible; transition: transform .5s var(--ease), visibility 0s; }
+    .insp .glass-in { flex: 1; height: auto; min-height: 0; border-radius: 22px 22px 0 0; }
+    .insp-top { display: none; }
+    .insp-body { margin-top: 0; }
+    .sheet-bar { display: flex; flex: 0 0 auto; align-items: center; justify-content: space-between; gap: 12px; height: 56px; padding: 0 12px 0 20px; }
+    .sheet-x { display: grid; place-items: center; width: 36px; height: 36px; margin-left: auto; border: 0; border-radius: 999px; background: var(--wash); color: var(--ink-2); cursor: pointer; transition: background .2s var(--ease), transform .16s var(--ease); }
+    .sheet-x:active { transform: scale(.94); }
+    .sheet-x svg { width: 14px; height: 14px; }
+    .msheet { display: flex; }
+    .idx-body { position: relative; flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; padding: 0 12px 28px; }
+    .idx-body::-webkit-scrollbar { display: none; }
+    .idx-body .f-sec:first-child { margin-top: 2px; }
+    .idx-body .row.hit { background: var(--wash); }
+    .idx-jump { display: flex; flex: 0 0 auto; gap: 20px; padding: 0 20px 10px; box-shadow: 0 1px 0 var(--hair); }
+    .idx-jump button { padding: 4px 0; border: 0; background: none; font: 300 12.5px/1.4 var(--mono); color: var(--ink-3); cursor: pointer; transition: color .2s var(--ease); }
+    .idx-jump button:active { color: var(--ink); }
+
+    /* the rest of the chart: a full-screen sheet over the chart, with a bar that slides away on the way down */
+    #rest { display: none; }
+    body.rest-open #rest { display: block; position: relative; z-index: 10; min-height: 100vh; min-height: 100dvh; padding: 0 28px 80px; background: linear-gradient(180deg, #FCFCFC, #F4F4F4); }
+    body.rest-settled #chart { display: none; }
+    .rest-bar { display: flex; position: sticky; top: 0; z-index: 3; align-items: center; justify-content: space-between; gap: 12px; height: 56px; margin: 0 -28px; padding: env(safe-area-inset-top) 12px 0 28px; box-sizing: content-box; background: rgba(252,252,252,.82); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); box-shadow: 0 1px 0 var(--hair); transition: transform .45s var(--ease); }
+    .rest-bar.away { transform: translateY(calc(-100% - 2px)); }
+    .rest-bar .rb-t { font: 300 12.5px/1 var(--mono); color: var(--ink-3); }
+    .rest-meta { display: block; padding: 28px 0 0; }
+    .rest-meta .hero-head { display: flex; margin: 0; }
+    #rest .rest-meta + .sec { margin-top: 56px; }
+  }
+  @media (max-width: 640px) {
+    body.rest-open #rest { padding: 0 16px 64px; }
+    .rest-bar { margin: 0 -16px; padding-left: 16px; }
   }
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation-duration: .001ms !important; animation-delay: 0s !important; transition-duration: .001ms !important; }
@@ -521,6 +613,7 @@
         <canvas id="plate" aria-hidden="true"></canvas>
         <div class="hero-head on-plate">
           <div><div class="t-label">Natal chart overview</div><h1>Lu</h1></div>
+          <button class="read-btn" id="openRest" type="button">Read your chart<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9.5v-7M3 5.5l3-3 3 3"/></svg></button>
           <div class="hero-meta">
             <span>Born</span><b>Fri 11 March 1994, 04:10 SGT</b>
             <span>Place</span><b>Singapore · 103°51'E 1°16'N</b>
@@ -536,10 +629,13 @@
               </div>
               <div class="legend" id="legend"></div>
               <div class="wheel-wrap"><svg id="wheel" viewBox="-14 -14 628 628" role="img" aria-label="Interactive natal chart wheel. Hover or tap planets, signs, houses and aspect lines."></svg></div>
+              <div class="minfo" id="minfo" aria-live="polite"></div>
+              <div class="mtabs-wrap"><div class="seg utabs" id="mtabs" role="tablist" aria-label="Chart mode" data-ease="cubic-bezier(.16,1,.3,1)"></div></div>
             </div>
           </div>
           <aside class="glass insp" aria-label="Chart inspector">
             <div class="glass-in">
+              <div class="sheet-bar"><button class="sheet-x" data-sheet-close aria-label="Close"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><path d="M4 4l6 6M10 4l-6 6"/></svg></button></div>
               <div class="insp-top">
                 <div class="seg utabs" id="segTabs" role="tablist" aria-label="Inspector" data-ease="cubic-bezier(.16,1,.3,1)"></div>
               </div>
@@ -552,7 +648,17 @@
         </div>
       </div>
       <p class="note t-small reveal" id="wheelNote"></p>
+      <div class="scrim" id="scrim"></div>
+      <aside class="msheet" id="idx" aria-label="Everything in your chart">
+        <div class="sheet-bar"><span class="t-label">Everything in your chart</span><button class="sheet-x" data-sheet-close aria-label="Close"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><path d="M4 4l6 6M10 4l-6 6"/></svg></button></div>
+        <div class="idx-jump" id="idxJump"><button data-j="0">Placements</button><button data-j="1">Signs</button><button data-j="2">Houses</button><button data-j="3">Aspects</button></div>
+        <div class="idx-body" id="idxBody"></div>
+      </aside>
     </section>
+
+    <div id="rest">
+    <div class="rest-bar" id="restBar"><span class="rb-t">Lu · Natal chart</span><button class="sheet-x" id="closeRest" aria-label="Back to the chart"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><path d="M4 4l6 6M10 4l-6 6"/></svg></button></div>
+    <div class="rest-meta" id="restMeta"></div>
 
     <section class="sec" id="planets" data-nav="Placements">
       <div class="sec-head reveal"><div class="t-label">Placements</div><h2 class="t-title">Where everything sits</h2></div>
@@ -560,7 +666,7 @@
     </section>
 
     <section class="sec" id="cusps" data-nav="Houses">
-      <div class="sec-head reveal"><div class="t-label">Houses</div><h2 class="t-title">Twelve houses, five with planets</h2></div>
+      <div class="sec-head reveal"><div class="t-label">Houses</div><h2 class="t-title">Twelve houses, six with placements</h2></div>
       <div class="houses" id="houseCards"></div>
       <div class="callout reveal" id="cuspsCallout"></div>
     </section>
@@ -631,6 +737,7 @@
       <span>Natal chart reference · 11 Mar 1994 04:10 SGT · Singapore · Placidus · Tropical</span>
       <span>Interpretations are symbolic, not deterministic.</span>
     </footer>
+    </div>
   </main>
 </div>
 
@@ -680,7 +787,7 @@
    "glyph": "◔",
    "num": "STORY 02",
    "title": "Bundle chart",
-   "body": "Look at your wheel and you'll see that it's lopsided: your whole sky fits in one third of it. All ten planets sit inside about 125°, and the other two thirds hold nothing but Chiron. Astrologers call this shape a bundle, and it belongs to people who go deep into a few parts of life and leave the rest alone. Every planet also sits on the left, eastern side of the chart, the side about you, your choices and your own momentum, so you tend to make your own way and set your own agenda. The hard part is letting other people in and letting them help, because so little of your chart faces them.",
+   "body": "Look at your wheel and you'll see that it's lopsided: your whole sky fits in one third of it. All ten planets sit inside about 125°, and the other two thirds hold only Chiron and Black Moon Lilith, a point rather than a planet. Astrologers call this shape a bundle, and it belongs to people who go deep into a few parts of life and leave the rest alone. Every planet also sits on the left, eastern side of the chart, the side about you, your choices and your own momentum, so you tend to make your own way and set your own agenda. The hard part is letting other people in and letting them help, because so little of your chart faces them.",
    "refs": [
     {
      "href": "#chart",
@@ -1068,7 +1175,7 @@
  ],
  "callouts": {
   "cusps": [
-   "<strong>91% of your chart's strength sits in four houses:</strong> the 2nd, 10th, 12th and 1st. Houses 3 to 7, the 9th and the 11th are empty, and the 8th holds only Chiron. Empty houses are normal, and your chart simply has a few very busy ones."
+   "<strong>91% of your chart's strength sits in four houses:</strong> the 2nd, 10th, 12th and 1st. Houses 4 to 7, the 9th and the 11th are empty, the 3rd holds only Black Moon Lilith, and the 8th holds only Chiron. Empty houses are normal, and your chart simply has a few very busy ones."
   ],
   "power": [
    "<strong>Your 2nd house holds 37% of your chart's strength.</strong> Five planets sit there: the Sun, Moon, Venus, Mars and Saturn. It's the part of life about value, belongings, money and self-worth, so think of 2nd house matters as the center of your chart, with your 10th house (28%) not far behind."
@@ -1154,6 +1261,10 @@
     "what": "The North Node is a point, not a planet. It shows the direction you're growing toward.",
     "chart": "Yours is in Scorpio. Opposite it, in Taurus, is your South Node: your comfort zone, the habits that come easily. For you, growing means stepping out of that \"my things, my way\" comfort and learning to trust and let people close. In your 10th house, that growth plays out through your work and how the world sees you. Its ℞ is routine, because this point almost always moves backwards."
    },
+   "Lilith": {
+    "what": "Black Moon Lilith is a point, not a planet: the spot where the Moon's path swings farthest from Earth. Astrologers read it as the wild, unfiltered side of you, the part that refuses to be tamed or told to behave.",
+    "chart": "Yours is in Aries, at almost 27°, in your 3rd house, the part of life about talking and learning. You may have a blunt, fiery honesty that comes out before you've planned it, and a strong urge to say what you really think even when people expect you to stay polite. If you were ever told to tone down how you speak, that fight to be heard on your own terms is where this point gets its power. Astrologers calculate this point two ways, and yours uses the smoothed-out average (the \"mean\" Lilith), which is the version astro.com shows."
+   },
    "Chiron": {
     "what": "Chiron is a small icy body between Saturn and Uranus. Astrologers call it the \"wounded healer\": a sore spot that slowly turns into wisdom you can share.",
     "chart": "Chiron in Virgo points to a worry about not being good enough or not doing things perfectly. The gift that grows from it is practical help, like routines and systems that help other people improve. It sits in your 8th house, the part of life about trust and sharing deeply with someone. It's almost exactly opposite your Saturn, so that \"not good enough\" feeling and your sense of duty can pull against each other. Healing comes from accepting that imperfect is okay."
@@ -1190,8 +1301,8 @@
    },
    "Aries": {
     "what": "Aries is bold and brave, the sign that likes to go first. As a fire sign it acts fast, and it loves starting new things.",
-    "chart": "Venus is your only planet in Aries, and your only planet in any fire sign. It makes you bold and direct in love. Your 3rd house starts in Aries too. That's the part of life about talking and learning, so you may speak up quickly and say what you think. Venus sits just before that line, still in your 2nd house.",
-    "tag": "Venus only · your one fire planet"
+    "chart": "Venus is your only planet in Aries, and your only planet in any fire sign. It makes you bold and direct in love. Black Moon Lilith, a point that shows your untamed side, sits here too, in your 3rd house. That house, the part of life about talking and learning, starts in Aries as well, so you may speak up quickly and say what you think. Venus sits just before that line, still in your 2nd house.",
+    "tag": "Venus and Lilith · your one fire planet"
    },
    "Aquarius": {
     "what": "Aquarius is original and independent, always thinking about the future. It's an air sign that lives for ideas, and it holds firm to what it believes.",
@@ -1241,9 +1352,9 @@
     "chart": "Five planets crowd in here, your Sun, Moon, Venus, Mars and Saturn, and your astro.com report gives this house more strength than any other. The old Greek astrologers called the 2nd the Gate of Hades, the first house fully below the horizon, and you were born about three hours before dawn with five bodies passing through it. Pisces on the cusp turns what is usually a vault into something closer to a tide: you might trust that what you need will come and still fear, with Saturn here, that it won't. Most of your other houses are ruled by planets sitting here, so nearly every area of your life would lead back to the same question of worth."
    },
    {
-    "tag": "Empty · ruled from your 2nd",
+    "tag": "Lilith only · ruled from your 2nd",
     "what": "The 3rd house covers everyday talk and learning: conversation, writing, siblings, neighbours and the short trips of ordinary life.",
-    "chart": "No planets sit here, which is normal, so the sign and its ruler tell the story. Aries on the cusp wants to get to the point and be the first to know, but its ruler, Mars, sits soft and cautious in Pisces in your 2nd house, so the quick Aries mind would arrive with a gentler, more practical delivery than people expect. Venus sits just 2° before this cusp, close enough that some astrologers would let it colour the way you speak."
+    "chart": "Only Black Moon Lilith sits here, a point and not a planet, so the sign and its ruler tell most of the story. Aries on the cusp wants to get to the point and be the first to know, but its ruler, Mars, sits soft and cautious in Pisces in your 2nd house, so the quick Aries mind would arrive with a gentler, more practical delivery than people expect. Venus sits just 2° before this cusp, close enough that some astrologers would let it colour the way you speak."
    },
    {
     "tag": "Empty · the bottom of your chart",
@@ -1407,12 +1518,14 @@
   "Pluto": "At home in Scorpio · your strongest planet",
   "N. Node": "Where you're headed · work and public life",
   "Chiron": "Opposite Saturn, almost exact",
+  "Lilith": "Your untamed voice · speaking up",
   "ASC": "Your first impression",
   "MC": "Top of your chart · career"
  }
 };
   const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const TOUCH = matchMedia('(hover: none)').matches;
+  const PHONE = matchMedia('(max-width: 960px)');
   const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const T = (s) => s + '︎'; // text presentation, never emoji
 
@@ -1441,7 +1554,8 @@
     { n: 'Neptune', a: 'NEP', g: '♆', lon: 292.7833, deg: "22°47'", house: 12 },
     { n: 'Pluto', a: 'PLU', g: '♇', lon: 238.0333, deg: "28°02'", house: 10, rx: true },
     { n: 'North Node', a: 'NODE', g: '☊', lon: 237.45, deg: "27°27'", house: 10, rx: true, key: 'N. Node' },
-    { n: 'Chiron', a: 'CHI', g: '⚷', lon: 155.05, deg: "5°03'", house: 8 },
+    { n: 'Chiron', a: 'CHI', g: '⚷', lon: 155.05, deg: "5°03'", house: 8, rx: true },
+    { n: 'Lilith', a: 'LIL', g: '⚸', lon: 26.9869, deg: "26°59'", house: 3, full: 'Black Moon Lilith' }, // mean Lilith; astro.com scores no aspects for it (see source file); keep last (the aspect grid skips it)
   ];
   // the two angles that open the 1st and 10th houses; listed with the planets, never drawn as glyphs
   const ANGLES = [{ n: 'Ascendant', a: 'ASC', lon: ASC, deg: "1°54'", house: 1 }, { n: 'Midheaven', a: 'MC', lon: MC, deg: "6°57'", house: 10 }]
@@ -1656,6 +1770,47 @@
     return { kind: 'Aspect', glyph: t.g, name: `${A.n} ${t.n} ${B.n}`, l1: `orb ${x.orb}`, l2: x.s };
   }
 
+  /* ───────── phone zoom ───────── */
+  const FULL = [-14, -14, 628, 628];
+  const Z = { ready: false, vb: FULL.slice(), raf: 0, key: '', on: false, card: null, nav: null };
+  const setVB = (v) => { Z.vb = v; svg.setAttribute('viewBox', v.map(f2).join(' ')); svg.classList.toggle('zoomed', v[2] < 600); };
+  // the square of the wheel worth seeing for a focus, kept inside the chart's own bounds
+  function frameOf(f) {
+    const ps = [], add = (lon, r) => ps.push(pt(lon, r));
+    if (f.kind === 'planet') { const p = PLANETS[f.i]; add(disp[p.i], R.zOut + 6); add(p.lon, R.zOut + 6); add(disp[p.i], R.deg - 12); }
+    else if (f.kind === 'angle') { const a = ANGLES[f.i]; add(a.lon, R.zOut + 16); add(a.lon, R.hIn); }
+    else if (f.kind === 'sign' || f.kind === 'house') {
+      const a = f.kind === 'sign' ? f.i * 30 : CUSPS[f.i], b0 = f.kind === 'sign' ? a + 30 : CUSPS[(f.i + 1) % 12], b = b0 < a ? b0 + 360 : b0;
+      for (let k = 0; k <= 6; k++) { const l = a + (b - a) * k / 6; add(l, R.zOut + 4); add(l, R.hIn - 8); }
+    } else if (f.kind === 'aspect') { const x = ASPECTS[f.i]; [x.a, x.b].forEach((i) => { add(PLANETS[i].lon, R.asp); add(disp[i], R.glyph + 18); }); }
+    if (!ps.length) return FULL;
+    const xs = ps.map((p) => p[0]), ys = ps.map((p) => p[1]);
+    const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+    const s = Math.min(628, Math.max(250, Math.max(x1 - x0, y1 - y0) + 36));
+    const fit = (c) => Math.min(Math.max(c - s / 2, -14), 614 - s);
+    return [fit((x0 + x1) / 2), fit((y0 + y1) / 2), s, s];
+  }
+  const easeExpo = (t) => t >= 1 ? 1 : 1 - Math.pow(2, -10 * t);
+  function zoomTo(v) {
+    cancelAnimationFrame(Z.raf);
+    if (RM) return setVB(v);
+    const from = Z.vb.slice(), t0 = performance.now();
+    const step = (now) => { const k = Math.min(1, (now - t0) / 700), e = easeExpo(k); setVB(from.map((a, i) => a + (v[i] - a) * e)); if (k < 1) Z.raf = requestAnimationFrame(step); };
+    Z.raf = requestAnimationFrame(step);
+  }
+  // the step bar follows the current list's rows, in their order
+  const stops = () => { const l = $('.list.on', lists); return l ? [...new Set($$('.row[data-focus]', l).filter((r) => r.offsetParent).map((r) => r.dataset.focus))] : []; };
+  const stepBy = (n) => { const st = stops(); if (!st.length) return; const i = S.pin ? st.indexOf(key(S.pin)) : -1; pin(parse(st[i < 0 ? (n > 0 ? 0 : st.length - 1) : (i + n + st.length) % st.length])); };
+  function zoomSync() {
+    if (!Z.ready) return;
+    const w = svg.getBoundingClientRect().width; if (!w) return; // hidden behind the rest sheet: keep the frame
+    const on = !DESK.matches && w < 520, k = key(S.pin);
+    if (k === Z.key && on === Z.on) return;
+    const moved = k !== Z.key; Z.key = k; Z.on = on;
+    zoomTo(on && S.pin ? frameOf(S.pin) : FULL);
+    if (moved) infoRender();
+  }
+
   /* ───────── highlight engine ───────── */
   const gAel = $('#asps');
   function paint() {
@@ -1704,6 +1859,7 @@
     if (pf) renderFocus(pf);
     $$('[data-focus]').forEach((el) => { if (el.closest('svg')) return; el.classList.toggle('hov', !!S.hover && el.dataset.focus === key(S.hover)); el.classList.toggle('sel', !!S.pin && el.dataset.focus === key(S.pin)); });
     agridHeads(f);
+    zoomSync();
   }
 
   /* hover. The wheel hit-tests by mode: the inspector tab decides what the whole wheel is sensitive to
@@ -1778,6 +1934,13 @@
     if (m) { e.preventDefault(); rxModal.showModal(); return; }
     const show = e.target.closest('[data-show]');
     if (show) { e.preventDefault(); showOnChart(parse(show.dataset.show)); return; }
+    if (PHONE.matches) {
+      if (lp.fired) { lp.fired = false; return; } // the long-press already opened the index
+      if (e.target.closest('#scrim, [data-sheet-close]')) { closeSheet(); return; }
+      if (e.target.closest('#idx')) { const r = e.target.closest('[data-focus]'); if (r) { pin(parse(r.dataset.focus)); closeSheet(); } return; }
+      if (e.target.closest('#minfo, .mtabs-wrap, .hero-head, #rest')) return; // they run their own taps and keep the lock
+      if (e.target.closest('.insp') && !e.target.closest('[data-focus]')) return;
+    }
     // on the wheel: lock what it is showing (taps and locked wheels have no hover, so they hit-test)
     if (e.target.closest('#wheel')) { const f = (S.hsrc === 'wheel' && S.hover) || wheelHit(e); if (f) pin(f); else unpin(); return; }
     const el = e.target.closest('[data-focus]');
@@ -1787,7 +1950,7 @@
   });
   document.addEventListener('keydown', (e) => {
     if (rxModal.open) return; // Esc closes the modal first
-    if (e.key === 'Escape') unpin();
+    if (e.key === 'Escape') { if (sheetEl) closeSheet(); else if (document.body.classList.contains('rest-open')) closeRest(); else unpin(); }
     const row = (e.key === 'Enter' || e.key === ' ') && e.target.closest?.('.insp [data-focus]');
     if (row) { e.preventDefault(); pin(parse(row.dataset.focus)); }
   });
@@ -1818,7 +1981,7 @@
     const pinned = same(f, S.pin), k = key(f) + (pinned ? '+' : ''); if (k === focusKey) return;
     const d = describe(f);
     // locking (or releasing) the card already on screen only relabels it, no crossfade
-    if (focusKey.replace('+', '') === key(f)) { focusKey = k; const fk = $(':scope > div:last-child .f-kind', focusEl); if (fk) fk.textContent = d.kind + (pinned ? ' · Locked' : ''); return; }
+    if (focusKey.replace('+', '') === key(f)) { focusKey = k; const fk = $(':scope > div:last-child .f-kind', focusEl); if (fk) fk.textContent = d.kind + (pinned && !PHONE.matches ? ' · Locked' : ''); return; }
     focusKey = k;
     let pos = `${d.l1}${d.l2 ? ` <em>·</em> ${d.l2}` : ''}`, body = '';
     if (f.kind === 'planet') {
@@ -1854,7 +2017,7 @@
       body = `<div class="f-str"><span class="track"><i style="width:${x.w}%;background:${t.c}"></i></span>${x.w}% strength</div>` + (pr?.tag ? `<div class="f-note">${pr.tag}</div>` : '') + (pr ? desc({ what: A.types[x.t], chart: pr.chart }) : '') + '</div>' +
         sec('Between', plRow(PLANETS[x.a]) + plRow(PLANETS[x.b]));
     }
-    const html = `<div class="fd-head"><div class="f-kind">${d.kind}${pinned ? ' · Locked' : ''}</div><div class="f-name">${d.glyph ? `<span class="sym">${T(d.glyph)}</span>` : ''}<b>${d.name}</b></div><div class="f-pos">${pos}</div>${body}`;
+    const html = `<div class="fd-head"><div class="f-kind">${d.kind}${pinned && !PHONE.matches ? ' · Locked' : ''}</div><div class="f-name">${d.glyph ? `<span class="sym">${T(d.glyph)}</span>` : ''}<b>${d.name}</b></div><div class="f-pos">${pos}</div>${body}`;
     // swap: the old card goes at once and the new one fades in (no overlap, so nothing ghosts)
     $$(':scope > div', focusEl).forEach((o) => o.remove());
     const n = document.createElement('div'); n.innerHTML = html; n.classList.add('out'); focusEl.appendChild(n);
@@ -1885,11 +2048,12 @@
   // the tab is the wheel's mode: switching it lets go of whatever was in focus
   const chooseMode = (v) => {
     setMode(v); S.pin = null; S.hover = null; S.hsrc = null; paint();
+    tabs.set(v); mtabs.set(v); mtRow.centre();
     $$('.list', lists).forEach((l) => l.classList.toggle('on', l.dataset.tab === v));
     if (v === 'aspects') { filterIn.place(); filterInRow.fade(); }
     segCentre();
   };
-  const tabs = segmented($('#segTabs'), TABS, S.tab, chooseMode);
+  const tabs = segmented($('#segTabs'), TABS, S.tab, chooseMode), mtabs = segmented($('#mtabs'), TABS, S.tab, chooseMode);
 
   // underline rows that overflow scroll sideways: fade the ends that hide more options, keep the chosen one in view
   const scrollRow = (el) => {
@@ -1898,7 +2062,7 @@
     el.addEventListener('scroll', fade, { passive: true }); addEventListener('resize', fade); document.fonts?.ready.then(fade); fade();
     return { fade, centre };
   };
-  const segRow = scrollRow($('#segTabs')), segCentre = segRow.centre;
+  const segRow = scrollRow($('#segTabs')), segCentre = segRow.centre, mtRow = scrollRow($('#mtabs'));
   const revealInList = (f) => {
     // the mode belongs to the lozenges: a lock only scrolls the current list to its row, if it has one
     const list = $('.list.on', lists), row = list && $(`[data-focus="${key(f)}"]`, list);
@@ -1927,6 +2091,7 @@
   function showOnChart(f) {
     S.pin = f; S.hover = null; paint(); revealInList(f);
     jump('chart');
+    if (PHONE.matches) return;
     const wc = $('.wheel-card .glass-in'); wc.classList.remove('flash'); void wc.offsetWidth; wc.classList.add('flash');
   }
 
@@ -1962,10 +2127,10 @@
 
   // aspect grid (aspectarian): lower triangle, planets × planets
   const AMAP = {}; ASPECTS.forEach((x) => { AMAP[Math.min(x.a, x.b) + '-' + Math.max(x.a, x.b)] = x; });
-  let g = '<table role="grid" aria-label="Aspect grid"><tr><th></th>' + PLANETS.slice(0, -1).map((p) => `<th data-col="${p.i}" title="${p.n}">${T(p.g)}</th>`).join('') + '</tr>';
-  for (let i = 1; i < PLANETS.length; i++) {
+  let g = '<table role="grid" aria-label="Aspect grid"><tr><th></th>' + PLANETS.slice(0, -2).map((p) => `<th data-col="${p.i}" title="${p.n}">${T(p.g)}</th>`).join('') + '</tr>';
+  for (let i = 1; i < PLANETS.length - 1; i++) {
     g += `<tr><th data-row="${i}" title="${PLANETS[i].n}">${T(PLANETS[i].g)}</th>`;
-    for (let j = 0; j < PLANETS.length - 1; j++) {
+    for (let j = 0; j < PLANETS.length - 2; j++) {
       if (j >= i) { g += '<td></td>'; continue; }
       const x = AMAP[j + '-' + i];
       g += x ? `<td class="c"><div class="acell" data-focus="aspect:${x.k}" data-t="${x.t}" data-r="${i}" data-c="${j}" style="color:${ATYPE[x.t].c}" tabindex="0" aria-label="${PLANETS[x.a].n} ${ATYPE[x.t].n} ${PLANETS[x.b].n}, orb ${x.orb}">${T(ATYPE[x.t].g)}</div></td>` : '<td class="c"></td>';
@@ -2078,15 +2243,110 @@
   addEventListener('wheel', () => { jumpTo = null; }, { passive: true });
   addEventListener('touchstart', () => { jumpTo = null; }, { passive: true });
   function jump(id) {
+    if (PHONE.matches) { if (id === 'chart') { closeRest(); return; } openRest(); }
     const t = document.getElementById(id); if (!t) return;
     const i = SECS.findIndex((s) => s.id === id);
     if (i >= 0) { jumpTo = id; jumpUntil = performance.now() + 1600; setActive(i); }
-    const y = id === 'chart' ? 0 : Math.max(0, t.getBoundingClientRect().top + scrollY - (DESK.matches ? 40 : 24));
+    const y = id === 'chart' ? 0 : Math.max(0, t.getBoundingClientRect().top + scrollY - (DESK.matches ? 40 : PHONE.matches ? 72 : 24));
     scrollTo({ top: y, behavior: RM ? 'auto' : 'smooth' });
   }
   $('.rail').addEventListener('click', (e) => { const a = e.target.closest('a'); if (!a) return; e.preventDefault(); e.stopPropagation(); jump(a.dataset.id || 'chart'); }, true);
   const replaceDot = () => { if (active >= 0) { dotAnim?.cancel(); dot.style.transform = `translateY(${dotY(active)}px)`; } };
   requestAnimationFrame(spy); spy(); document.fonts?.ready.then(replaceDot); addEventListener('resize', replaceDot); $('.rail').addEventListener('transitionend', (e) => { if (e.target === e.currentTarget && e.propertyName === 'width') replaceDot(); });
+
+  /* ───────── phone: info under the wheel, stepper, index and card sheets, the rest of the chart in its own sheet ───────── */
+  const mi = $('#minfo'), idxEl = $('#idx'), idxBody = $('#idxBody'), scrim = $('#scrim'), restEl = $('#rest'), restBar = $('#restBar');
+  const CHEV = '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4.5l3 3 3-3"/></svg>';
+  const ARROW = (d) => `<svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="${d}"/></svg>`;
+  const SIGNATURES = (Object.values(CONTENT.callouts).flat().find((t) => /Chart signatures/.test(t)) || '').replace(/<strong>.*?<\/strong>\s*/, '');
+  const OVERVIEW = `Sun ${SIGNS[PLANETS[0].sign].n} · Moon ${SIGNS[PLANETS[1].sign].n} · Rising ${SIGNS[ANGLES[0].sign].n}`;
+  // the tag and "in your chart" text each kind of focus already has for its card
+  const cardOf = (f) => {
+    if (f.kind === 'planet') { const p = PLANETS[f.i]; return { tag: p.note, text: CONTENT.cards.planets[p.n]?.chart }; }
+    if (f.kind === 'angle') { const a = ANGLES[f.i]; return { tag: a.note, text: CONTENT.cards.planets[a.n]?.chart }; }
+    if (f.kind === 'sign') { const c = CONTENT.cards.signs[SIGNS[f.i].n]; return { tag: c?.tag, text: c?.chart }; }
+    if (f.kind === 'house') { const c = CONTENT.cards.houses[f.i]; return { tag: c?.tag, text: c?.chart }; }
+    const x = ASPECTS[f.i], A = CONTENT.cards.aspects, pr = A.pairs[PLANETS[x.a].n + '|' + PLANETS[x.b].n] || A.pairs[PLANETS[x.b].n + '|' + PLANETS[x.a].n];
+    return { tag: pr?.tag, text: pr?.chart };
+  };
+  function infoRender() {
+    const f = S.pin, d = describe(f), c = d ? cardOf(f) : null;
+    mi.classList.toggle('pinned', !!d);
+    mi.innerHTML = `<div class="mi-in">
+      <div class="mi-top"><button class="mi-name" type="button" aria-label="${d ? d.name + ': ' : ''}see everything in your chart">${d?.glyph ? `<span class="sym">${T(d.glyph)}</span>` : ''}<b>${d ? d.name : 'Your chart'}</b>${CHEV}</button>
+        <button class="zb" data-z="-1" aria-label="Previous">${ARROW('M8.5 3.5L5 7l3.5 3.5')}</button><button class="zb" data-z="1" aria-label="Next">${ARROW('M5.5 3.5L9 7l-3.5 3.5')}</button></div>
+      <div class="mi-pos">${d ? [d.l1, d.l2s || d.l2].filter(Boolean).join(' · ') : OVERVIEW}</div>
+      <div class="mi-body" role="button" tabindex="0"${d ? ' aria-label="Read the full card"' : ''}><span class="mi-tag">${d ? c.tag || '' : SIGNATURES}</span><span class="mi-text">${d ? c.text || '' : 'Tap anything on the wheel, or step through it with the arrows. Tap a name to see everything in your chart at once.'}</span></div>
+      <button class="mi-more" type="button" tabindex="-1">More</button>
+    </div>`;
+  }
+  mi.addEventListener('keydown', (e) => { if ((e.key === 'Enter' || e.key === ' ') && e.target.classList.contains('mi-body')) { e.preventDefault(); e.target.click(); } });
+  mi.addEventListener('click', (e) => {
+    const b = e.target.closest('button, .mi-body'); if (!b) return;
+    e.stopPropagation(); // stepping re-renders this area, so the page-wide handler would see a detached target and let go
+    if (b.dataset.z) return stepBy(+b.dataset.z);
+    if (b.classList.contains('mi-name')) return openIndex(S.pin);
+    if (S.pin) openSheet(inspEl); else stepBy(1);
+  });
+
+  // sheets: one at a time, over a dimmed chart
+  let sheetEl = null;
+  function openSheet(el) { if (sheetEl && sheetEl !== el) sheetEl.classList.remove('open'); sheetEl = el; el.classList.add('open'); scrim.classList.add('on'); }
+  function closeSheet() { if (!sheetEl) return; sheetEl.classList.remove('open'); scrim.classList.remove('on'); sheetEl = null; }
+  idxBody.innerHTML = `<div class="f-sec">Placements</div>${placeRows()}<div class="f-sec">Signs</div>${SIGNS_BY_COUNT.map(sgRow).join('')}<div class="f-sec">Houses</div>${HOUSES.map((h, i) => hsRow(i)).join('')}<div class="f-sec">Aspects</div>${ASPECTS.map(asRow).join('')}`;
+  $('#idxJump').addEventListener('click', (e) => {
+    const b = e.target.closest('button'); if (!b) return; e.stopPropagation();
+    const h = $$('.f-sec', idxBody)[+b.dataset.j]; idxBody.scrollTo({ top: h.offsetTop - 8, behavior: RM ? 'auto' : 'smooth' });
+  });
+  function openIndex(f) {
+    $$('.row.hit', idxBody).forEach((r) => r.classList.remove('hit'));
+    openSheet(idxEl);
+    const row = f && $(`.row[data-focus="${key(f)}"]`, idxBody);
+    idxBody.scrollTop = row ? Math.max(0, row.offsetTop - idxBody.clientHeight / 2 + row.offsetHeight / 2) : 0;
+    row?.classList.add('hit');
+  }
+
+  // long-press anything on the wheel: the index opens on it
+  const lp = { t: 0, at: null, fired: false };
+  svg.addEventListener('pointerdown', (e) => {
+    if (!PHONE.matches) return;
+    lp.fired = false; lp.at = [e.clientX, e.clientY]; clearTimeout(lp.t);
+    const ev = { clientX: e.clientX, clientY: e.clientY, target: e.target };
+    lp.t = setTimeout(() => { lp.fired = true; navigator.vibrate?.(8); openIndex(wheelHit(ev) || S.pin); }, 480);
+  });
+  svg.addEventListener('pointermove', (e) => { if (lp.at && Math.hypot(e.clientX - lp.at[0], e.clientY - lp.at[1]) > 8) clearTimeout(lp.t); });
+  ['pointerup', 'pointercancel', 'pointerleave'].forEach((t) => svg.addEventListener(t, () => { clearTimeout(lp.t); lp.at = null; }));
+  svg.addEventListener('contextmenu', (e) => { if (PHONE.matches) e.preventDefault(); });
+
+  // the rest of the chart: slides up over it, and back down to where you left the wheel
+  $('#restMeta').innerHTML = `<div class="hero-head">${$('.hero-head.off-plate').innerHTML}</div>`;
+  let restAnim = null;
+  function openRest() {
+    if (!PHONE.matches || document.body.classList.contains('rest-open')) return;
+    closeSheet(); restAnim?.cancel(); restBar.classList.remove('away');
+    document.body.classList.add('rest-open'); scrollTo(0, 0);
+    restAnim = restEl.animate([{ transform: 'translateY(100vh)' }, { transform: 'none' }], { duration: RM ? 0 : 560, easing: 'cubic-bezier(.16,1,.3,1)' });
+    restAnim.onfinish = () => document.body.classList.add('rest-settled');
+  }
+  function closeRest() {
+    if (!document.body.classList.contains('rest-open')) return;
+    restAnim?.cancel(); document.body.classList.remove('rest-settled'); zoomSync();
+    restAnim = restEl.animate([{ transform: 'none' }, { transform: `translateY(${innerHeight}px)` }], { duration: RM ? 0 : 380, easing: 'cubic-bezier(.16,1,.3,1)', fill: 'forwards' });
+    restAnim.onfinish = () => { document.body.classList.remove('rest-open'); restAnim.cancel(); restAnim = null; scrollTo(0, 0); };
+  }
+  $('#openRest').addEventListener('click', openRest);
+  $('#closeRest').addEventListener('click', closeRest);
+  let lastY = 0;
+  addEventListener('scroll', () => {
+    if (!document.body.classList.contains('rest-settled')) return;
+    const y = scrollY, dy = y - lastY; if (Math.abs(dy) < 6) return;
+    restBar.classList.toggle('away', dy > 0 && y > 80); lastY = y;
+  }, { passive: true });
+  PHONE.addEventListener('change', () => { closeSheet(); document.body.classList.remove('rest-open', 'rest-settled'); restAnim?.cancel(); zoomSync(); });
+
+  Z.ready = true;
+  addEventListener('resize', zoomSync);
+  infoRender();
 
   paint();
 

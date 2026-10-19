@@ -3,8 +3,8 @@ Only the sections the rewrite uses are kept here. Left out on purpose: midpoints
 Arabic parts, planetary moons, rise/set times, the monthly ephemeris, the esoteric ray section and the
 Mean/True node raw tables. The original paste had them; they're out of scope for hobbyist copy.
 
-NOTE: Chiron is NOT in this output. Chiron 5°03' Virgo, 8th house, opposite Saturn 0°09' comes from the
-older lu-chart.html. Ask the user where Chiron comes from before building new charts.
+NOTE: The first paste had no Chiron or Lilith. A second paste (2026-10-19, with Chiron and Lilith switched on)
+confirms Chiron retrograde in Virgo, 8th house, and adds Lilith; see "SECOND PASTE" at the end.
 
 ==== BODIES (sign + house delineations) ====
 
@@ -118,3 +118,27 @@ Element: Fire 15.27% · Earth 18.81% · Air 16.80% · Water 49.12%
 Mode: Cardinal 29.33% · Fixed 40.57% · Mutable 30.10%
 House power: 2nd 36.95% (1) · 10th 28.00% (2) · 12th 16.28% (3) · 1st 10.19% (4) · every other house 1.07%
 House mode: Angular 40.34% · Succedent 40.16% · Cadent 19.50%
+
+==== SECOND PASTE (2026-10-19): Chiron and Lilith switched on ====
+Lilith in Aries and 3rd House: querent's capacity to let go and accept their natural darker side is forceful,
+  energetic, direct, courageous, and seeks adventure and challenge. Most often this manifests in the area of life
+  dealing with communicating to and receiving from the environment.
+Retrograde Chiron in Virgo and 8th House: querent's ability to help, heal, and teach others, and where one has
+  much experience is very analytical, critical, modest, helpful, and works toward perfection. Most often this
+  manifests in an independent, backward, introverted manner, and in the area of life dealing with sex, death, the
+  occult, and other hard to grasp topics. This bit plays only a minor part in their psyche.
+(Chiron esoteric section left out on purpose: esoteric material is out of scope.)
+
+Planet power with Chiron and Lilith included (position + aspects = total, rank, %):
+  Pluto 110.6 (1) 13.09% · Mars 86.8 (2) 10.29% · Neptune 86.6 (3) 10.26% · Jupiter 82.2 (4) 9.73%
+  Saturn 81.1 (5) 9.60% · Venus 75.7 (6) 8.96% · Uranus 55.2 (7) 6.54% · Moon 53.4 (8) 6.32%
+  Mercury 47.1 (9) 5.58% · Ascendant 45.0 (10) 5.33% · Sun 44.7 (11) 5.30% · Midheaven 40.0 (12) 4.74%
+  North Node 22.0 (13) 2.61% · Chiron 7.0 (14) 0.83% · Lilith 7.0 (15) 0.83%
+Changes from the first table: Mars +7.0, Mercury +7.0, Pluto +3.5; everything else unchanged.
+Chiron, Lilith, the node, Asc and MC all score 0.0 for aspects: Astrolog doesn't compute aspects for these points,
+  so their low ranks say nothing about their aspects (the page's Chiron oppositions are geometric, not astro.com's).
+Not in this paste: the new sign, element, mode and house power tables.
+
+Aspects to mean Lilith (26°59' Aries), computed from the page's positions, majors within 5°:
+  Uranus square 1°43' · Mercury sextile 2°51' · Neptune square 4°12' · Ascendant square 4°55'
+  (minor: Node quincunx 0°28', Pluto quincunx 1°03')
