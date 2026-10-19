@@ -16,7 +16,7 @@ The result is one self-contained HTML file, `charts/<name>.html`, that looks and
 
 Ask for anything missing, in one message:
 
-1. **The paste.** astro.com's "Walter Pullen" (Astrolog) text report with delineations, Placidus houses, and Chiron and Lilith switched on as additional objects. If Chiron or Lilith is missing from the positions, ask for a fresh paste with them on, since adding them changes the power tables.
+1. **The paste.** astro.com's "Walter Pullen" (Astrolog) text report with delineations, Placidus houses, and Chiron and Lilith switched on as additional objects. Chiron and Lilith must appear in the Positions block with a degree (e.g. "Chiron 5Vir03'…", "Lilith 26Ari59'…"); a delineation alone isn't enough. If either is missing from the positions, ask for a fresh paste with them on, since adding them changes the power tables.
 2. **The name** to show on the page (a first name or nickname).
 3. **Whether they want to approve samples first** (recommended, and the default).
 
@@ -44,13 +44,13 @@ Keep these sections and skip everything else (midpoints, astro-map line crossing
 | Power tables | Planets (score, rank, %), signs, elements, modes, houses |
 | Stelliums | Groups of three or more |
 
-Quirks: Astrolog cuts names to 8 characters ("North No", "Ascendan", "Midheave"), it writes the person's name in lowercase in the delineations ("lu's spirit…"), and it computes no aspects for Chiron, Lilith, the node or the angles.
+Quirks: Astrolog cuts names to 8 characters ("North No", "Ascendan", "Midheave"), it writes the person's name in lowercase in the delineations ("lu's spirit…"), or "querent" when no name was entered, and it computes no aspects for Chiron, Lilith, the node or the angles.
 
 ## 3. Replace the data
 
 All of it lives in the `<script>` near the bottom of the page, plus a few strings in the HTML.
 
-**Longitudes.** Absolute ecliptic longitude = sign index × 30 + degrees + minutes / 60 + seconds / 3600, with Aries = 0 through Pisces = 11.
+**Longitudes.** Absolute ecliptic longitude = sign index × 30 + degrees + minutes / 60 + seconds / 3600, with Aries = 0 through Pisces = 11. Round to 4 decimals.
 
 | Constant | What to put in |
 |---|---|
@@ -63,14 +63,15 @@ All of it lives in the `<script>` near the bottom of the page, plus a few string
 
 **Aspects.** Each entry is `[a, b, type, orb, strength, label]`, where `a` and `b` are `PLANETS` indices and type is `conj`, `sex`, `sq`, `tri` or `opp`.
 
-- Take every major aspect from astro.com's ranked list (Con, Sex, Squ, Tri, Opp; skip minor ones).
-- Add Chiron's major aspects yourself, from the longitudes, within 3°, since Astrolog leaves them out. Leave Lilith without aspects; the grid skips it.
-- Strength (0–100) = round(100 × (1 − orb ÷ 10°)), at least 5. Label by orb: Exact under 0°30', Tight under 2°30', Strong under 5°, Moderate under 7°, Wide beyond.
-- Order them strongest first, with the aspects you computed yourself at the end. In the ranked list the code marks those with `·` instead of a number using `x.t === 'opp'`, because Lu's only oppositions are computed Chiron ones. If the new chart has oppositions from astro.com, add a sixth field such as `'calc'` to the computed entries, carry it through the `.map(...)` and test that instead.
+- Take every major aspect from astro.com's ranked list (Con, Sex, Squ, Tri, Opp; skip minor ones), with the orb exactly as astro.com prints it.
+- Add Chiron's and the North Node's major aspects to the other bodies yourself, from the longitudes, within 3°, rounding the orb to the nearest minute, since Astrolog leaves them out. Leave Lilith without aspects; the grid skips it.
+- Strength (0–100) = round(100 × (1 − orb ÷ 12°)), at least 5. Label by orb: Exact under 0°30', Tight under 2°30', Strong under 5°, Moderate under 7°, Wide beyond.
+- Order them by strength, highest first (ties in astro.com's order), with the aspects you computed yourself at the end, also by strength.
+- Mark the computed ones: add a sixth field `'calc'` to each, carry it through the `.map(...)` (e.g. `([a, b, t, orb, w, s, src], k) => ({ k, a, b, t, orb, w, s, src })`), and in the ranked list change the test that prints `·` instead of a number from `x.t === 'opp'` to `x.src === 'calc'`. (The reference tests for oppositions because Lu's only computed aspects happened to be Chiron oppositions.)
 
 **Strength and balance bars** (search for `bars([` and `donut(`):
 
-- `#powerPlanets`: the top 6 planets by %, each bar's width = its % ÷ the top % × 100.
+- `#powerPlanets`: the top 6 planets by % from the planet table that includes Chiron and Lilith, each bar's width = its % ÷ the top % × 100, rounded to one decimal (the same rounding for every bar below).
 - `#powerHouses`: the top 4 houses, labelled like `'2nd · Value'` (names from `HOUSES`).
 - `#signBars`: the top 4 signs, coloured by element (`EL.water` etc.).
 - `#donutEl` and `#donutMo`: element and mode percentages, largest first.
@@ -78,9 +79,9 @@ All of it lives in the `<script>` near the bottom of the page, plus a few string
 **Strings in the HTML:**
 
 - `<title>`, the comment under `<style>`, `.rail-brand` (text and aria-label) and both `<h1>`s: the person's name.
-- Both `.hero-meta` blocks and the `<footer>`: date, time, zone, place and coordinates from the header line.
+- Both `.hero-meta` blocks and the `<footer>`: date, time, zone, place and coordinates from the header line, written like the reference: "Fri 11 March 1994, 04:10 UTC+8", "Singapore · 103°51'E 1°16'N", and in the footer "11 Mar 1994 04:10 UTC+8". Astrolog's "Zone h8e" means UTC+8 (h5w would be UTC−5); use a local abbreviation such as SGT only if the person gives one.
 - Section titles that state facts: Houses ("Twelve houses, N with placements", counting houses with anything from `PLANETS`), Balance (e.g. "Nearly half water") and Signs (e.g. "Scorpio and Pisces lead").
-- The hero plate's colours follow the chart's strongest element. Lu's are water: the five-stop ramp in `gl.uniform3fv(U.uC, [...])`, its highlight `uHi`, and the matching `.plate` CSS gradient fallback. For another element, keep the same structure (a near-black tinted with that element's hue, rising to a pale tint) based on its colour in `ELHEX`.
+- The hero plate's colours follow the chart's strongest element. Lu's are water: the five-stop ramp in `gl.uniform3fv(U.uC, [...])`, its highlight `uHi`, and the matching `.plate` CSS gradient fallback. Lu's ramp runs from a near-black teal through the water hue and ends in a pale lavender (`#a9a6ea`, highlight `#e4e4ff`, CSS `#8f8fe0`). For another element, keep that structure: a near-black tinted with the element's hue (its colour in `ELHEX`), rising through that hue to a pale tint shifted slightly towards lavender.
 
 Sign order in the lists is computed, so leave it alone.
 
@@ -112,7 +113,7 @@ How to write it:
 
 ## 5. Check the page
 
-- Search the new file for leftovers from the reference: `Lu`, `lu's`, `1994`, `Singapore`, and any of Lu's placements (e.g. "Pisces" where the new chart has none). Fix every hit.
+- Search the new file for leftovers from the reference: `Lu`, `lu's`, `1994`, `Singapore`, every code comment that names Lu (e.g. the plate shader's "Lu's water palette" and the Lilith note in `PLANETS`), and any of Lu's placements (e.g. "Pisces" where the new chart has none). Fix every hit.
 - Make sure the JSON in `CONTENT` parses and every planet, sign, house and aspect has its card.
 - Open the page in a browser with no console errors. Check that the wheel draws, hovering each planet fills the side panel, the aspect grid lines up and the Placements list shows every house with something in it.
 - Tell the person to double-click `charts/<name>.html` to open it.
