@@ -246,7 +246,8 @@
   .list::-webkit-scrollbar { display: none; }
   .list.on { opacity: 1; visibility: visible; transition-duration: .2s; }
   .row { display: grid; align-items: center; gap: 10px; padding: 7px 8px; border-radius: 10px; cursor: pointer; transition: background .2s var(--ease); font: 300 12.5px/1.35 var(--mono); color: var(--ink-2); }
-  .row.hov, .row:hover { background: var(--wash); }
+  .row.hov { background: var(--wash); }
+  @media (hover: hover) { .row:hover { background: var(--wash); } }
   .row.sel { background: var(--wash-2); }
   .row .sym { font-size: 15px; color: var(--ink); text-align: center; }
   .row .nm { color: var(--ink); font-weight: 400; }
@@ -254,7 +255,7 @@
   .row .rt { text-align: right; color: var(--ink-3); white-space: nowrap; }
   .row:focus-visible { outline: 1.5px solid var(--ink-4); outline-offset: -1.5px; }
   .lnk { cursor: pointer; border-radius: 4px; transition: color .2s var(--ease); text-decoration: underline transparent; text-underline-offset: 3px; }
-  .lnk:hover { color: var(--ink); text-decoration-color: var(--ink-5); }
+  @media (hover: hover) { .lnk:hover { color: var(--ink); text-decoration-color: var(--ink-5); } }
   .lnk.sym:hover { text-decoration: none; }
   .r-pl { grid-template-columns: 20px 74px 1fr 34px 58px; }
   .r-sg { grid-template-columns: 20px 92px 1fr; }
@@ -581,11 +582,10 @@
     .sheet-x:active { transform: scale(.94); }
     .sheet-x svg { width: 14px; height: 14px; }
     .msheet { display: flex; }
-    .idx-body { position: relative; flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; padding: 0 12px 28px; }
-    .idx-body::-webkit-scrollbar { display: none; }
-    /* section headings in the index: darker, with room above and below */
-    .idx-body .f-sec { margin: 34px 8px 12px; color: var(--ink-2); }
-    .idx-body .f-sec:first-child { margin-top: 18px; }
+    /* four pages side by side: swipe sideways between sections, scroll down within one */
+    .idx-body { position: relative; flex: 1; min-height: 0; display: flex; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; scrollbar-width: none; }
+    .idx-body::-webkit-scrollbar, .idx-page::-webkit-scrollbar { display: none; }
+    .idx-page { position: relative; flex: 0 0 100%; min-width: 0; overflow-y: auto; overscroll-behavior: contain; scroll-snap-align: start; scroll-snap-stop: always; scrollbar-width: none; padding: 10px 12px 28px; }
     .idx-body .row.hit { background: var(--wash); }
     /* jump tabs: the headings' type on the underline row; the underline follows the section in view */
     .idx-tabs { flex: 0 0 auto; padding: 0 20px; }
@@ -2334,7 +2334,7 @@
   // history: every screen opened in the sheet (the index or any card); back past the first returns to the chart
   const hist = { list: [], at: -1 };
   const cardScroller = () => $(':scope > div:last-child', focusEl);
-  function histSave() { const h = hist.list[hist.at]; if (h) h.scroll = h.sheet === 'idx' ? idxBody.scrollTop : cardScroller()?.scrollTop || 0; }
+  function histSave() { const h = hist.list[hist.at]; if (h) h.scroll = h.sheet === 'idx' ? { page: idxAt(), top: idxPages[idxAt()].scrollTop } : cardScroller()?.scrollTop || 0; }
   function histShow(h) {
     if (h.sheet === 'idx') showIndex(h.f, h.scroll);
     else { pin(h.f); openSheet(inspEl); const sc = cardScroller(); if (sc) sc.scrollTop = h.scroll || 0; }
@@ -2353,32 +2353,33 @@
   // a link inside the card: on a phone it's a new screen in the sheet's history
   const inspGo = (f) => (PHONE.matches && sheetEl === inspEl ? histGo({ sheet: 'card', f }) : pin(f));
 
-  idxBody.innerHTML = `<div class="f-sec">Placements</div>${placeRows()}<div class="f-sec">Signs</div>${SIGNS_BY_COUNT.map(sgRow).join('')}<div class="f-sec">Houses</div>${HOUSES.map((h, i) => hsRow(i)).join('')}<div class="f-sec">Aspects</div>${ASPECTS.map(asRow).join('')}`;
-  // jump tabs: a tap scrolls to that section; while scrolling, the underline sits on the section in view
-  const idxHeads = $$('.f-sec', idxBody);
-  let idxJump = false, idxJumpT = 0;
-  const idxGo = (v) => {
-    idxJump = true; clearTimeout(idxJumpT); idxJumpT = setTimeout(idxLand, 700); // the underline goes straight to the tapped tab and stays there until the scroll lands
-    idxBody.scrollTo({ top: idxHeads[+v].offsetTop - 12, behavior: RM ? 'auto' : 'smooth' });
-  };
-  const idxTabs = segmented($('#idxTabs'), ['Placements', 'Signs', 'Houses', 'Aspects'].map((n, i) => ({ v: String(i), html: n })), '0', idxGo);
-  $('#idxTabs').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) idxGo(b.dataset.v); }); // the tab already underlined still scrolls to its heading
-  function idxSpy() {
-    if (idxJump) return;
-    const y = idxBody.scrollTop + 28; let k = 0;
-    idxHeads.forEach((h, i) => { if (h.offsetTop <= y) k = i; });
-    if (idxBody.scrollTop > 0 && idxBody.scrollTop + idxBody.clientHeight >= idxBody.scrollHeight - 2) k = idxHeads.length - 1;
-    idxTabs.set(String(k));
-  }
-  function idxLand() { idxJump = false; }
-  idxBody.addEventListener('scroll', () => { if (idxJump) { clearTimeout(idxJumpT); idxJumpT = setTimeout(idxLand, 140); } else idxSpy(); }, { passive: true });
+  // four pages, one per section; the tabs name them, so the pages carry no headings
+  idxBody.innerHTML = [placeRows(), SIGNS_BY_COUNT.map(sgRow).join(''), HOUSES.map((h, i) => hsRow(i)).join(''), ASPECTS.map(asRow).join('')].map((rows) => `<div class="idx-page">${rows}</div>`).join('');
+  const idxPages = $$('.idx-page', idxBody), PAGE_OF = { planet: 0, angle: 0, sign: 1, house: 2, aspect: 3 };
+  const idxW = () => idxBody.clientWidth || 1;
+  const idxAt = () => Math.round(idxBody.scrollLeft / idxW());
+  const idxTabs = segmented($('#idxTabs'), ['Placements', 'Signs', 'Houses', 'Aspects'].map((n, i) => ({ v: String(i), html: n })), '0', (v) => idxBody.scrollTo({ left: +v * idxW(), behavior: RM ? 'auto' : 'smooth' }));
+  // the underline rides the swipe: it sits between two tabs in proportion to how far the page has moved
+  const idxLoz = $('#idxTabs .loz'), idxBtns = $$('#idxTabs button');
+  let idxSettle = 0;
+  idxBody.addEventListener('scroll', () => {
+    const p = Math.max(0, Math.min(idxBtns.length - 1, idxBody.scrollLeft / idxW())), i = Math.floor(p), t = p - i, A = idxBtns[i], B = idxBtns[Math.min(i + 1, idxBtns.length - 1)];
+    idxLoz.getAnimations().forEach((x) => x.cancel());
+    idxLoz.style.left = A.offsetLeft + (B.offsetLeft - A.offsetLeft) * t + 'px';
+    idxLoz.style.width = A.offsetWidth + (B.offsetWidth - A.offsetWidth) * t + 'px';
+    clearTimeout(idxSettle); idxSettle = setTimeout(() => idxTabs.set(String(idxAt())), 90);
+  }, { passive: true });
   function showIndex(f, scroll) {
     $$('.row.hit', idxBody).forEach((r) => r.classList.remove('hit'));
     openSheet(idxEl);
-    const row = f && $(`.row[data-focus="${key(f)}"]`, idxBody);
-    idxBody.scrollTop = scroll != null ? scroll : row ? Math.max(0, row.offsetTop - idxBody.clientHeight / 2 + row.offsetHeight / 2) : 0;
-    row?.classList.add('hit');
-    idxJump = false; idxSpy(); idxTabs.place();
+    if (scroll) { idxBody.scrollLeft = scroll.page * idxW(); idxPages[scroll.page].scrollTop = scroll.top; }
+    else {
+      const k = f ? PAGE_OF[f.kind] : 0, pg = idxPages[k], row = f && $(`.row[data-focus="${key(f)}"]`, pg);
+      idxBody.scrollLeft = k * idxW();
+      pg.scrollTop = row ? Math.max(0, row.offsetTop - pg.clientHeight / 2 + row.offsetHeight / 2) : 0;
+      row?.classList.add('hit');
+    }
+    idxTabs.set(String(idxAt())); idxTabs.place();
   }
   const openIndex = (f) => histStart({ sheet: 'idx', f });
 
