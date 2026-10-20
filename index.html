@@ -507,10 +507,10 @@
   #rest { display: contents; }
   @media (max-width: 960px) {
     .page { padding: 0; }
-    #chart { position: fixed; inset: 0; z-index: 5; height: 100vh; height: 100dvh; margin: 0; display: flex; flex-direction: column; }
+    #chart { position: fixed; top: 0; left: 0; right: 0; z-index: 5; height: 100vh; height: 100lvh; margin: 0; display: flex; flex-direction: column; }
     #chart .hero-head.off-plate, #wheelNote, #chart .legend { display: none; }
     #chart .reveal { opacity: 1; transform: none; }
-    #chart .plate { flex: 1; min-height: 0; margin: 0; border-radius: 0; display: flex; flex-direction: column; padding: calc(env(safe-area-inset-top) + 8px) 10px calc(env(safe-area-inset-bottom) + 10px); }
+    #chart .plate { flex: 1; min-height: 0; margin: 0; border-radius: 0; display: flex; flex-direction: column; padding: calc(env(safe-area-inset-top) + 8px) 10px calc(env(safe-area-inset-bottom) + 10px); padding-bottom: calc(env(safe-area-inset-bottom) + 10px + 100lvh - 100dvh); }
     .hero-head.on-plate { display: flex; flex-direction: row; align-items: center; justify-content: space-between; gap: 12px; margin: 2px 6px 10px; position: relative; color: #fff; }
     .hero-head.on-plate .t-label { color: rgba(255,255,255,.62); }
     .hero-head.on-plate h1 { font-size: 26px; margin-top: 4px; color: #fff; }
@@ -603,9 +603,6 @@
     .rest-meta { display: block; padding: 28px 0 0; }
     .rest-meta .hero-head { display: flex; margin: 0; }
     #rest .rest-meta + .sec { margin-top: 56px; }
-  }
-  @media (max-width: 960px) {
-    html:has(> body:not(.rest-open)), body:not(.rest-open) { background: #123540; }
   }
   @media (max-width: 640px) {
     body.rest-open #rest { padding: 0 16px 64px; }
@@ -1965,7 +1962,7 @@
       const hb = e.target.closest('[data-hist]');
       if (hb) { histStep(hb.dataset.hist === 'back' ? -1 : 1); return; }
       if (e.target.closest('#scrim, [data-sheet-close]')) { closeSheet(); return; }
-      if (e.target.closest('#idx')) { const r = e.target.closest('[data-focus]'); if (r) histGo({ sheet: 'card', f: parse(r.dataset.focus) }); return; }
+      if (e.target.closest('#idx')) { const r = e.target.closest('[data-focus]'); if (r) { closeSheet(); pin(parse(r.dataset.focus)); } return; } // the sheet slides away and the wheel zooms to it
       if (e.target.closest('#minfo, .mtabs-wrap, .hero-head, #rest')) return; // they run their own taps and keep the lock
       if (e.target.closest('.insp') && !e.target.closest('[data-focus]')) return;
     }
@@ -2410,8 +2407,9 @@
     restAnim = restEl.animate([{ transform: 'none' }, { transform: `translateY(${innerHeight}px)` }], { duration: RM ? 0 : 380, easing: 'cubic-bezier(.16,1,.3,1)', fill: 'forwards' });
     restAnim.onfinish = () => { document.body.classList.remove('rest-open'); restAnim.cancel(); restAnim = null; scrollTo(0, 0); };
   }
+  // no theme colour on the chart screen, so Safari's bars stay see-through over the plate
   const themeMeta = $('meta[name="theme-color"]');
-  const themeSync = () => { themeMeta.content = PHONE.matches && !document.body.classList.contains('rest-open') ? '#123540' : '#FCFCFC'; };
+  const themeSync = () => { if (PHONE.matches && !document.body.classList.contains('rest-open')) themeMeta.remove(); else if (!themeMeta.isConnected) document.head.appendChild(themeMeta); };
   new MutationObserver(themeSync).observe(document.body, { attributes: true, attributeFilter: ['class'] }); themeSync();
   $('#openRest').addEventListener('click', openRest);
   $('#closeRest').addEventListener('click', closeRest);
