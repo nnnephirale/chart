@@ -583,9 +583,11 @@
     .sheet-x svg { width: 14px; height: 14px; }
     .msheet { display: flex; }
     /* four pages side by side: swipe sideways between sections, scroll down within one */
-    .idx-body { position: relative; flex: 1; min-height: 0; display: flex; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; scrollbar-width: none; }
+    /* each section is a card on a grey ground; the neighbours peek at the edges and step back as they leave the centre */
+    .idx-body { position: relative; flex: 1; min-height: 0; display: flex; gap: 10px; padding: 12px 0 16px 20px; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; scrollbar-width: none; background: linear-gradient(180deg, #F7F7F7, #F1F1F1); }
+    .idx-body::after { content: ''; flex: 0 0 10px; }
     .idx-body::-webkit-scrollbar, .idx-page::-webkit-scrollbar { display: none; }
-    .idx-page { position: relative; flex: 0 0 100%; min-width: 0; overflow-y: auto; overscroll-behavior: contain; scroll-snap-align: start; scroll-snap-stop: always; scrollbar-width: none; padding: 10px 12px 28px; }
+    .idx-page { position: relative; flex: 0 0 calc(100% - 40px); min-width: 0; overflow-y: auto; overscroll-behavior: contain; scroll-snap-align: center; scroll-snap-stop: always; scrollbar-width: none; padding: 10px 8px 24px; border-radius: 20px; background: #fff; box-shadow: 0 0 0 1px rgba(0,0,0,.04), 0 1px 2px rgba(0,0,0,.04), 0 8px 24px rgba(0,0,0,.06); transform-origin: 50% 40%; will-change: transform, opacity; }
     .idx-body .row.hit { background: var(--wash); }
     /* jump tabs: the headings' type on the underline row; the underline follows the section in view */
     .idx-tabs { flex: 0 0 auto; padding: 0 20px; }
@@ -2356,30 +2358,36 @@
   // four pages, one per section; the tabs name them, so the pages carry no headings
   idxBody.innerHTML = [placeRows(), SIGNS_BY_COUNT.map(sgRow).join(''), HOUSES.map((h, i) => hsRow(i)).join(''), ASPECTS.map(asRow).join('')].map((rows) => `<div class="idx-page">${rows}</div>`).join('');
   const idxPages = $$('.idx-page', idxBody), PAGE_OF = { planet: 0, angle: 0, sign: 1, house: 2, aspect: 3 };
-  const idxW = () => idxBody.clientWidth || 1;
-  const idxAt = () => Math.round(idxBody.scrollLeft / idxW());
-  const idxTabs = segmented($('#idxTabs'), ['Placements', 'Signs', 'Houses', 'Aspects'].map((n, i) => ({ v: String(i), html: n })), '0', (v) => idxBody.scrollTo({ left: +v * idxW(), behavior: RM ? 'auto' : 'smooth' }));
-  // the underline rides the swipe: it sits between two tabs in proportion to how far the page has moved
+  const idxStride = () => (idxPages[1].offsetLeft - idxPages[0].offsetLeft) || 1;
+  const idxLeft = (i) => idxPages[i].offsetLeft - (idxBody.clientWidth - idxPages[i].offsetWidth) / 2;
+  const idxAt = () => Math.max(0, Math.min(idxPages.length - 1, Math.round(idxBody.scrollLeft / idxStride())));
+  const idxTabs = segmented($('#idxTabs'), ['Placements', 'Signs', 'Houses', 'Aspects'].map((n, i) => ({ v: String(i), html: n })), '0', (v) => idxBody.scrollTo({ left: idxLeft(+v), behavior: RM ? 'auto' : 'smooth' }));
+  // the swipe drives everything: the underline slides between tabs, and each card steps back (scale and fade) as it leaves the centre
   const idxLoz = $('#idxTabs .loz'), idxBtns = $$('#idxTabs button');
-  let idxSettle = 0;
-  idxBody.addEventListener('scroll', () => {
-    const p = Math.max(0, Math.min(idxBtns.length - 1, idxBody.scrollLeft / idxW())), i = Math.floor(p), t = p - i, A = idxBtns[i], B = idxBtns[Math.min(i + 1, idxBtns.length - 1)];
+  let idxSettle = 0, idxRaf = 0;
+  function idxFrame() {
+    idxRaf = 0;
+    const p = Math.max(0, Math.min(idxBtns.length - 1, idxBody.scrollLeft / idxStride())), i = Math.floor(p), t = p - i, A = idxBtns[i], B = idxBtns[Math.min(i + 1, idxBtns.length - 1)];
     idxLoz.getAnimations().forEach((x) => x.cancel());
     idxLoz.style.left = A.offsetLeft + (B.offsetLeft - A.offsetLeft) * t + 'px';
     idxLoz.style.width = A.offsetWidth + (B.offsetWidth - A.offsetWidth) * t + 'px';
+    if (!RM) idxPages.forEach((pg, k) => { const d = Math.min(1, Math.abs(k - p)); pg.style.transform = `scale(${1 - 0.06 * d})`; pg.style.opacity = 1 - 0.45 * d; });
+  }
+  idxBody.addEventListener('scroll', () => {
+    if (!idxRaf) idxRaf = requestAnimationFrame(idxFrame);
     clearTimeout(idxSettle); idxSettle = setTimeout(() => idxTabs.set(String(idxAt())), 90);
   }, { passive: true });
   function showIndex(f, scroll) {
     $$('.row.hit', idxBody).forEach((r) => r.classList.remove('hit'));
     openSheet(idxEl);
-    if (scroll) { idxBody.scrollLeft = scroll.page * idxW(); idxPages[scroll.page].scrollTop = scroll.top; }
+    if (scroll) { idxBody.scrollLeft = idxLeft(scroll.page); idxPages[scroll.page].scrollTop = scroll.top; }
     else {
       const k = f ? PAGE_OF[f.kind] : 0, pg = idxPages[k], row = f && $(`.row[data-focus="${key(f)}"]`, pg);
-      idxBody.scrollLeft = k * idxW();
+      idxBody.scrollLeft = idxLeft(k);
       pg.scrollTop = row ? Math.max(0, row.offsetTop - pg.clientHeight / 2 + row.offsetHeight / 2) : 0;
       row?.classList.add('hit');
     }
-    idxTabs.set(String(idxAt())); idxTabs.place();
+    idxTabs.set(String(idxAt())); idxTabs.place(); idxFrame();
   }
   const openIndex = (f) => histStart({ sheet: 'idx', f });
 
