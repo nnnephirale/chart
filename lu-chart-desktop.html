@@ -4,6 +4,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="theme-color" content="#FCFCFC" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <title>Lu · Natal Chart</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -531,6 +534,13 @@
     .mi-name .sym { font-size: 19px; line-height: 1; }
     .mi-name b { font: 400 23px/1.1 var(--serif); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .mi-name svg { flex: 0 0 auto; width: 11px; height: 11px; color: var(--ink-3); }
+    /* with nothing picked, "Your chart" is the way in: a big muted button that opens everything */
+    .minfo:not(.pinned) .mi-top { margin-bottom: 10px; }
+    .minfo:not(.pinned) .mi-name { flex: 1 1 auto; height: 56px; margin-right: 6px; padding: 0 16px 0 18px; gap: 10px; border-radius: 18px; background: rgba(0,0,0,.05); box-shadow: inset 0 0 0 1px rgba(0,0,0,.04), 0 1px 2px rgba(0,0,0,.04), 0 6px 18px rgba(0,0,0,.05); transition: transform .16s var(--ease), background .2s var(--ease); }
+    .minfo:not(.pinned) .mi-name:active { transform: scale(.98); background: rgba(0,0,0,.08); }
+    .minfo:not(.pinned) .mi-name b { flex: 0 0 auto; margin-right: auto; }
+    .mi-see { font: 300 11.5px/1 var(--mono); color: var(--ink-3); white-space: nowrap; }
+    .minfo:not(.pinned) .mi-name svg { width: 13px; height: 13px; color: var(--ink-2); transform: rotate(-90deg); }
     .mi-pos { font: 300 12px/1.5 var(--mono); color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 4px; }
     .mi-body { position: relative; flex: 1; min-height: 0; margin-top: 4px; padding: 0 4px 0 0; border: 0; background: none; color: inherit; text-align: left; cursor: pointer; overflow: hidden; -webkit-tap-highlight-color: transparent; }
     .mi-tag { display: block; font: 300 12.5px/1.5 var(--sans); color: var(--ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -557,18 +567,31 @@
     .insp .glass-in { flex: 1; height: auto; min-height: 0; border-radius: 22px 22px 0 0; }
     .insp-top { display: none; }
     .insp-body { margin-top: 0; }
-    .sheet-bar { display: flex; flex: 0 0 auto; align-items: center; justify-content: space-between; gap: 12px; height: 56px; padding: 0 12px 0 20px; }
+    .sheet-bar { display: flex; flex: 0 0 auto; align-items: center; justify-content: space-between; gap: 8px; height: 56px; padding: 0 12px 0 10px; }
+    /* back and forward through everything opened in the sheet; forward only exists once you've gone back */
+    .sheet-nav { display: flex; align-items: center; gap: 2px; }
+    .sheet-nb { display: grid; place-items: center; width: 36px; height: 36px; padding: 0; border: 0; border-radius: 999px; background: none; color: var(--ink-2); cursor: pointer; transition: background .2s var(--ease), transform .16s var(--ease); }
+    .sheet-nb:active { transform: scale(.94); background: var(--wash); }
+    .sheet-nb[hidden] { display: none; }
+    .sheet-nb.in { animation: nb-in .32s var(--ease); }
+    @keyframes nb-in { from { opacity: 0; transform: translateX(-6px); } }
+    .sheet-nb svg { width: 14px; height: 14px; }
+    .sheet-bar .t-label { margin-left: 2px; }
     .sheet-x { display: grid; place-items: center; width: 36px; height: 36px; margin-left: auto; border: 0; border-radius: 999px; background: var(--wash); color: var(--ink-2); cursor: pointer; transition: background .2s var(--ease), transform .16s var(--ease); }
     .sheet-x:active { transform: scale(.94); }
     .sheet-x svg { width: 14px; height: 14px; }
     .msheet { display: flex; }
     .idx-body { position: relative; flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; padding: 0 12px 28px; }
     .idx-body::-webkit-scrollbar { display: none; }
-    .idx-body .f-sec:first-child { margin-top: 2px; }
+    /* section headings in the index: darker, with room above and below */
+    .idx-body .f-sec { margin: 34px 8px 12px; color: var(--ink-2); }
+    .idx-body .f-sec:first-child { margin-top: 18px; }
     .idx-body .row.hit { background: var(--wash); }
-    .idx-jump { display: flex; flex: 0 0 auto; gap: 20px; padding: 0 20px 10px; box-shadow: 0 1px 0 var(--hair); }
-    .idx-jump button { padding: 4px 0; border: 0; background: none; font: 300 12.5px/1.4 var(--mono); color: var(--ink-3); cursor: pointer; transition: color .2s var(--ease); }
-    .idx-jump button:active { color: var(--ink); }
+    /* jump tabs: the headings' type on the underline row; the underline follows the section in view */
+    .idx-tabs { flex: 0 0 auto; padding: 0 20px; }
+    #idxTabs { justify-content: space-between; gap: 14px; }
+    #idxTabs button { padding: 12px 0 13px; font: 400 10.5px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
+    #idxTabs button[aria-selected="true"] { color: var(--ink); }
 
     /* the rest of the chart: a full-screen sheet over the chart, with a bar that slides away on the way down */
     #rest { display: none; }
@@ -580,6 +603,9 @@
     .rest-meta { display: block; padding: 28px 0 0; }
     .rest-meta .hero-head { display: flex; margin: 0; }
     #rest .rest-meta + .sec { margin-top: 56px; }
+  }
+  @media (max-width: 960px) {
+    html:has(> body:not(.rest-open)), body:not(.rest-open) { background: #123540; }
   }
   @media (max-width: 640px) {
     body.rest-open #rest { padding: 0 16px 64px; }
@@ -635,7 +661,7 @@
           </div>
           <aside class="glass insp" aria-label="Chart inspector">
             <div class="glass-in">
-              <div class="sheet-bar"><button class="sheet-x" data-sheet-close aria-label="Close"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><path d="M4 4l6 6M10 4l-6 6"/></svg></button></div>
+              <div class="sheet-bar"><div class="sheet-nav"><button class="sheet-nb" data-hist="back" aria-label="Back"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 3.5L5 7l3.5 3.5"/></svg></button><button class="sheet-nb" data-hist="fwd" aria-label="Forward" hidden><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 3.5L9 7l-3.5 3.5"/></svg></button></div><button class="sheet-x" data-sheet-close aria-label="Close"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><path d="M4 4l6 6M10 4l-6 6"/></svg></button></div>
               <div class="insp-top">
                 <div class="seg utabs" id="segTabs" role="tablist" aria-label="Inspector" data-ease="cubic-bezier(.16,1,.3,1)"></div>
               </div>
@@ -650,8 +676,8 @@
       <p class="note t-small reveal" id="wheelNote"></p>
       <div class="scrim" id="scrim"></div>
       <aside class="msheet" id="idx" aria-label="Everything in your chart">
-        <div class="sheet-bar"><span class="t-label">Everything in your chart</span><button class="sheet-x" data-sheet-close aria-label="Close"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><path d="M4 4l6 6M10 4l-6 6"/></svg></button></div>
-        <div class="idx-jump" id="idxJump"><button data-j="0">Placements</button><button data-j="1">Signs</button><button data-j="2">Houses</button><button data-j="3">Aspects</button></div>
+        <div class="sheet-bar"><div class="sheet-nav"><button class="sheet-nb" data-hist="back" aria-label="Back"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 3.5L5 7l3.5 3.5"/></svg></button><button class="sheet-nb" data-hist="fwd" aria-label="Forward" hidden><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 3.5L9 7l-3.5 3.5"/></svg></button></div><span class="t-label">Everything in your chart</span><button class="sheet-x" data-sheet-close aria-label="Close"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><path d="M4 4l6 6M10 4l-6 6"/></svg></button></div>
+        <div class="idx-tabs"><div class="seg utabs" id="idxTabs" role="tablist" aria-label="Jump to a section" data-ease="cubic-bezier(.16,1,.3,1)"></div></div>
         <div class="idx-body" id="idxBody"></div>
       </aside>
     </section>
@@ -1936,15 +1962,17 @@
     if (show) { e.preventDefault(); showOnChart(parse(show.dataset.show)); return; }
     if (PHONE.matches) {
       if (lp.fired) { lp.fired = false; return; } // the long-press already opened the index
+      const hb = e.target.closest('[data-hist]');
+      if (hb) { histStep(hb.dataset.hist === 'back' ? -1 : 1); return; }
       if (e.target.closest('#scrim, [data-sheet-close]')) { closeSheet(); return; }
-      if (e.target.closest('#idx')) { const r = e.target.closest('[data-focus]'); if (r) { pin(parse(r.dataset.focus)); closeSheet(); } return; }
+      if (e.target.closest('#idx')) { const r = e.target.closest('[data-focus]'); if (r) histGo({ sheet: 'card', f: parse(r.dataset.focus) }); return; }
       if (e.target.closest('#minfo, .mtabs-wrap, .hero-head, #rest')) return; // they run their own taps and keep the lock
       if (e.target.closest('.insp') && !e.target.closest('[data-focus]')) return;
     }
     // on the wheel: lock what it is showing (taps and locked wheels have no hover, so they hit-test)
     if (e.target.closest('#wheel')) { const f = (S.hsrc === 'wheel' && S.hover) || wheelHit(e); if (f) pin(f); else unpin(); return; }
     const el = e.target.closest('[data-focus]');
-    if (el) { if (el.closest('.insp')) pin(parse(el.dataset.focus)); return; } // rows elsewhere lock through their own handlers
+    if (el) { if (el.closest('.insp')) inspGo(parse(el.dataset.focus)); return; } // rows elsewhere lock through their own handlers
     if (e.target.closest('#focus')) return; // reading or selecting text in the open card keeps it
     if (!e.target.closest('.toolbar')) unpin(); // the label and aspect-line toggles keep the lock
   });
@@ -1952,7 +1980,7 @@
     if (rxModal.open) return; // Esc closes the modal first
     if (e.key === 'Escape') { if (sheetEl) closeSheet(); else if (document.body.classList.contains('rest-open')) closeRest(); else unpin(); }
     const row = (e.key === 'Enter' || e.key === ' ') && e.target.closest?.('.insp [data-focus]');
-    if (row) { e.preventDefault(); pin(parse(row.dataset.focus)); }
+    if (row) { e.preventDefault(); inspGo(parse(row.dataset.focus)); }
   });
 
   /* ───────── inspector ───────── */
@@ -2273,7 +2301,7 @@
     const f = S.pin, d = describe(f), c = d ? cardOf(f) : null;
     mi.classList.toggle('pinned', !!d);
     mi.innerHTML = `<div class="mi-in">
-      <div class="mi-top"><button class="mi-name" type="button" aria-label="${d ? d.name + ': ' : ''}see everything in your chart">${d?.glyph ? `<span class="sym">${T(d.glyph)}</span>` : ''}<b>${d ? d.name : 'Your chart'}</b>${CHEV}</button>
+      <div class="mi-top"><button class="mi-name" type="button" aria-label="${d ? d.name + ': ' : ''}see everything in your chart">${d?.glyph ? `<span class="sym">${T(d.glyph)}</span>` : ''}<b>${d ? d.name : 'Your chart'}</b>${d ? '' : '<span class="mi-see">See all</span>'}${CHEV}</button>
         <button class="zb" data-z="-1" aria-label="Previous">${ARROW('M8.5 3.5L5 7l3.5 3.5')}</button><button class="zb" data-z="1" aria-label="Next">${ARROW('M5.5 3.5L9 7l-3.5 3.5')}</button></div>
       <div class="mi-pos">${d ? [d.l1, d.l2s || d.l2].filter(Boolean).join(' · ') : OVERVIEW}</div>
       <div class="mi-body" role="button" tabindex="0"${d ? ' aria-label="Read the full card"' : ''}><span class="mi-tag">${d ? c.tag || '' : SIGNATURES}</span><span class="mi-text">${d ? c.text || '' : 'Tap anything on the wheel, or step through it with the arrows. Tap a name to see everything in your chart at once.'}</span></div>
@@ -2286,25 +2314,73 @@
     e.stopPropagation(); // stepping re-renders this area, so the page-wide handler would see a detached target and let go
     if (b.dataset.z) return stepBy(+b.dataset.z);
     if (b.classList.contains('mi-name')) return openIndex(S.pin);
-    if (S.pin) openSheet(inspEl); else stepBy(1);
+    if (S.pin) histStart({ sheet: 'card', f: S.pin }); else stepBy(1);
   });
 
-  // sheets: one at a time, over a dimmed chart
+  // sheets: one at a time, over a dimmed chart; moving between the index and a card swaps them in place
   let sheetEl = null;
-  function openSheet(el) { if (sheetEl && sheetEl !== el) sheetEl.classList.remove('open'); sheetEl = el; el.classList.add('open'); scrim.classList.add('on'); }
-  function closeSheet() { if (!sheetEl) return; sheetEl.classList.remove('open'); scrim.classList.remove('on'); sheetEl = null; }
+  function openSheet(el) {
+    if (sheetEl === el) return;
+    if (sheetEl) {
+      [sheetEl, el].forEach((x) => { x.style.transition = 'none'; });
+      sheetEl.classList.remove('open'); el.classList.add('open'); el.offsetWidth;
+      [sheetEl, el].forEach((x) => { x.style.transition = ''; });
+      if (!RM) el.firstElementChild.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 150, easing: 'ease-out' });
+    } else el.classList.add('open');
+    sheetEl = el; scrim.classList.add('on');
+  }
+  function closeSheet() { hist.list = []; hist.at = -1; if (!sheetEl) return; sheetEl.classList.remove('open'); scrim.classList.remove('on'); sheetEl = null; }
+
+  // history: every screen opened in the sheet (the index or any card); back past the first returns to the chart
+  const hist = { list: [], at: -1 };
+  const cardScroller = () => $(':scope > div:last-child', focusEl);
+  function histSave() { const h = hist.list[hist.at]; if (h) h.scroll = h.sheet === 'idx' ? idxBody.scrollTop : cardScroller()?.scrollTop || 0; }
+  function histShow(h) {
+    if (h.sheet === 'idx') showIndex(h.f, h.scroll);
+    else { pin(h.f); openSheet(inspEl); const sc = cardScroller(); if (sc) sc.scrollTop = h.scroll || 0; }
+    const on = hist.at < hist.list.length - 1;
+    $$('[data-hist="fwd"]').forEach((b) => { if (on && b.hidden) { b.hidden = false; b.classList.remove('in'); b.offsetWidth; b.classList.add('in'); } else if (!on) b.hidden = true; });
+  }
+  function histStart(h) { hist.list = [h]; hist.at = 0; histShow(h); }
+  function histGo(h) { histSave(); hist.list = hist.list.slice(0, hist.at + 1); hist.list.push(h); hist.at++; histShow(h); }
+  function histStep(d) {
+    histSave();
+    const n = hist.at + d;
+    if (n < 0) return closeSheet();
+    if (n >= hist.list.length) return;
+    hist.at = n; histShow(hist.list[n]);
+  }
+  // a link inside the card: on a phone it's a new screen in the sheet's history
+  const inspGo = (f) => (PHONE.matches && sheetEl === inspEl ? histGo({ sheet: 'card', f }) : pin(f));
+
   idxBody.innerHTML = `<div class="f-sec">Placements</div>${placeRows()}<div class="f-sec">Signs</div>${SIGNS_BY_COUNT.map(sgRow).join('')}<div class="f-sec">Houses</div>${HOUSES.map((h, i) => hsRow(i)).join('')}<div class="f-sec">Aspects</div>${ASPECTS.map(asRow).join('')}`;
-  $('#idxJump').addEventListener('click', (e) => {
-    const b = e.target.closest('button'); if (!b) return; e.stopPropagation();
-    const h = $$('.f-sec', idxBody)[+b.dataset.j]; idxBody.scrollTo({ top: h.offsetTop - 8, behavior: RM ? 'auto' : 'smooth' });
-  });
-  function openIndex(f) {
+  // jump tabs: a tap scrolls to that section; while scrolling, the underline sits on the section in view
+  const idxHeads = $$('.f-sec', idxBody);
+  let idxJump = false, idxJumpT = 0;
+  const idxGo = (v) => {
+    idxJump = true; clearTimeout(idxJumpT); idxJumpT = setTimeout(idxLand, 700); // the underline goes straight to the tapped tab and stays there until the scroll lands
+    idxBody.scrollTo({ top: idxHeads[+v].offsetTop - 12, behavior: RM ? 'auto' : 'smooth' });
+  };
+  const idxTabs = segmented($('#idxTabs'), ['Placements', 'Signs', 'Houses', 'Aspects'].map((n, i) => ({ v: String(i), html: n })), '0', idxGo);
+  $('#idxTabs').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) idxGo(b.dataset.v); }); // the tab already underlined still scrolls to its heading
+  function idxSpy() {
+    if (idxJump) return;
+    const y = idxBody.scrollTop + 28; let k = 0;
+    idxHeads.forEach((h, i) => { if (h.offsetTop <= y) k = i; });
+    if (idxBody.scrollTop > 0 && idxBody.scrollTop + idxBody.clientHeight >= idxBody.scrollHeight - 2) k = idxHeads.length - 1;
+    idxTabs.set(String(k));
+  }
+  function idxLand() { idxJump = false; }
+  idxBody.addEventListener('scroll', () => { if (idxJump) { clearTimeout(idxJumpT); idxJumpT = setTimeout(idxLand, 140); } else idxSpy(); }, { passive: true });
+  function showIndex(f, scroll) {
     $$('.row.hit', idxBody).forEach((r) => r.classList.remove('hit'));
     openSheet(idxEl);
     const row = f && $(`.row[data-focus="${key(f)}"]`, idxBody);
-    idxBody.scrollTop = row ? Math.max(0, row.offsetTop - idxBody.clientHeight / 2 + row.offsetHeight / 2) : 0;
+    idxBody.scrollTop = scroll != null ? scroll : row ? Math.max(0, row.offsetTop - idxBody.clientHeight / 2 + row.offsetHeight / 2) : 0;
     row?.classList.add('hit');
+    idxJump = false; idxSpy(); idxTabs.place();
   }
+  const openIndex = (f) => histStart({ sheet: 'idx', f });
 
   // long-press anything on the wheel: the index opens on it
   const lp = { t: 0, at: null, fired: false };
@@ -2334,6 +2410,9 @@
     restAnim = restEl.animate([{ transform: 'none' }, { transform: `translateY(${innerHeight}px)` }], { duration: RM ? 0 : 380, easing: 'cubic-bezier(.16,1,.3,1)', fill: 'forwards' });
     restAnim.onfinish = () => { document.body.classList.remove('rest-open'); restAnim.cancel(); restAnim = null; scrollTo(0, 0); };
   }
+  const themeMeta = $('meta[name="theme-color"]');
+  const themeSync = () => { themeMeta.content = PHONE.matches && !document.body.classList.contains('rest-open') ? '#123540' : '#FCFCFC'; };
+  new MutationObserver(themeSync).observe(document.body, { attributes: true, attributeFilter: ['class'] }); themeSync();
   $('#openRest').addEventListener('click', openRest);
   $('#closeRest').addEventListener('click', closeRest);
   let lastY = 0;
@@ -2342,7 +2421,7 @@
     const y = scrollY, dy = y - lastY; if (Math.abs(dy) < 6) return;
     restBar.classList.toggle('away', dy > 0 && y > 80); lastY = y;
   }, { passive: true });
-  PHONE.addEventListener('change', () => { closeSheet(); document.body.classList.remove('rest-open', 'rest-settled'); restAnim?.cancel(); zoomSync(); });
+  PHONE.addEventListener('change', () => { closeSheet(); document.body.classList.remove('rest-open', 'rest-settled'); restAnim?.cancel(); zoomSync(); themeSync(); });
 
   Z.ready = true;
   addEventListener('resize', zoomSync);
