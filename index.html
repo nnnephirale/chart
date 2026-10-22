@@ -542,6 +542,29 @@
     .minfo:not(.pinned) .mi-name b { flex: 0 0 auto; margin-right: auto; }
     .mi-see { font: 300 11.5px/1 var(--mono); color: var(--ink-3); white-space: nowrap; }
     .minfo:not(.pinned) .mi-name svg { width: 13px; height: 13px; color: var(--ink-2); transform: rotate(-90deg); }
+    /* rest state: Sun, Moon, Rising tiles, then the chart signatures as chips */
+    .mi-rest { flex: 1; min-height: 0; margin: 0 -4px -8px 0; padding: 0 4px 16px 0; overflow-y: auto; scrollbar-width: none; -webkit-mask-image: linear-gradient(#000 calc(100% - 16px), transparent); mask-image: linear-gradient(#000 calc(100% - 16px), transparent); }
+    .mi-rest::-webkit-scrollbar { display: none; }
+    .mi-b3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin-right: 4px; }
+    .b3 { display: flex; flex-direction: column; gap: 6px; min-width: 0; padding: 9px 10px 10px 11px; border: 0; border-radius: 14px; background: var(--wash); color: var(--ink); text-align: left; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: transform .16s var(--ease), background .2s var(--ease); }
+    .b3:active { transform: scale(.98); background: var(--wash-2); }
+    .b3-k { display: flex; align-items: center; gap: 5px; height: 13px; font: 400 10.5px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
+    .b3-k .sym { font-size: 12px; color: var(--ink-2); }
+    .b3-k .ax-sym { font: 400 8.5px/1 var(--mono); letter-spacing: .04em; color: var(--ink-2); }
+    .b3-s { display: flex; align-items: baseline; justify-content: space-between; gap: 4px; min-width: 0; }
+    .b3-s b { font: 400 18px/1.1 var(--serif); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .b3-s .sym { flex: 0 0 auto; font-size: 15px; line-height: 1; }
+    .mi-sigs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; margin: 6px 4px 0 0; }
+    .sig { display: flex; align-items: center; gap: 8px; min-width: 0; min-height: 48px; padding: 7px 10px 7px 7px; border: 0; border-radius: 14px; background: #fff; box-shadow: inset 0 0 0 1px var(--line), 0 1px 2px rgba(0,0,0,.03); font: 300 11.5px/1.4 var(--mono); color: var(--ink-3); text-align: left; text-wrap: balance; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: transform .16s var(--ease), background .2s var(--ease); }
+    .sig:active { transform: scale(.98); background: var(--bg-2); }
+    .sig-ic { flex: 0 0 auto; display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; color: var(--c); background: color-mix(in srgb, var(--c) 13%, transparent); }
+    .sig-ic .sym { font-size: 12.5px; line-height: 1; }
+    .sig-ic b { font: 400 11px/1 var(--mono); color: var(--ink); }
+    .sig-ic svg { width: 11px; height: 11px; }
+    .sig-tx b { font-weight: 400; color: var(--ink); }
+    .sig-tx .sym { margin-right: 3px; }
+    .sig-el svg { width: 9px; height: 9px; margin-right: 3px; vertical-align: -.5px; }
+    .minfo:not(.pinned) .mi-body { display: none; }
     .mi-pos { font: 300 12px/1.5 var(--mono); color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 4px; }
     .mi-body { position: relative; flex: 1; min-height: 0; margin-top: 4px; padding: 0 4px 0 0; border: 0; background: none; color: inherit; text-align: left; cursor: pointer; overflow: hidden; -webkit-tap-highlight-color: transparent; }
     .mi-tag { display: block; font: 300 12.5px/1.5 var(--sans); color: var(--ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -2277,7 +2300,9 @@
     const t = document.getElementById(id); if (!t) return;
     const i = SECS.findIndex((s) => s.id === id);
     if (i >= 0) { jumpTo = id; jumpUntil = performance.now() + 1600; setActive(i); }
-    const y = id === 'chart' ? 0 : Math.max(0, t.getBoundingClientRect().top + scrollY - (DESK.matches ? 40 : PHONE.matches ? 72 : 24));
+    // on phones, measure against the rest sheet itself: it may still be sliding up from 100vh
+    const top = PHONE.matches ? t.getBoundingClientRect().top - restEl.getBoundingClientRect().top + restEl.offsetTop : t.getBoundingClientRect().top + scrollY;
+    const y = id === 'chart' ? 0 : Math.max(0, top - (DESK.matches ? 40 : PHONE.matches ? 72 : 24));
     scrollTo({ top: y, behavior: RM ? 'auto' : 'smooth' });
   }
   $('.rail').addEventListener('click', (e) => { const a = e.target.closest('a'); if (!a) return; e.preventDefault(); e.stopPropagation(); jump(a.dataset.id || 'chart'); }, true);
@@ -2289,7 +2314,30 @@
   const CHEV = '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4.5l3 3 3-3"/></svg>';
   const ARROW = (d) => `<svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="${d}"/></svg>`;
   const SIGNATURES = (Object.values(CONTENT.callouts).flat().find((t) => /Chart signatures/.test(t)) || '').replace(/<strong>.*?<\/strong>\s*/, '');
-  const OVERVIEW = `Sun ${SIGNS[PLANETS[0].sign].n} · Moon ${SIGNS[PLANETS[1].sign].n} · Rising ${SIGNS[ANGLES[0].sign].n}`;
+  // with nothing picked: Sun, Moon and Rising as three sign tiles, then each chart signature as a chip with its own symbol
+  const ELICON = (el) => `<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round" aria-hidden="true"><path d="${el === 'fire' || el === 'air' ? 'M6 1.6L10.8 10H1.2Z' : 'M1.2 2H10.8L6 10.4Z'}"/>${el === 'air' ? '<path d="M2.8 7.2h6.4"/>' : el === 'earth' ? '<path d="M2.8 4.8h6.4"/>' : ''}</svg>`;
+  const fAttr = (f) => ` data-f='${JSON.stringify(f)}'`;
+  const BIG3 = [['☉', 'Sun', PLANETS[0], { kind: 'planet', i: 0 }], ['☽', 'Moon', PLANETS[1], { kind: 'planet', i: 1 }], ['', 'Rising', ANGLES[0], { kind: 'angle', i: 0 }]].map(([g, l, p, f]) => {
+    const sg = SIGNS[p.sign];
+    return `<button class="b3" type="button"${fAttr(f)} aria-label="${l} in ${sg.n}"><span class="b3-k">${g ? `<span class="sym">${T(g)}</span>` : '<span class="ax-sym">ASC</span>'}${l}</span><span class="b3-s"><b>${sg.n}</b><span class="sym" style="color:${ELHEX[sg.el]}">${T(sg.g)}</span></span></button>`;
+  }).join('');
+  const ASP_WORD = { conjunction: 'conj', sextile: 'sex', square: 'sq', trine: 'tri', opposition: 'opp' };
+  const SIGCHIPS = SIGNATURES.split(/\s*·\s*/).filter(Boolean).map((t) => {
+    const hm = t.match(/(\d+)(?:st|nd|rd|th) house/i), am = t.match(/\b(conjunction|sextile|square|trine|opposition)s?\b/i), em = t.match(/\b(water|fire|earth|air)\b/i);
+    const pl = PLANETS.find((p) => new RegExp(`\\b${p.n}\\b`).test(t));
+    let ic, f, c = 'var(--ink-2)';
+    if (hm) { ic = `<b>${hm[1]}</b>`; f = { kind: 'house', i: hm[1] - 1 }; }
+    else if (am) { const a = ATYPE[ASP_WORD[am[1].toLowerCase()]]; ic = `<span class="sym">${T(a.g)}</span>`; c = a.hex; }
+    else if (pl) { ic = `<span class="sym">${T(pl.g)}</span>`; c = em ? ELHEX[em[1].toLowerCase()] : 'var(--ink-2)'; }
+    else if (em) { ic = ELICON(em[1].toLowerCase()); c = ELHEX[em[1].toLowerCase()]; }
+    if (!f && pl) f = { kind: 'planet', i: pl.i };
+    // names in ink, planets with their glyph, elements with their triangle, the rest quiet
+    let tx = t.replace(/(\d+(?:st|nd|rd|th) house|\d+%)/g, '<b>$1</b>');
+    if (pl) tx = tx.replace(new RegExp(`\\b${pl.n}\\b`), `<b>${hm || am ? `<span class="sym">${T(pl.g)}</span>` : ''}${pl.n}</b>`);
+    if (em && !(!hm && !am && !pl)) tx = tx.replace(em[0], `<b class="sig-el" style="color:${ELHEX[em[1].toLowerCase()]}">${ELICON(em[1].toLowerCase())}</b>${em[0]}`);
+    else if (em) tx = tx.replace(em[0], `<b>${em[0]}</b>`);
+    return `<button class="sig" type="button"${f ? fAttr(f) : ' data-go="balance"'}><span class="sig-ic" style="--c:${c}">${ic}</span><span class="sig-tx">${tx}</span></button>`;
+  }).join('');
   // the tag and "in your chart" text each kind of focus already has for its card
   const cardOf = (f) => {
     if (f.kind === 'planet') { const p = PLANETS[f.i]; return { tag: p.note, text: CONTENT.cards.planets[p.n]?.chart }; }
@@ -2305,8 +2353,8 @@
     mi.innerHTML = `<div class="mi-in">
       <div class="mi-top"><button class="mi-name" type="button" aria-label="${d ? d.name + ': ' : ''}see everything in your chart">${d?.glyph ? `<span class="sym">${T(d.glyph)}</span>` : ''}<b>${d ? d.name : 'Your chart'}</b>${d ? '' : '<span class="mi-see">See all</span>'}${CHEV}</button>
         <button class="zb" data-z="-1" aria-label="Previous">${ARROW('M8.5 3.5L5 7l3.5 3.5')}</button><button class="zb" data-z="1" aria-label="Next">${ARROW('M5.5 3.5L9 7l-3.5 3.5')}</button></div>
-      <div class="mi-pos">${d ? [d.l1, d.l2s || d.l2].filter(Boolean).join(' · ') : OVERVIEW}</div>
-      <div class="mi-body" role="button" tabindex="0"${d ? ' aria-label="Read the full card"' : ''}><span class="mi-tag">${d ? c.tag || '' : SIGNATURES}</span><span class="mi-text">${d ? c.text || '' : 'Tap anything on the wheel, or step through it with the arrows. Tap a name to see everything in your chart at once.'}</span></div>
+      ${d ? `<div class="mi-pos">${[d.l1, d.l2s || d.l2].filter(Boolean).join(' · ')}</div>` : `<div class="mi-rest"><div class="mi-b3">${BIG3}</div>${SIGCHIPS ? `<div class="mi-sigs">${SIGCHIPS}</div>` : ''}</div>`}
+      <div class="mi-body" role="button" tabindex="0"${d ? ' aria-label="Read the full card"' : ''}><span class="mi-tag">${d ? c.tag || '' : ''}</span><span class="mi-text">${d ? c.text || '' : ''}</span></div>
       <button class="mi-more" type="button" tabindex="-1">More</button>
     </div>`;
   }
@@ -2315,6 +2363,8 @@
     const b = e.target.closest('button, .mi-body'); if (!b) return;
     e.stopPropagation(); // stepping re-renders this area, so the page-wide handler would see a detached target and let go
     if (b.dataset.z) return stepBy(+b.dataset.z);
+    if (b.dataset.f) return pin(JSON.parse(b.dataset.f));
+    if (b.dataset.go) return jump(b.dataset.go);
     if (b.classList.contains('mi-name')) return openIndex(S.pin);
     if (S.pin) histStart({ sheet: 'card', f: S.pin }); else stepBy(1);
   });
