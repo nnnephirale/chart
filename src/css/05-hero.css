@@ -26,12 +26,56 @@
   font-weight: 400;
   color: var(--ink-2);
 }
+/* the plate's palette follows the chart's strongest element (the build sets <html data-plate>). Each runs
+   from a near-black in the element's hue, up through the hue, to a pale tint leaning lavender; -hi lights the
+   ridges, -fallback stands in before the shader draws, and -deep sits behind the plate on phones. */
+:root,
+[data-plate='water'] {
+  --plate-0: #0b2a33;
+  --plate-1: #174a57;
+  --plate-2: #2f6b80;
+  --plate-3: #5d7fc0;
+  --plate-4: #a9a6ea;
+  --plate-hi: #e4e4ff;
+  --plate-fallback: linear-gradient(135deg, #0b2a33, #2f6b80 55%, #8f8fe0);
+  --plate-deep: #123540;
+}
+[data-plate='fire'] {
+  --plate-0: #2a120a;
+  --plate-1: #5a2414;
+  --plate-2: #a8492a;
+  --plate-3: #d27a72;
+  --plate-4: #e3a9d2;
+  --plate-hi: #ffe6f2;
+  --plate-fallback: linear-gradient(135deg, #2a120a, #a8492a 55%, #d08cbc);
+  --plate-deep: #3d1a10;
+}
+[data-plate='earth'] {
+  --plate-0: #1e1b0b;
+  --plate-1: #403816;
+  --plate-2: #7a6a2c;
+  --plate-3: #a39a86;
+  --plate-4: #c6bde6;
+  --plate-hi: #efeaff;
+  --plate-fallback: linear-gradient(135deg, #1e1b0b, #7a6a2c 55%, #aaa0d4);
+  --plate-deep: #2c2810;
+}
+[data-plate='air'] {
+  --plate-0: #0c1630;
+  --plate-1: #1a2f63;
+  --plate-2: #3a5fb0;
+  --plate-3: #7b86dc;
+  --plate-4: #b7b0f0;
+  --plate-hi: #ecebff;
+  --plate-fallback: linear-gradient(135deg, #0c1630, #3a5fb0 55%, #9a94e6);
+  --plate-deep: #13224a;
+}
 .plate {
   position: relative;
   border-radius: 30px;
   padding: 26px;
   overflow: hidden;
-  background: linear-gradient(135deg, #0b2a33, #2f6b80 55%, #8f8fe0);
+  background: var(--plate-fallback);
 }
 .plate canvas {
   position: absolute;

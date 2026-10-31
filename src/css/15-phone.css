@@ -695,7 +695,7 @@
   body:not(.rest-open) {
     overflow: hidden;
     overscroll-behavior: none;
-    background: #123540;
+    background: var(--plate-deep);
   }
   .rest-bar {
     display: flex;

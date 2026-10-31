@@ -1,4 +1,4 @@
-/* ───────── plate: the Superhuman texture, in Lu's water palette ───────── */
+/* ───────── plate: the Superhuman texture, in the palette of the chart's strongest element (--plate-* in 05-hero.css) ───────── */
 (() => {
   const canvas = $('#plate'),
     gl = canvas.getContext('webgl2', { antialias: false, premultipliedAlpha: false });
@@ -57,8 +57,9 @@ void main(){
     const n = parseInt(h.slice(1), 16);
     return [((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255];
   };
-  gl.uniform3fv(U.uC, ['#0b2a33', '#174a57', '#2f6b80', '#5d7fc0', '#a9a6ea'].flatMap(rgb));
-  gl.uniform3fv(U.uHi, rgb('#e4e4ff'));
+  const tok = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  gl.uniform3fv(U.uC, [0, 1, 2, 3, 4].map((i) => tok('--plate-' + i)).flatMap(rgb));
+  gl.uniform3fv(U.uHi, rgb(tok('--plate-hi')));
   // the texture is soft noise: a 0.75× buffer upscaled is indistinguishable, and it drifts slowly enough for ~30fps
   let dpr = 0.75,
     time = 3,

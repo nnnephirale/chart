@@ -1,5 +1,5 @@
 # Design notes
-Page: `lu-chart-desktop.html` (desktop rebuild of `lu-chart-ios.html`; the originals are untouched), built from `src/` (see ARCHITECTURE.md).
+Page: `lu-chart-desktop.html` (desktop rebuild of `lu-chart-ios.html`; the originals are untouched), built from the shared engine in `src/` and Lu's data in `people/lu/` (see ARCHITECTURE.md). Every other chart is built from the same engine.
 References: 34_DESIGNSYSTEMS/03_resurf (motion), 02_perfolios (section dot, blur-in), 01_superhuman (shader plate + glass border). Precedence: house style, with the references' motion applied.
 
 ## Project rules
@@ -12,7 +12,7 @@ References: 34_DESIGNSYSTEMS/03_resurf (motion), 02_perfolios (section dot, blur
 - Conjunctions are drawn as an arc between the fanned glyphs, not as a chord (a 1° chord is invisible).
 - Motion: segmented controls glide on the Resurf lozenge spring (.45s, bounce .18); the section dot glides on the house ease-out (380ms, no overshoot, no swell); sections fade up on scroll (opacity + 8px, 500ms); inspector views crossfade on opacity. No blur anywhere on desktop (2026-10-02: "restraint is very important"; blur was also the main lag source). The glass rim is translucent white without backdrop blur. All of it stops under reduced motion.
 - Performance: the plate shader renders at 0.75× CSS px, ~30fps, 3 noise octaves (the other 3 had zero weight), and only reallocates its buffer after a resize settles, so the rail push doesn't thrash it.
-- The shader plate frames the hero only, in a water palette (Lu's chart is 49% water), behind glass-rimmed white cards. It pauses offscreen.
+- The shader plate frames the hero only, in the palette of the chart's strongest element (Lu's chart is 49% water), behind glass-rimmed white cards. It pauses offscreen. Each palette runs from a near-black in the element's hue up to a pale tint leaning lavender (`--plate-*` in `src/css/05-hero.css`). Water is the original; fire, earth and air were added 2026-10-31 and await the owner's look.
 
 ## Screen notes
 - No transits by request ("aspects, not transits", 2026-10-02).

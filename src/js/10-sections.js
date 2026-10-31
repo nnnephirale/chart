@@ -43,26 +43,29 @@ const bars = (rows) =>
         `<div class="bar-r"><span class="sym">${g ? T(g) : ''}</span><span class="nm">${n}</span><div class="track"><div class="fill" style="--w:${w / 100};${c ? `background:${c}` : ''}"></div></div><span class="v">${v}</span></div>`,
     )
     .join('');
-$('#powerPlanets .bars').innerHTML = bars([
-  ['♇', 'Pluto', '13.17%', 100],
-  ['♆', 'Neptune', '10.66%', 80.9],
-  ['♃', 'Jupiter', '10.11%', 76.8],
-  ['♄', 'Saturn', '9.98%', 75.8],
-  ['♂', 'Mars', '9.82%', 74.6],
-  ['♀', 'Venus', '9.31%', 70.7],
+// each strength list shows the top entries of its power table, largest first, with bars relative to the top one
+const topRows = (rows, n) => [...rows].sort((a, b) => b[1] - a[1]).slice(0, n);
+const powerBars = (rows, n, label) => {
+  const top = topRows(rows, n);
+  return bars(
+    top.map(([k, v]) => {
+      const [g, name, c] = label(k);
+      return [g, name, v.toFixed(2) + '%', Math.round((v / top[0][1]) * 1000) / 10, c];
+    }),
+  );
+};
+$('#powerPlanets .bars').innerHTML = powerBars(CHART.power.planets, 6, (n) => [
+  (PLANETS.find((p) => p.n === n) || {}).g || '',
+  n,
 ]);
-$('#powerHouses .bars').innerHTML = bars([
-  ['', '2nd · Value', '36.95%', 100],
-  ['', '10th · Calling', '28.00%', 75.8],
-  ['', '12th · Hidden', '16.28%', 44.1],
-  ['', '1st · Self', '10.19%', 27.6],
+$('#powerHouses .bars').innerHTML = powerBars(CHART.power.houses, 4, (h) => [
+  '',
+  `${ORD(h)} · ${HOUSES[h - 1]}`,
 ]);
-$('#signBars .bars').innerHTML = bars([
-  ['♏', 'Scorpio', '23.58%', 100, EL.water],
-  ['♓', 'Pisces', '23.31%', 98.9, EL.water],
-  ['♑', 'Capricorn', '13.96%', 59.2, EL.earth],
-  ['♒', 'Aquarius', '11.96%', 50.8, EL.air],
-]);
+$('#signBars .bars').innerHTML = powerBars(CHART.power.signs, 4, (n) => {
+  const s = SIGNS.find((x) => x.n === n);
+  return [s.g, n, EL[s.el]];
+});
 
 const donut = (title, rows) => {
   const r = 46,
@@ -78,17 +81,16 @@ const donut = (title, rows) => {
     .join('');
   return `<div class="t-label">${title}</div><div class="donut-wrap"><svg class="donut" width="120" height="120" viewBox="0 0 120 120"><circle cx="60" cy="60" r="${r}" fill="none" stroke="rgba(0,0,0,.04)" stroke-width="14"/>${arcs}</svg><div class="lg">${rows.map(([n, v, col]) => `<div><span class="dot" style="background:${col};width:8px;height:8px"></span><span>${n}</span><span>${v.toFixed(2)}%</span></div>`).join('')}</div></div>`;
 };
-$('#donutEl').innerHTML = donut('Elements', [
-  ['Water', 49.12, EL.water],
-  ['Earth', 18.81, EL.earth],
-  ['Air', 16.8, EL.air],
-  ['Fire', 15.27, EL.fire],
-]);
-$('#donutMo').innerHTML = donut('Modes', [
-  ['Fixed', 40.57, '#5E6470'],
-  ['Mutable', 30.1, '#9AA0A8'],
-  ['Cardinal', 29.33, '#C9CDD2'],
-]);
+// modes have no colour of their own: the largest takes the darkest grey
+const MODE_GREYS = ['#5E6470', '#9AA0A8', '#C9CDD2'];
+$('#donutEl').innerHTML = donut(
+  'Elements',
+  topRows(CHART.balance.elements, 4).map(([n, v]) => [n, v, EL[n.toLowerCase()]]),
+);
+$('#donutMo').innerHTML = donut(
+  'Modes',
+  topRows(CHART.balance.modes, 3).map(([n, v], i) => [n, v, MODE_GREYS[i]]),
+);
 
 // aspect grid (aspectarian): lower triangle, planets × planets
 const AMAP = {};
@@ -148,7 +150,7 @@ $('#alist').innerHTML =
   `<div class="alist-head"><span class="t-label">Ranked</span><div class="seg utabs" id="segFilterOut" role="tablist" aria-label="Aspect type" data-ease="cubic-bezier(.16,1,.3,1)"></div></div>` +
   ASPECTS.map(
     (x, n) =>
-      `<div class="ar" data-focus="aspect:${x.k}" data-t="${x.t}"><span class="k">${x.t === 'opp' ? '·' : n + 1}</span><div><div class="pr"><span class="sym">${T(PLANETS[x.a].g)}</span> ${PLANETS[x.a].n} – <span class="sym">${T(PLANETS[x.b].g)}</span> ${PLANETS[x.b].n}</div><div class="track"><div class="fill" style="--w:${x.w / 100};background:${ATYPE[x.t].c}"></div></div></div><span class="ty"><span class="sym" style="color:${ATYPE[x.t].c}">${T(ATYPE[x.t].g)}</span>${ATYPE[x.t].n}</span><span class="ob">${x.orb}</span><span class="st${/Tight|Exact/.test(x.s) ? ' tight' : ''}">${x.s}</span>${showBtn('aspect:' + x.k).replace('class="show"', 'class="show" style="right:12px"')}</div>`,
+      `<div class="ar" data-focus="aspect:${x.k}" data-t="${x.t}"><span class="k">${x.src === 'calc' ? '·' : n + 1}</span><div><div class="pr"><span class="sym">${T(PLANETS[x.a].g)}</span> ${PLANETS[x.a].n} – <span class="sym">${T(PLANETS[x.b].g)}</span> ${PLANETS[x.b].n}</div><div class="track"><div class="fill" style="--w:${x.w / 100};background:${ATYPE[x.t].c}"></div></div></div><span class="ty"><span class="sym" style="color:${ATYPE[x.t].c}">${T(ATYPE[x.t].g)}</span>${ATYPE[x.t].n}</span><span class="ob">${x.orb}</span><span class="st${/Tight|Exact/.test(x.s) ? ' tight' : ''}">${x.s}</span>${showBtn('aspect:' + x.k).replace('class="show"', 'class="show" style="right:12px"')}</div>`,
   ).join('');
 filterOut = segmented($('#segFilterOut'), FILTERS, 'all', applyFilter);
 filterOutRow = scrollRow($('#segFilterOut'));

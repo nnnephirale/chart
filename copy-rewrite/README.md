@@ -84,12 +84,14 @@ The draft files (`01-planets.md`, `02-signs.md`, `03-page-sections.md`) were del
 - **astro.com lists no aspects to the angles or the nodes.** The closest it leaves out: Venus sextile Ascendant 0°53', Saturn trine MC 2°03', Chiron sextile MC 1°54'. Not on the page yet.
 - **Open with the user:** how gently to handle the mother/early-home theme that three Moon aspects point to (currently left out), and whether to use evolutionary-astrology "soul" language for the node (currently not used).
 
-## Where the copy lives in `lu-chart-desktop.html`
+## Where the copy lives
+
+All of it is in `people/lu/content.json` (the page is built from it with `node scripts/build.mjs`); the code that shows it is in `src/js/` (see ARCHITECTURE.md).
 
 | Search for | What it holds |
 |---|---|
-| `"cards"` in `CONTENT` | Side-panel descriptors: `planets` and `signs` (`what`, `chart`, signs also `tag`), `houses` (array of 12 with `tag`), `aspects` (`types` lines plus `pairs` keyed "Planet|Planet" with `tag` and `chart`). |
-| `const CONTENT` | All long-form copy (stories, codes, configs, features, prompts, callouts, intros, notes) and `pnotes`, the planet tags. |
+| `"cards"` in `content.json` | Side-panel descriptors: `planets` and `signs` (`what`, `chart`, signs also `tag`), `houses` (array of 12 with `tag`), `aspects` (`types` lines plus `pairs` keyed "Planet|Planet" with `tag` and `chart`). |
+| `content.json` | All long-form copy (stories, codes, configs, features, prompts, callouts, intros, notes) and `pnotes`, the planet tags. |
 | `function describe(` | Card titles and subheadings for planets, signs, houses and aspects. |
 | `function renderFocus(` | Builds the side-panel cards from `CONTENT.cards`. |
 | `const HINT` | The one-line hints at the top of each list. |
@@ -98,9 +100,9 @@ The draft files (`01-planets.md`, `02-signs.md`, `03-page-sections.md`) were del
 
 ## Not done yet: the reusable pipeline
 
-The page still has Lu's data typed in by hand. To make "paste raw data → new chart" work, the agreed order is:
+To make "paste raw data → new chart" work, the agreed order is:
 1. Settle the voice for every area. That's this folder's job.
-2. Split the page into a shared template plus `charts/<name>.json`.
+2. Split the page into a shared template plus per-person data. Done 2026-10-31: `src/` plus `people/<name>/chart.json` and `content.json`.
 3. Write a parser for the Astrolog text. It should skip midpoints, map lines, Arabic parts, planetary moons and rays.
 4. Add a project CLAUDE.md for the workflow. A short one now exists and points here.
 5. Commit, and add a STARTTHIS shortcut.

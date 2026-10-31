@@ -1,4 +1,4 @@
-  const CONTENT = {
+{
  "stories": [
   {
    "el": "water",
@@ -761,4 +761,4 @@
   "ASC": "Your first impression",
   "MC": "Top of your chart · career"
  }
-};
+}

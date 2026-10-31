@@ -1,0 +1,88 @@
+{
+  "name": "Lu",
+  "born": "Fri 11 March 1994, 04:10 SGT",
+  "place": "Singapore · 103°51'E 1°16'N",
+  "footer": "11 Mar 1994 04:10 SGT · Singapore",
+  "titles": {
+    "houses": "Twelve houses, six with placements",
+    "balance": "Nearly half water",
+    "signs": "Scorpio and Pisces lead"
+  },
+  "cusps": ["1Aqu54'", "2Pis29'", "5Ari03'", "6Tau57'", "6Gem19'", "3Can54'", "1Leo54'", "2Vir29'", "5Lib03'", "6Sco57'", "6Sag19'", "3Cap54'"],
+  "planets": {
+    "Sun": {"pos": "20Pis01'", "house": 2},
+    "Moon": {"pos": "3Pis37'", "house": 2},
+    "Mercury": {"pos": "24Aqu08'", "house": 1},
+    "Venus": {"pos": "2Ari47'", "house": 2},
+    "Mars": {"pos": "2Pis39'", "house": 2},
+    "Jupiter": {"pos": "14Sco29'", "house": 10, "rx": true},
+    "Saturn": {"pos": "4Pis54'", "house": 2},
+    "Uranus": {"pos": "25Cap16'", "house": 12},
+    "Neptune": {"pos": "22Cap47'", "house": 12},
+    "Pluto": {"pos": "28Sco02'", "house": 10, "rx": true},
+    "North Node": {"pos": "27Sco27'", "house": 10, "rx": true},
+    "Chiron": {"pos": "5Vir03'", "house": 8, "rx": true},
+    "Lilith": {"pos": "26Ari59'13\"", "house": 3}
+  },
+  "aspects": [
+    ["Pluto", "North Node", "conj", "0°35'", 100, "Tight"],
+    ["Moon", "Mars", "conj", "0°58'", 100, "Tight"],
+    ["Moon", "Saturn", "conj", "1°17'", 97, "Tight"],
+    ["Mars", "Saturn", "conj", "2°15'", 88, "Tight"],
+    ["Uranus", "Neptune", "conj", "2°30'", 85, "Tight"],
+    ["Sun", "Neptune", "sex", "2°46'", 80, "Strong"],
+    ["Uranus", "Pluto", "sex", "2°46'", 78, "Strong"],
+    ["Mercury", "Pluto", "sq", "3°54'", 72, "Strong"],
+    ["Venus", "Pluto", "tri", "4°44'", 67, "Strong"],
+    ["Mars", "Pluto", "sq", "4°37'", 62, "Strong"],
+    ["Moon", "Pluto", "sq", "5°35'", 58, "Strong"],
+    ["Neptune", "Pluto", "sex", "5°16'", 55, "Moderate"],
+    ["Sun", "Jupiter", "tri", "5°32'", 52, "Moderate"],
+    ["Saturn", "Pluto", "sq", "6°52'", 44, "Moderate"],
+    ["Sun", "Uranus", "sex", "5°15'", 40, "Moderate"],
+    ["Jupiter", "Saturn", "tri", "9°35'", 30, "Wide"],
+    ["Moon", "Jupiter", "tri", "10°52'", 25, "Wide"],
+    ["Sun", "Pluto", "tri", "8°01'", 22, "Wide"],
+    ["Mercury", "Jupiter", "sq", "9°39'", 18, "Wide"],
+    ["Mercury", "Mars", "conj", "8°31'", 14, "Wide"],
+    ["Moon", "Mercury", "conj", "9°29'", 8, "Wide"],
+    ["Saturn", "Chiron", "opp", "0°09'", 100, "Exact", "calc"],
+    ["Moon", "Chiron", "opp", "1°26'", 95, "Tight", "calc"],
+    ["Mars", "Chiron", "opp", "2°24'", 86, "Tight", "calc"]
+  ],
+  "power": {
+    "planets": [
+      ["Pluto", 13.17],
+      ["Neptune", 10.66],
+      ["Jupiter", 10.11],
+      ["Saturn", 9.98],
+      ["Mars", 9.82],
+      ["Venus", 9.31]
+    ],
+    "houses": [
+      [2, 36.95],
+      [10, 28],
+      [12, 16.28],
+      [1, 10.19]
+    ],
+    "signs": [
+      ["Scorpio", 23.58],
+      ["Pisces", 23.31],
+      ["Capricorn", 13.96],
+      ["Aquarius", 11.96]
+    ]
+  },
+  "balance": {
+    "elements": [
+      ["Water", 49.12],
+      ["Earth", 18.81],
+      ["Air", 16.8],
+      ["Fire", 15.27]
+    ],
+    "modes": [
+      ["Fixed", 40.57],
+      ["Mutable", 30.1],
+      ["Cardinal", 29.33]
+    ]
+  }
+}

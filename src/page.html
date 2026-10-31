@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!-- Built by scripts/build.mjs from src/. Edit src/ (see ARCHITECTURE.md), not this file. -->
-<html lang="en">
+<html lang="en" data-plate="{{plate}}">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<title>Lu · Natal Chart</title>
+<title>{{name}} · Natal Chart</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans:wght@300;400;500&family=Instrument+Serif&family=Noto+Sans+Symbols&family=Noto+Sans+Symbols+2&display=swap" rel="stylesheet" />
@@ -36,27 +36,27 @@
 
 
 <div class="page">
-  <nav class="rail" aria-label="Sections"><div class="rail-panel"><a class="rail-brand" href="#chart" aria-label="Lu, back to the chart">Lu</a><ol id="rail"><span class="dot" aria-hidden="true"></span></ol></div></nav>
+  <nav class="rail" aria-label="Sections"><div class="rail-panel"><a class="rail-brand" href="#chart" aria-label="{{name}}, back to the chart">{{name}}</a><ol id="rail"><span class="dot" aria-hidden="true"></span></ol></div></nav>
 
   <main id="main">
     <!-- ═══ CHART ═══ -->
     <section class="sec" id="chart" data-nav="Chart">
       <div class="hero-head off-plate reveal">
-        <div><div class="t-label">Natal chart overview</div><h1>Lu</h1></div>
+        <div><div class="t-label">Natal chart overview</div><h1>{{name}}</h1></div>
         <div class="hero-meta">
-          <span>Born</span><b>Fri 11 March 1994, 04:10 SGT</b>
-          <span>Place</span><b>Singapore · 103°51'E 1°16'N</b>
+          <span>Born</span><b>{{born}}</b>
+          <span>Place</span><b>{{place}}</b>
           <span>System</span><b>Placidus · tropical, geocentric</b>
         </div>
       </div>
       <div class="plate reveal" style="--d:.08s">
         <canvas id="plate" aria-hidden="true"></canvas>
         <div class="hero-head on-plate">
-          <div><div class="t-label">Natal chart overview</div><h1>Lu</h1></div>
+          <div><div class="t-label">Natal chart overview</div><h1>{{name}}</h1></div>
           <button class="read-btn" id="openRest" type="button">Read your chart<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9.5v-7M3 5.5l3-3 3 3"/></svg></button>
           <div class="hero-meta">
-            <span>Born</span><b>Fri 11 March 1994, 04:10 SGT</b>
-            <span>Place</span><b>Singapore · 103°51'E 1°16'N</b>
+            <span>Born</span><b>{{born}}</b>
+            <span>Place</span><b>{{place}}</b>
             <span>System</span><b>Placidus · tropical, geocentric</b>
           </div>
         </div>
@@ -97,7 +97,7 @@
     </section>
 
     <div id="rest">
-    <div class="rest-bar" id="restBar"><span class="rb-t">Lu · Natal chart</span><button class="sheet-x" id="closeRest" aria-label="Back to the chart"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><path d="M4 4l6 6M10 4l-6 6"/></svg></button></div>
+    <div class="rest-bar" id="restBar"><span class="rb-t">{{name}} · Natal chart</span><button class="sheet-x" id="closeRest" aria-label="Back to the chart"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><path d="M4 4l6 6M10 4l-6 6"/></svg></button></div>
     <div class="rest-meta" id="restMeta"></div>
 
     <section class="sec" id="planets" data-nav="Placements">
@@ -106,7 +106,7 @@
     </section>
 
     <section class="sec" id="cusps" data-nav="Houses">
-      <div class="sec-head reveal"><div class="t-label">Houses</div><h2 class="t-title">Twelve houses, six with placements</h2></div>
+      <div class="sec-head reveal"><div class="t-label">Houses</div><h2 class="t-title">{{titles.houses}}</h2></div>
       <div class="houses" id="houseCards"></div>
       <div class="callout reveal" id="cuspsCallout"></div>
     </section>
@@ -122,7 +122,7 @@
     </section>
 
     <section class="sec" id="balance" data-nav="Balance">
-      <div class="sec-head reveal"><div class="t-label">Elements and modes</div><h2 class="t-title">Nearly half water</h2></div>
+      <div class="sec-head reveal"><div class="t-label">Elements and modes</div><h2 class="t-title">{{titles.balance}}</h2></div>
       <div class="two">
         <div class="card pad reveal" id="donutEl"></div>
         <div class="card pad reveal" id="donutMo" style="--d:.06s"></div>
@@ -131,7 +131,7 @@
     </section>
 
     <section class="sec" id="signs" data-nav="Signs">
-      <div class="sec-head reveal"><div class="t-label">Strongest signs</div><h2 class="t-title">Scorpio and Pisces lead</h2></div>
+      <div class="sec-head reveal"><div class="t-label">Strongest signs</div><h2 class="t-title">{{titles.signs}}</h2></div>
       <div class="card pad reveal" id="signBars"><div class="bars"></div></div>
       <div class="callout reveal" id="signsCallout"></div>
     </section>
@@ -174,7 +174,7 @@
     </section>
 
     <footer>
-      <span>Natal chart reference · 11 Mar 1994 04:10 SGT · Singapore · Placidus · Tropical</span>
+      <span>Natal chart reference · {{footer}} · Placidus · Tropical</span>
       <span>Interpretations are symbolic, not deterministic.</span>
     </footer>
     </div>
@@ -199,7 +199,8 @@
 <script>
 (() => {
   'use strict';
-@@ js/01-content.js
+  const CONTENT = {{content}};
+  const CHART = {{chart}};
 @@ js/02-core.js
 @@ js/03-chart-data.js
 @@ js/04-state-segmented.js

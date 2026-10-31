@@ -1,6 +1,4 @@
-/* ───────── data (Astrolog 7.80; absolute ecliptic longitude) ───────── */
-const ASC = 301.9,
-  MC = 216.95;
+/* ───────── data: the chart's own (CHART, from people/<name>/chart.json) and the fixed tables ───────── */
 const SIGNS = [
   ['Aries', '♈', 'fire', 'Cardinal'],
   ['Taurus', '♉', 'earth', 'Fixed'],
@@ -32,40 +30,43 @@ const HOUSES = [
   'Hidden',
 ];
 const ORD = (n) => n + (n === 1 ? 'st' : n === 2 ? 'nd' : n === 3 ? 'rd' : 'th');
-const CUSPS = [301.9, 332.4833, 5.05, 36.95, 66.3167, 93.9, 121.9, 152.4833, 185.05, 216.95, 246.3167, 273.9];
-const CUSP_TXT = [
-  "1° Aqu 54'",
-  "2° Pis 29'",
-  "5° Ari 03'",
-  "6° Tau 57'",
-  "6° Gem 19'",
-  "3° Can 54'",
-  "1° Leo 54'",
-  "2° Vir 29'",
-  "5° Lib 03'",
-  "6° Sco 57'",
-  "6° Sag 19'",
-  "3° Cap 54'",
+// the bodies every chart lists, in this order; Lilith stays last (the aspect grid skips it)
+const BODIES = [
+  { n: 'Sun', a: 'SUN', g: '☉' },
+  { n: 'Moon', a: 'MOON', g: '☽' },
+  { n: 'Mercury', a: 'MERC', g: '☿' },
+  { n: 'Venus', a: 'VEN', g: '♀' },
+  { n: 'Mars', a: 'MARS', g: '♂' },
+  { n: 'Jupiter', a: 'JUP', g: '♃' },
+  { n: 'Saturn', a: 'SAT', g: '♄' },
+  { n: 'Uranus', a: 'URA', g: '♅' },
+  { n: 'Neptune', a: 'NEP', g: '♆' },
+  { n: 'Pluto', a: 'PLU', g: '♇' },
+  { n: 'North Node', a: 'NODE', g: '☊', key: 'N. Node' },
+  { n: 'Chiron', a: 'CHI', g: '⚷' },
+  { n: 'Lilith', a: 'LIL', g: '⚸', full: 'Black Moon Lilith' }, // mean Lilith; astro.com scores no aspects for it
 ];
-const PLANETS = [
-  { n: 'Sun', a: 'SUN', g: '☉', lon: 350.0167, deg: "20°01'", house: 2 },
-  { n: 'Moon', a: 'MOON', g: '☽', lon: 333.6167, deg: "3°37'", house: 2 },
-  { n: 'Mercury', a: 'MERC', g: '☿', lon: 324.1333, deg: "24°08'", house: 1 },
-  { n: 'Venus', a: 'VEN', g: '♀', lon: 2.7833, deg: "2°47'", house: 2 },
-  { n: 'Mars', a: 'MARS', g: '♂', lon: 332.65, deg: "2°39'", house: 2 },
-  { n: 'Jupiter', a: 'JUP', g: '♃', lon: 224.4833, deg: "14°29'", house: 10, rx: true },
-  { n: 'Saturn', a: 'SAT', g: '♄', lon: 334.9, deg: "4°54'", house: 2 },
-  { n: 'Uranus', a: 'URA', g: '♅', lon: 295.2667, deg: "25°16'", house: 12 },
-  { n: 'Neptune', a: 'NEP', g: '♆', lon: 292.7833, deg: "22°47'", house: 12 },
-  { n: 'Pluto', a: 'PLU', g: '♇', lon: 238.0333, deg: "28°02'", house: 10, rx: true },
-  { n: 'North Node', a: 'NODE', g: '☊', lon: 237.45, deg: "27°27'", house: 10, rx: true, key: 'N. Node' },
-  { n: 'Chiron', a: 'CHI', g: '⚷', lon: 155.05, deg: "5°03'", house: 8, rx: true },
-  { n: 'Lilith', a: 'LIL', g: '⚸', lon: 26.9869, deg: "26°59'", house: 3, full: 'Black Moon Lilith' }, // mean Lilith; astro.com scores no aspects for it (see source file); keep last (the aspect grid skips it)
-];
+// a position as astro.com prints it, e.g. 20Pis01'27": sign, degree within it, absolute ecliptic longitude
+const POS = (s) => {
+  const [, d, sg, m, sec = 0] = s.match(/^(\d+)([A-Z][a-z]{2})(\d+)'(?:(\d+)")?$/);
+  const sign = SIGNS.findIndex((x) => x.n.startsWith(sg));
+  const lon = Math.round((sign * 30 + +d + m / 60 + sec / 3600) * 1e4) / 1e4;
+  return { lon, sign, d: +d, m: m.padStart(2, '0'), abbr: sg };
+};
+const CUSPS_AT = CHART.cusps.map(POS);
+const CUSPS = CUSPS_AT.map((c) => c.lon);
+const CUSP_TXT = CUSPS_AT.map((c) => `${c.d}° ${c.abbr} ${c.m}'`);
+const ASC = CUSPS[0],
+  MC = CUSPS[9];
+const PLANETS = BODIES.map((b) => {
+  const p = CHART.planets[b.n],
+    at = POS(p.pos);
+  return { ...b, lon: at.lon, deg: `${at.d}°${at.m}'`, house: p.house, rx: !!p.rx };
+});
 // the two angles that open the 1st and 10th houses; listed with the planets, never drawn as glyphs
 const ANGLES = [
-  { n: 'Ascendant', a: 'ASC', lon: ASC, deg: "1°54'", house: 1 },
-  { n: 'Midheaven', a: 'MC', lon: MC, deg: "6°57'", house: 10 },
+  { n: 'Ascendant', a: 'ASC', lon: ASC, deg: `${CUSPS_AT[0].d}°${CUSPS_AT[0].m}'`, house: 1 },
+  { n: 'Midheaven', a: 'MC', lon: MC, deg: `${CUSPS_AT[9].d}°${CUSPS_AT[9].m}'`, house: 10 },
 ].map((x, i) => ({ ...x, i, sign: Math.floor(x.lon / 30), note: CONTENT.pnotes[x.a] || '' }));
 PLANETS.forEach((p, i) => {
   p.i = i;
@@ -79,33 +80,18 @@ const ATYPE = {
   tri: { n: 'Trine', g: '△', c: 'var(--tri)', hex: '#4F9468' },
   opp: { n: 'Opposition', g: '☍', c: 'var(--opp)', hex: '#8A6BB0' },
 };
-// [a, b, type, orb, strength %, label] — ranked as in the reading; Saturn–Chiron listed last
-const ASPECTS = [
-  [9, 10, 'conj', "0°35'", 100, 'Tight'],
-  [1, 4, 'conj', "0°58'", 100, 'Tight'],
-  [1, 6, 'conj', "1°17'", 97, 'Tight'],
-  [4, 6, 'conj', "2°15'", 88, 'Tight'],
-  [7, 8, 'conj', "2°30'", 85, 'Tight'],
-  [0, 8, 'sex', "2°46'", 80, 'Strong'],
-  [7, 9, 'sex', "2°46'", 78, 'Strong'],
-  [2, 9, 'sq', "3°54'", 72, 'Strong'],
-  [3, 9, 'tri', "4°44'", 67, 'Strong'],
-  [4, 9, 'sq', "4°37'", 62, 'Strong'],
-  [1, 9, 'sq', "5°35'", 58, 'Strong'],
-  [8, 9, 'sex', "5°16'", 55, 'Moderate'],
-  [0, 5, 'tri', "5°32'", 52, 'Moderate'],
-  [6, 9, 'sq', "6°52'", 44, 'Moderate'],
-  [0, 7, 'sex', "5°15'", 40, 'Moderate'],
-  [5, 6, 'tri', "9°35'", 30, 'Wide'],
-  [1, 5, 'tri', "10°52'", 25, 'Wide'],
-  [0, 9, 'tri', "8°01'", 22, 'Wide'],
-  [2, 5, 'sq', "9°39'", 18, 'Wide'],
-  [2, 4, 'conj', "8°31'", 14, 'Wide'],
-  [1, 2, 'conj', "9°29'", 8, 'Wide'],
-  [6, 11, 'opp', "0°09'", 100, 'Exact'],
-  [1, 11, 'opp', "1°26'", 95, 'Tight'],
-  [4, 11, 'opp', "2°24'", 86, 'Tight'],
-].map(([a, b, t, orb, w, s], k) => ({ k, a, b, t, orb, w, s }));
+// [a, b, type, orb, strength %, label, 'calc' when worked out from the positions rather than taken from astro.com]
+const BODY = Object.fromEntries(PLANETS.map((p) => [p.n, p.i]));
+const ASPECTS = CHART.aspects.map(([a, b, t, orb, w, s, src], k) => ({
+  k,
+  a: BODY[a],
+  b: BODY[b],
+  t,
+  orb,
+  w,
+  s,
+  src,
+}));
 const houseOf = (h) => PLANETS.filter((p) => p.house === h + 1);
 const signOf = (s) => PLANETS.filter((p) => p.sign === s);
 const aspectsOf = (i) => ASPECTS.filter((x) => x.a === i || x.b === i);

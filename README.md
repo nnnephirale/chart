@@ -8,6 +8,7 @@ You can make one for yourself or a friend by pasting an astro.com report into a 
 
 - **A coding agent:** [Claude Code](https://claude.com/claude-code) or [Codex](https://openai.com/codex/). Either one's normal plan covers this, with no API key needed.
 - **Git**, to download this folder.
+- **Node.js 18 or later**, which the agent uses to build the page. Claude Code and Codex users usually have it already.
 - **The birth details:** date, exact time and place.
 
 ## Make a chart
@@ -34,17 +35,20 @@ The agent shows you a few sample cards and a story first. Once you're happy with
 
 | Path | What it is |
 |---|---|
-| `lu-chart-desktop.html` | The reference page (Lu's chart). New charts start as a copy of it. |
-| `src/`, `scripts/build.mjs` | The page's source, one file per feature, and the build that joins them into the reference page. See [ARCHITECTURE.md](ARCHITECTURE.md). |
+| `lu-chart-desktop.html` | The reference page (Lu's chart). |
+| `src/` | The page itself, shared by every chart: one file per feature. See [ARCHITECTURE.md](ARCHITECTURE.md). |
+| `people/` | One folder per person: `chart.json` (the facts from the paste) and `content.json` (the copy). New charts start as a copy of `people/lu/`. |
+| `scripts/build.mjs` | Joins `src/` and each person's folder into their page. |
 | `AGENTS.md` | The step-by-step recipe agents follow. Claude Code reads it through `CLAUDE.md`, Codex reads it directly. |
 | `rules/writing.md` | The writing rules: who the reader is, which astrology counts, how facts are sourced. |
 | `rules/writing-voice.md`, `rules/humanizer.md` | The voice the copy is written in, and the AI-writing tells it avoids. The humanizer is MIT-licensed (see `rules/humanizer-LICENSE.txt`). |
 | `DESIGN-NOTES.md` | Every design and interaction rule behind the page. |
-| `charts/` | Where new chart pages go. |
+| `charts/` | Where new chart pages go. Like `people/`, kept out of git except Lu's. |
 
 ## Good to know
 
-- **Birth data is personal.** Keep a friend's chart off public GitHub unless they agree.
+- **Birth data is personal.** Everyone's `people/` folder and chart page stay out of git (except Lu's), so a friend's chart doesn't reach public GitHub by accident.
+- **A fix to the page reaches every chart.** Run `node scripts/build.mjs` and every chart in `people/` is rebuilt with it.
 - **The copy takes a while to write.** A full page has over 100 pieces of text, and the agent checks each one against the rules.
 - **Fetching from astro.com is off the table.** Their terms allow only people using a browser, which is why you paste the report yourself.
 - **The page is for fun and reflection.** Interpretations are symbolic, not predictions.

@@ -1,1 +1,7 @@
 .DS_Store
+# the build's record of what it last wrote, for its hand-edit guard (per machine)
+scripts/.built.json
+# birth data is personal: only Lu's chart is in the repo
+people/*
+!people/lu/
+charts/*.html
