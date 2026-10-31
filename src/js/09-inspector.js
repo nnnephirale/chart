@@ -188,6 +188,7 @@ const chooseMode = (v) => {
     filterInRow.fade();
   }
   segCentre();
+  infoRender();
 };
 const tabs = segmented($('#segTabs'), TABS, S.tab, chooseMode),
   mtabs = segmented($('#mtabs'), TABS, S.tab, chooseMode);
@@ -237,6 +238,7 @@ const applyFilter = (v) => {
   $$('.ar').forEach((r) => r.classList.toggle('gone', v !== 'all' && r.dataset.t !== v));
   $$('.acell').forEach((c) => (c.style.opacity = v === 'all' || c.dataset.t === v ? '' : '.15'));
   paint();
+  if (!S.pin) infoRender();
 };
 const filterIn = segmented($('#segFilterIn'), FILTERS, 'all', applyFilter),
   filterInRow = scrollRow($('#segFilterIn'));

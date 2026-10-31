@@ -2567,6 +2567,55 @@ footer {
     margin-right: 3px;
     vertical-align: -0.5px;
   }
+  /* a mode tab with nothing picked previews its own kind: the section's lead fact, then its items as the same cards */
+  .mi-lead {
+    margin: 0 6px 8px 2px;
+    font: 300 12.5px/1.45 var(--sans);
+    color: var(--ink-2);
+    text-wrap: pretty;
+  }
+  .mi-rest > .mi-sigs:first-child {
+    margin-top: 0;
+  }
+  .mi-sigs.one {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .sig-ic .ax-sym {
+    font: 400 8.5px/1 var(--mono);
+    letter-spacing: 0.04em;
+    color: var(--ink);
+  }
+  .sig-tx {
+    min-width: 0;
+  }
+  .sig-sub {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .sig-pl {
+    display: block;
+    margin-top: 2px;
+    color: var(--ink-2);
+  }
+  .sig-pl .sym {
+    margin-right: 5px;
+    font-size: 12.5px;
+  }
+  .sig-rt {
+    flex: 0 0 auto;
+    margin-left: auto;
+    padding-left: 8px;
+    color: var(--ink-3);
+  }
+  .sig.sig-more {
+    min-height: 40px;
+    justify-content: center;
+    background: none;
+    box-shadow: none;
+    color: var(--ink-2);
+  }
   .minfo:not(.pinned) .mi-body {
     display: none;
   }
@@ -5111,6 +5160,7 @@ const chooseMode = (v) => {
     filterInRow.fade();
   }
   segCentre();
+  infoRender();
 };
 const tabs = segmented($('#segTabs'), TABS, S.tab, chooseMode),
   mtabs = segmented($('#mtabs'), TABS, S.tab, chooseMode);
@@ -5160,6 +5210,7 @@ const applyFilter = (v) => {
   $$('.ar').forEach((r) => r.classList.toggle('gone', v !== 'all' && r.dataset.t !== v));
   $$('.acell').forEach((c) => (c.style.opacity = v === 'all' || c.dataset.t === v ? '' : '.15'));
   paint();
+  if (!S.pin) infoRender();
 };
 const filterIn = segmented($('#segFilterIn'), FILTERS, 'all', applyFilter),
   filterInRow = scrollRow($('#segFilterIn'));
@@ -5688,6 +5739,94 @@ const SIGCHIPS = SIGNATURES.split(/\s*·\s*/)
     return `<button class="sig" type="button"${f ? fAttr(f) : ' data-go="balance"'}><span class="sig-ic" style="--c:${c}">${ic}</span><span class="sig-tx">${tx}</span></button>`;
   })
   .join('');
+// with nothing picked, each mode tab previews its own kind; All keeps Sun, Moon, Rising and the signatures
+const lead = (k) => {
+  const t = CONTENT.callouts[k]?.[0]?.match(/<strong>(.*?)<\/strong>/)?.[1];
+  return t ? `<p class="mi-lead">${t.trim().replace(/[,:;]$/, '.')}</p>` : '';
+};
+const chip = (f, c, ic, tx, rt = '') =>
+  `<button class="sig" type="button"${fAttr(f)}><span class="sig-ic" style="--c:${c}">${ic}</span><span class="sig-tx">${tx}</span>${rt}</button>`;
+const plGlyphs = (ps) =>
+  `<span class="sig-pl">${ps.map((p) => `<span class="sym">${T(p.g)}</span>`).join('')}</span>`;
+const TAB_NAME = { planets: 'Placements', signs: 'Signs', houses: 'Houses', aspects: 'Aspects' };
+const ASP_PREVIEW = 6;
+function restFor(tab) {
+  if (tab === 'planets') {
+    const pl = PLANETS.slice(2).map((p) => {
+      const s = SIGNS[p.sign];
+      return chip(
+        { kind: 'planet', i: p.i },
+        ELHEX[s.el],
+        `<span class="sym">${T(p.g)}</span>`,
+        `<b>${p.key || p.n}${p.rx ? ' ℞' : ''}</b><span class="sig-sub">${s.n} ${ORD(p.house)}</span>`,
+      );
+    });
+    const mc = ANGLES[1],
+      ms = SIGNS[mc.sign];
+    pl.push(
+      chip(
+        { kind: 'angle', i: 1 },
+        ELHEX[ms.el],
+        '<span class="ax-sym">MC</span>',
+        `<b>${mc.n}</b><span class="sig-sub">${ms.n} ${ORD(mc.house)}</span>`,
+      ),
+    );
+    return `<div class="mi-b3">${BIG3}</div><div class="mi-sigs">${pl.join('')}</div>`;
+  }
+  if (tab === 'signs')
+    return (
+      lead('signs') +
+      `<div class="mi-sigs">${SIGNS_BY_COUNT.filter((s) => signOf(s.i).length)
+        .map((s) =>
+          chip(
+            { kind: 'sign', i: s.i },
+            ELHEX[s.el],
+            `<span class="sym">${T(s.g)}</span>`,
+            `<b>${s.n}</b>${plGlyphs(signOf(s.i))}`,
+          ),
+        )
+        .join('')}</div>`
+    );
+  if (tab === 'houses')
+    return (
+      lead('cusps') +
+      `<div class="mi-sigs">${HOUSES.map((h, i) => i)
+        .filter((i) => houseOf(i).length)
+        .map((i) =>
+          chip(
+            { kind: 'house', i },
+            'var(--ink-2)',
+            `<b>${i + 1}</b>`,
+            `<b>${HOUSES[i]}</b>${plGlyphs(houseOf(i))}`,
+          ),
+        )
+        .join('')}</div>`
+    );
+  if (tab === 'aspects') {
+    // the strongest few, within the chosen aspect type
+    const xs = ASPECTS.filter((x) => S.filter === 'all' || x.t === S.filter).sort((a, b) => b.w - a.w),
+      more = xs.length - ASP_PREVIEW;
+    return (
+      lead('aspects') +
+      `<div class="mi-sigs one">${xs
+        .slice(0, ASP_PREVIEW)
+        .map((x) => {
+          const t = ATYPE[x.t];
+          return chip(
+            { kind: 'aspect', i: x.k },
+            t.hex,
+            `<span class="sym">${T(t.g)}</span>`,
+            `<b>${PLANETS[x.a].n}</b> ${t.n} <b>${PLANETS[x.b].n}</b>`,
+            `<span class="sig-rt">${x.orb}</span>`,
+          );
+        })
+        .join(
+          '',
+        )}${more > 0 ? `<button class="sig sig-more" type="button" data-all="1">${more} more aspects</button>` : ''}</div>`
+    );
+  }
+  return `<div class="mi-b3">${BIG3}</div>${SIGCHIPS ? `<div class="mi-sigs">${SIGCHIPS}</div>` : ''}`;
+}
 // the tag and "in your chart" text each kind of focus already has for its card
 const cardOf = (f) => {
   if (f.kind === 'planet') {
@@ -5717,9 +5856,9 @@ function infoRender() {
     c = d ? cardOf(f) : null;
   mi.classList.toggle('pinned', !!d);
   mi.innerHTML = `<div class="mi-in">
-      <div class="mi-top"><button class="mi-name" type="button" aria-label="${d ? d.name + ': ' : ''}see everything in your chart">${d?.glyph ? `<span class="sym">${T(d.glyph)}</span>` : ''}<b>${d ? d.name : 'Your chart'}</b>${d ? '' : '<span class="mi-see">See all</span>'}${CHEV}</button>
+      <div class="mi-top"><button class="mi-name" type="button" aria-label="${d ? d.name + ': ' : ''}see everything in your chart">${d?.glyph ? `<span class="sym">${T(d.glyph)}</span>` : ''}<b>${d ? d.name : TAB_NAME[S.tab] || 'Your chart'}</b>${d ? '' : '<span class="mi-see">See all</span>'}${CHEV}</button>
         <button class="zb" data-z="-1" aria-label="Previous">${ARROW('M8.5 3.5L5 7l3.5 3.5')}</button><button class="zb" data-z="1" aria-label="Next">${ARROW('M5.5 3.5L9 7l-3.5 3.5')}</button></div>
-      ${d ? `<div class="mi-pos">${[d.l1, d.l2s || d.l2].filter(Boolean).join(' · ')}</div>` : `<div class="mi-rest"><div class="mi-b3">${BIG3}</div>${SIGCHIPS ? `<div class="mi-sigs">${SIGCHIPS}</div>` : ''}</div>`}
+      ${d ? `<div class="mi-pos">${[d.l1, d.l2s || d.l2].filter(Boolean).join(' · ')}</div>` : `<div class="mi-rest">${restFor(S.tab)}</div>`}
       <div class="mi-body" role="button" tabindex="0"${d ? ' aria-label="Read the full card"' : ''}><span class="mi-tag">${d ? c.tag || '' : ''}</span><span class="mi-text">${d ? c.text || '' : ''}</span></div>
       <button class="mi-more" type="button" tabindex="-1">More</button>
     </div>`;
@@ -5737,7 +5876,7 @@ mi.addEventListener('click', (e) => {
   if (b.dataset.z) return stepBy(+b.dataset.z);
   if (b.dataset.f) return pin(JSON.parse(b.dataset.f));
   if (b.dataset.go) return jump(b.dataset.go);
-  if (b.classList.contains('mi-name')) return openIndex(S.pin);
+  if (b.classList.contains('mi-name') || b.dataset.all) return openIndex(S.pin);
   if (S.pin) histStart({ sheet: 'card', f: S.pin });
   else stepBy(1);
 });
@@ -5832,7 +5971,8 @@ idxBody.innerHTML = [
   .map((rows) => `<div class="idx-page">${rows}</div>`)
   .join('');
 const idxPages = $$('.idx-page', idxBody),
-  PAGE_OF = { planet: 0, angle: 0, sign: 1, house: 2, aspect: 3 };
+  PAGE_OF = { planet: 0, angle: 0, sign: 1, house: 2, aspect: 3 },
+  PAGE_OF_TAB = { planets: 0, signs: 1, houses: 2, aspects: 3 };
 const idxStride = () => idxPages[1].offsetLeft - idxPages[0].offsetLeft || 1;
 const idxLeft = (i) => idxPages[i].offsetLeft - (idxBody.clientWidth - idxPages[i].offsetWidth) / 2;
 const idxAt = () => Math.max(0, Math.min(idxPages.length - 1, Math.round(idxBody.scrollLeft / idxStride())));
@@ -5880,7 +6020,7 @@ function showIndex(f, scroll) {
     idxBody.scrollLeft = idxLeft(scroll.page);
     idxPages[scroll.page].scrollTop = scroll.top;
   } else {
-    const k = f ? PAGE_OF[f.kind] : 0,
+    const k = f ? PAGE_OF[f.kind] : (PAGE_OF_TAB[S.tab] ?? 0),
       pg = idxPages[k],
       row = f && $(`.row[data-focus="${key(f)}"]`, pg);
     idxBody.scrollLeft = idxLeft(k);

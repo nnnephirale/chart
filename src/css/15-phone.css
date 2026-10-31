@@ -372,6 +372,55 @@
     margin-right: 3px;
     vertical-align: -0.5px;
   }
+  /* a mode tab with nothing picked previews its own kind: the section's lead fact, then its items as the same cards */
+  .mi-lead {
+    margin: 0 6px 8px 2px;
+    font: 300 12.5px/1.45 var(--sans);
+    color: var(--ink-2);
+    text-wrap: pretty;
+  }
+  .mi-rest > .mi-sigs:first-child {
+    margin-top: 0;
+  }
+  .mi-sigs.one {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .sig-ic .ax-sym {
+    font: 400 8.5px/1 var(--mono);
+    letter-spacing: 0.04em;
+    color: var(--ink);
+  }
+  .sig-tx {
+    min-width: 0;
+  }
+  .sig-sub {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .sig-pl {
+    display: block;
+    margin-top: 2px;
+    color: var(--ink-2);
+  }
+  .sig-pl .sym {
+    margin-right: 5px;
+    font-size: 12.5px;
+  }
+  .sig-rt {
+    flex: 0 0 auto;
+    margin-left: auto;
+    padding-left: 8px;
+    color: var(--ink-3);
+  }
+  .sig.sig-more {
+    min-height: 40px;
+    justify-content: center;
+    background: none;
+    box-shadow: none;
+    color: var(--ink-2);
+  }
   .minfo:not(.pinned) .mi-body {
     display: none;
   }

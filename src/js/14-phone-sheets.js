@@ -89,7 +89,8 @@ idxBody.innerHTML = [
   .map((rows) => `<div class="idx-page">${rows}</div>`)
   .join('');
 const idxPages = $$('.idx-page', idxBody),
-  PAGE_OF = { planet: 0, angle: 0, sign: 1, house: 2, aspect: 3 };
+  PAGE_OF = { planet: 0, angle: 0, sign: 1, house: 2, aspect: 3 },
+  PAGE_OF_TAB = { planets: 0, signs: 1, houses: 2, aspects: 3 };
 const idxStride = () => idxPages[1].offsetLeft - idxPages[0].offsetLeft || 1;
 const idxLeft = (i) => idxPages[i].offsetLeft - (idxBody.clientWidth - idxPages[i].offsetWidth) / 2;
 const idxAt = () => Math.max(0, Math.min(idxPages.length - 1, Math.round(idxBody.scrollLeft / idxStride())));
@@ -137,7 +138,7 @@ function showIndex(f, scroll) {
     idxBody.scrollLeft = idxLeft(scroll.page);
     idxPages[scroll.page].scrollTop = scroll.top;
   } else {
-    const k = f ? PAGE_OF[f.kind] : 0,
+    const k = f ? PAGE_OF[f.kind] : (PAGE_OF_TAB[S.tab] ?? 0),
       pg = idxPages[k],
       row = f && $(`.row[data-focus="${key(f)}"]`, pg);
     idxBody.scrollLeft = idxLeft(k);

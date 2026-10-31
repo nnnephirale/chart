@@ -52,7 +52,7 @@ The script files are not modules. `page.html` opens one closure (`(() => { 'use 
 | `src/js/10-sections.js` | The sections below the chart: Placements by house, house cards, strength bars (top entries of each `CHART.power` table, widths relative to the top one), element and mode donuts, the aspect grid and ranked list, clusters, stories, features, cheat codes, questions, intros. |
 | `src/js/11-reveal-jump.js` | Fade-up on scroll (bars and donuts fill) and smooth in-page jumps with a flash. |
 | `src/js/12-rail.js` | The desktop section rail: icons, scroll-spy, the gliding dot, `jump()`. |
-| `src/js/13-phone-info.js` | The phone info area under the wheel: "Your chart" rest state (Sun, Moon, Rising tiles, signature cards parsed from the `stelliums` callout) and `infoRender`. |
+| `src/js/13-phone-info.js` | The phone info area under the wheel: "Your chart" rest state (Sun, Moon, Rising tiles, signature cards parsed from the `stelliums` callout), each mode tab's preview with nothing locked (`restFor`), and `infoRender`. |
 | `src/js/14-phone-sheets.js` | Phone sheets: open and close, sheet history (back and forward), the swipeable index, long-press to open it. |
 | `src/js/15-phone-rest.js` | The rest-of-chart sheet on phones (`openRest`, `closeRest`), Safari theme colour, the auto-hiding sheet bar. |
 | `src/js/16-boot.js` | First render: readies the zoom, the info area and `paint()`. |
