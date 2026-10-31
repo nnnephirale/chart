@@ -10,7 +10,8 @@ The result is one self-contained HTML file, `charts/<name>.html`, that looks and
 - `rules/writing-voice.md`: how the copy should sound. Wins over the humanizer where they disagree.
 - `rules/humanizer.md`: the AI-writing tells to remove from every draft.
 - `DESIGN-NOTES.md`: every design and interaction rule. The design is finished: don't restyle, re-layout or "improve" the page. Lines that mention Lu's own placements are examples, not rules.
-- `lu-chart-desktop.html`: the reference. Read its `CONTENT` object to see the length, depth and tone each kind of copy needs. Never edit this file while making a new chart.
+- `lu-chart-desktop.html`: the reference. Read its `CONTENT` object (also in `src/js/01-content.js`) to see the length, depth and tone each kind of copy needs. Never edit this file while making a new chart.
+- `ARCHITECTURE.md`: which source file owns what. The reference page is built from `src/`.
 
 ## 0. Before starting
 
@@ -119,3 +120,12 @@ How to write it:
 - Tell the person to double-click `charts/<name>.html` to open it.
 
 Birth data is personal. Don't commit or push a chart to a public repository unless its owner agrees.
+
+## Changing the page's code
+
+This is for fixing or changing the page itself, not for making a chart.
+
+- Edit `src/`, never `lu-chart-desktop.html` or `index.html`: both are built from it. Run `node scripts/build.mjs` after every change, then `npm test`. The build refuses to overwrite a page that was edited by hand.
+- [ARCHITECTURE.md](ARCHITECTURE.md) maps every source file to what it owns; start there. The script files share one closure and run in name order, so they aren't modules.
+- **Docs move with the code.** A change that adds, moves, renames or removes a source file, script or convention updates ARCHITECTURE.md and every doc that cites it, in the same commit. `tests/docs-map.test.mjs` enforces the map; the rest is on you.
+- Format `src/css` and `src/js` with `npx prettier --write src/css src/js` (settings in `.prettierrc.json`).

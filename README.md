@@ -35,6 +35,7 @@ The agent shows you a few sample cards and a story first. Once you're happy with
 | Path | What it is |
 |---|---|
 | `lu-chart-desktop.html` | The reference page (Lu's chart). New charts start as a copy of it. |
+| `src/`, `scripts/build.mjs` | The page's source, one file per feature, and the build that joins them into the reference page. See [ARCHITECTURE.md](ARCHITECTURE.md). |
 | `AGENTS.md` | The step-by-step recipe agents follow. Claude Code reads it through `CLAUDE.md`, Codex reads it directly. |
 | `rules/writing.md` | The writing rules: who the reader is, which astrology counts, how facts are sourced. |
 | `rules/writing-voice.md`, `rules/humanizer.md` | The voice the copy is written in, and the AI-writing tells it avoids. The humanizer is MIT-licensed (see `rules/humanizer-LICENSE.txt`). |

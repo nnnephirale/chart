@@ -1,5 +1,5 @@
 # Design notes
-Page: `lu-chart-desktop.html` (desktop rebuild of `lu-chart-ios.html`; the originals are untouched).
+Page: `lu-chart-desktop.html` (desktop rebuild of `lu-chart-ios.html`; the originals are untouched), built from `src/` (see ARCHITECTURE.md).
 References: 34_DESIGNSYSTEMS/03_resurf (motion), 02_perfolios (section dot, blur-in), 01_superhuman (shader plate + glass border). Precedence: house style, with the references' motion applied.
 
 ## Project rules

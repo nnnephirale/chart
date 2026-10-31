@@ -1,0 +1,49 @@
+  /* ---------- wheel svg ---------- */
+  /* phones: the wheel's camera glides to whatever is locked (after Lemniscate's spread guidance) */
+  #wheel.zoomed { overflow: hidden; -webkit-mask: linear-gradient(90deg, transparent, #000 12px, #000 calc(100% - 12px), transparent), linear-gradient(transparent, #000 12px, #000 calc(100% - 12px), transparent); -webkit-mask-composite: source-in; mask-composite: intersect; }
+  .zb { flex: 0 0 auto; display: grid; place-items: center; width: 36px; height: 36px; border: 0; border-radius: 999px; background: none; color: var(--ink-3); cursor: pointer; -webkit-tap-highlight-color: transparent; transition: background .2s var(--ease), color .2s var(--ease), opacity .3s var(--ease), transform .16s var(--ease); }
+  .zb svg { width: 14px; height: 14px; }
+  .zb:active { transform: scale(.94); }
+  #wheel text { font-family: var(--mono); }
+  #wheel .gsym { font-family: var(--sym); }
+  .z-seg { transition: fill-opacity .3s var(--ease); fill-opacity: .18; }
+  .z-seg.hi { fill-opacity: .36; }
+  .z-lbl, .h-lbl { transition: opacity .3s ease-out; }
+  #wheel .lbl-name, #wheel .lbl-glyph { transition: opacity .3s ease-out; }
+  .mode-glyph .lbl-name, .mode-name .lbl-glyph { opacity: 0; transition-duration: .15s !important; }
+  .hsec, .ssec { fill-opacity: 0; transition: fill-opacity .3s var(--ease); pointer-events: none; }
+  .hsec { fill: #000; }
+  .hsec.on { fill-opacity: .05; }
+  .ssec.on { fill-opacity: .08; }
+  /* the wheel hit-tests by mode, so element cursors defer to the wheel's */
+  #wheel [data-focus] { cursor: inherit !important; }
+  #wheel.aim { cursor: pointer; }
+  /* mode emphasis: what the lozenge selects stays at full strength, the rest steps back */
+  .g-signs, .g-houses { transition: opacity .3s var(--ease); }
+  #wheel:is(.m-planets, .m-houses, .m-aspects) .g-signs, #wheel:is(.m-planets, .m-signs, .m-aspects) .g-houses { opacity: .35; }
+  #wheel.m-houses .h-lbl { fill: #4d4d4d; }
+  #wheel .h-lbl.on { fill: #1a1a1a; font-weight: 500; }
+  #wheel .cusp { transition: stroke .3s var(--ease); }
+  #wheel .cusp.on { stroke: rgba(0,0,0,.42); }
+  #wheel:is(.m-signs, .m-houses, .m-aspects) .pl:not(.hi) { opacity: .3; }
+  #wheel:is(.m-planets, .m-signs, .m-houses) #asps:not(.quiet) .asp:not(.hi) { opacity: .14; }
+  #wheel.m-aspects #asps:not(.quiet) .asp:not(.hi) { opacity: .8; }
+  .pl { transition: opacity .3s var(--ease); cursor: pointer; }
+  .pl .gl { transform-box: fill-box; transform-origin: center; transition: transform .45s var(--ease), fill .25s; }
+  .pl.hi .gl { transform: scale(1.28); }
+  .pl.dim { opacity: .25; }
+  .pl .halo { opacity: 0; transition: opacity .3s var(--ease); }
+  .pl.hi .halo, .pl.sel .halo { opacity: 1; }
+  .pl.sel .halo { stroke: var(--ink-2); }
+  .asp { transition: opacity .3s var(--ease), stroke-width .3s var(--ease); opacity: .5; }
+  #asps.quiet .asp { opacity: .09; }
+  #asps.hidden .asp { opacity: 0; }
+  #asps .asp.hi { opacity: 1; stroke-width: 2.2; }
+  #asps .asp.cj.hi { stroke-width: 4.5; }
+  #asps .asp.filtered { opacity: 0 !important; }
+  .asp-hit { stroke: transparent; stroke-width: 12; cursor: pointer; }
+  #asps.hidden .asp-hit, .asp-hit.filtered { pointer-events: none; }
+  .ax { transition: opacity .3s; }
+  .ctr { opacity: 0; transition: opacity .2s ease-out; pointer-events: none; }
+  .ctr.on { opacity: 1; }
+

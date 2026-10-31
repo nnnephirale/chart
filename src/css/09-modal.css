@@ -1,0 +1,22 @@
+  /* ---------- modal ---------- */
+  .modal { border: 0; padding: 0; background: none; width: min(440px, calc(100vw - 32px)); max-width: none; overflow: visible; }
+  .modal::backdrop { background: rgba(0,0,0,.4); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
+  .modal[open]::backdrop { animation: m-fade .2s ease-out; }
+  .modal[open] .m-in { animation: m-in .24s var(--ease); }
+  .modal.closing::backdrop { animation: m-fade .15s ease-out reverse forwards; }
+  .modal.closing .m-in { animation: m-out .15s ease-out forwards; }
+  @keyframes m-fade { from { opacity: 0; } }
+  @keyframes m-in { from { opacity: 0; transform: translateY(6px) scale(.97); } }
+  @keyframes m-out { to { opacity: 0; transform: scale(.98); } }
+  .m-in { position: relative; background: #fff; border-radius: var(--r-card); padding: 24px 24px 22px; box-shadow: 0 0 0 1px var(--hair), 0 2px 6px rgba(0,0,0,.05), 0 24px 70px rgba(0,0,0,.2); }
+  .m-in h2 { display: flex; align-items: baseline; gap: 10px; margin: 6px 0 12px; font: 400 25px/1.05 var(--serif); }
+  .m-in h2 .rx { margin: 0; font-size: 15px; }
+  .m-in .prose { font-size: 14px; }
+  .m-in .prose p { margin: 0 0 10px; }
+  .m-in .chips { margin-top: 14px; max-height: none; -webkit-mask-image: none; mask-image: none; padding-bottom: 0; }
+  .m-x { position: absolute; top: 14px; right: 14px; width: 30px; height: 30px; display: grid; place-items: center; border: 0; border-radius: 999px; background: none; color: var(--ink-4); cursor: pointer; transition: background .2s var(--ease), color .2s var(--ease), transform .16s var(--ease); }
+  .m-x:hover { background: var(--wash); color: var(--ink-2); }
+  .m-x:active { transform: scale(.94); }
+  .show { position: absolute; right: 10px; top: 50%; translate: 0 -50%; opacity: 0; transition: opacity .2s var(--ease), background .2s; border: 0; border-radius: 999px; background: #fff; box-shadow: 0 0 0 .5px rgba(0,0,0,.1), 0 2px 8px -2px rgba(0,0,0,.12); padding: 5px 10px; font: 300 11.5px/1 var(--mono); color: var(--ink-2); cursor: pointer; }
+  .show:active { scale: .98; }
+  @media (hover: hover) { .tr:hover .show, .acell:hover .show, .pr:hover .show { opacity: 1; } .tr:hover .dg, .pr:hover .dg { opacity: 0; } }
