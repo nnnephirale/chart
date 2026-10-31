@@ -1,132 +1,745 @@
-  /* ---------- phone (≤960px): the chart is its own full screen; everything else waits in sheets ---------- */
-  .read-btn, .minfo, .mtabs-wrap, .sheet-bar, .scrim, .msheet, .rest-bar, .rest-meta { display: none; }
-  #rest { display: contents; }
-  @media (max-width: 960px) {
-    .page { padding: 0; }
-    #chart { position: relative; z-index: 5; height: 100vh; height: 100lvh; margin: 0; display: flex; flex-direction: column; }
-    #chart .hero-head.off-plate, #wheelNote, #chart .legend { display: none; }
-    #chart .reveal { opacity: 1; transform: none; }
-    #chart .plate { flex: 1; min-height: 0; margin: 0; border-radius: 0; display: flex; flex-direction: column; padding: calc(env(safe-area-inset-top) + 8px) 10px calc(env(safe-area-inset-bottom) + 10px); padding-bottom: calc(env(safe-area-inset-bottom) + 10px + 100lvh - 100dvh); }
-    .hero-head.on-plate { display: flex; flex-direction: row; align-items: center; justify-content: space-between; gap: 12px; margin: 2px 6px 10px; position: relative; color: #fff; }
-    .hero-head.on-plate .t-label { color: rgba(255,255,255,.62); }
-    .hero-head.on-plate h1 { font-size: 26px; margin-top: 4px; color: #fff; }
-    .hero-head.on-plate .hero-meta { display: none; }
-    .read-btn { display: inline-flex; align-items: center; gap: 7px; height: 34px; padding: 0 14px; border: 0; border-radius: 999px; background: rgba(255,255,255,.16); box-shadow: inset 0 0 0 1px rgba(255,255,255,.34); color: #fff; font: 300 12.5px/1 var(--mono); cursor: pointer; -webkit-tap-highlight-color: transparent; transition: background .2s var(--ease), transform .16s var(--ease); }
-    .read-btn:active { transform: scale(.98); background: rgba(255,255,255,.24); }
-    .read-btn svg { width: 12px; height: 12px; }
-    .hero-grid { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 0; }
-    .wheel-card { flex: 1; min-height: 0; }
-    .wheel-card .glass-in { height: 100%; display: flex; flex-direction: column; padding: 10px 12px 0; }
-    /* the wheel takes only the height it needs (a square at full width) and gives way first on short screens */
-    .wheel-wrap { position: relative; flex: 0 1 auto; width: 100%; aspect-ratio: 1 / 1; min-height: 220px; padding: 0; margin: 6px 0 4px; }
-    #wheel { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
-
-    /* what's in focus, right under the wheel: name and stepper, position, tag, three lines, More */
-    .minfo { display: flex; flex-direction: column; flex: 1 0 150px; min-height: 150px; padding: 8px 4px 8px 8px; box-shadow: 0 -1px 0 var(--hair); }
-    .mi-in { position: relative; display: flex; flex-direction: column; min-height: 0; flex: 1; animation: el-in .25s ease-out; }
-    .mi-top { display: flex; align-items: center; gap: 2px; }
-    .mi-name { flex: 0 1 auto; margin-right: auto; min-width: 0; display: flex; align-items: center; gap: 8px; height: 38px; padding: 0; border: 0; background: none; color: var(--ink); cursor: pointer; text-align: left; -webkit-tap-highlight-color: transparent; transition: transform .16s var(--ease); }
-    .mi-name:active { transform: scale(.98); }
-    .mi-name .sym { font-size: 19px; line-height: 1; }
-    .mi-name b { font: 400 23px/1.1 var(--serif); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .mi-name svg { flex: 0 0 auto; width: 11px; height: 11px; color: var(--ink-3); }
-    /* with nothing picked, "Your chart" is the way in: a big muted button that opens everything */
-    .minfo:not(.pinned) .mi-top { margin-bottom: 10px; }
-    .minfo:not(.pinned) .mi-name { flex: 1 1 auto; height: 56px; margin-right: 6px; padding: 0 16px 0 18px; gap: 10px; border-radius: 18px; background: rgba(0,0,0,.05); box-shadow: inset 0 0 0 1px rgba(0,0,0,.04), 0 1px 2px rgba(0,0,0,.04), 0 6px 18px rgba(0,0,0,.05); transition: transform .16s var(--ease), background .2s var(--ease); }
-    .minfo:not(.pinned) .mi-name:active { transform: scale(.98); background: rgba(0,0,0,.08); }
-    .minfo:not(.pinned) .mi-name b { flex: 0 0 auto; margin-right: auto; }
-    .mi-see { font: 300 11.5px/1 var(--mono); color: var(--ink-3); white-space: nowrap; }
-    .minfo:not(.pinned) .mi-name svg { width: 13px; height: 13px; color: var(--ink-2); transform: rotate(-90deg); }
-    /* rest state: Sun, Moon, Rising tiles, then the chart signatures as chips */
-    .mi-rest { flex: 1; min-height: 0; margin: 0 -4px -8px 0; padding: 0 4px 16px 0; overflow-y: auto; scrollbar-width: none; -webkit-mask-image: linear-gradient(#000 calc(100% - 16px), transparent); mask-image: linear-gradient(#000 calc(100% - 16px), transparent); }
-    .mi-rest::-webkit-scrollbar { display: none; }
-    .mi-b3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin-right: 4px; }
-    .b3 { display: flex; flex-direction: column; gap: 6px; min-width: 0; padding: 9px 10px 10px 11px; border: 0; border-radius: 14px; background: var(--wash); color: var(--ink); text-align: left; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: transform .16s var(--ease), background .2s var(--ease); }
-    .b3:active { transform: scale(.98); background: var(--wash-2); }
-    .b3-k { display: flex; align-items: center; gap: 5px; height: 13px; font: 400 10.5px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
-    .b3-k .sym { font-size: 12px; color: var(--ink-2); }
-    .b3-k .ax-sym { font: 400 8.5px/1 var(--mono); letter-spacing: .04em; color: var(--ink-2); }
-    .b3-s { display: flex; align-items: baseline; justify-content: space-between; gap: 4px; min-width: 0; }
-    .b3-s b { font: 400 18px/1.1 var(--serif); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .b3-s .sym { flex: 0 0 auto; font-size: 15px; line-height: 1; }
-    .mi-sigs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; margin: 6px 4px 0 0; }
-    .sig { display: flex; align-items: center; gap: 8px; min-width: 0; min-height: 48px; padding: 7px 10px 7px 7px; border: 0; border-radius: 14px; background: #fff; box-shadow: inset 0 0 0 1px var(--line), 0 1px 2px rgba(0,0,0,.03); font: 300 11.5px/1.4 var(--mono); color: var(--ink-3); text-align: left; text-wrap: balance; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: transform .16s var(--ease), background .2s var(--ease); }
-    .sig:active { transform: scale(.98); background: var(--bg-2); }
-    .sig-ic { flex: 0 0 auto; display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; color: var(--c); background: color-mix(in srgb, var(--c) 13%, transparent); }
-    .sig-ic .sym { font-size: 12.5px; line-height: 1; }
-    .sig-ic b { font: 400 11px/1 var(--mono); color: var(--ink); }
-    .sig-ic svg { width: 11px; height: 11px; }
-    .sig-tx b { font-weight: 400; color: var(--ink); }
-    .sig-tx .sym { margin-right: 3px; }
-    .sig-el svg { width: 9px; height: 9px; margin-right: 3px; vertical-align: -.5px; }
-    .minfo:not(.pinned) .mi-body { display: none; }
-    .mi-pos { font: 300 12px/1.5 var(--mono); color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 4px; }
-    .mi-body { position: relative; flex: 1; min-height: 0; margin-top: 4px; padding: 0 4px 0 0; border: 0; background: none; color: inherit; text-align: left; cursor: pointer; overflow: hidden; -webkit-tap-highlight-color: transparent; }
-    .mi-tag { display: block; font: 300 12.5px/1.5 var(--sans); color: var(--ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .mi-tag:empty { display: none; }
-    /* three lines at least; a taller screen shows more, faded where the card takes over */
-    .mi-text { display: block; font: 300 13.5px/1.5 var(--sans); color: var(--ink-2); }
-    .mi-body { -webkit-mask-image: linear-gradient(#000 calc(100% - 22px), transparent); mask-image: linear-gradient(#000 calc(100% - 22px), transparent); }
-    .minfo:not(.pinned) .mi-body { -webkit-mask-image: none; mask-image: none; }
-    .minfo:not(.pinned) .mi-text { color: var(--ink-3); }
-    .mi-more { position: absolute; right: 4px; bottom: 0; z-index: 1; border: 0; padding: 0 0 0 40px; cursor: pointer; background: linear-gradient(90deg, rgba(255,255,255,0), #fff 45%); font: 400 12.5px/1.6 var(--mono); color: var(--ink); }
-    .minfo:not(.pinned) .mi-more { display: none; }
-
-    /* mode tabs along the bottom, by the thumb */
-    .mtabs-wrap { display: block; flex: 0 0 auto; margin: 0 -12px; padding: 0 20px; box-shadow: 0 -1px 0 var(--hair); }
-    #mtabs { justify-content: space-between; gap: 14px; box-shadow: none; }
-    #mtabs button { padding: 15px 0 14px; font-size: 12.5px; }
-    #mtabs .loz { bottom: 8px; }
-
-    /* sheets: the More card (the inspector) and the index rise from the bottom over a dimmed chart */
-    .scrim { display: block; position: fixed; inset: 0; z-index: 25; background: rgba(0,0,0,.4); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); opacity: 0; visibility: hidden; transition: opacity .3s var(--ease), visibility 0s .3s; }
-    .scrim.on { opacity: 1; visibility: visible; transition-delay: 0s; }
-    .insp, .msheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; height: 86vh; height: 86dvh; display: flex; flex-direction: column; padding: 0 0 env(safe-area-inset-bottom); border-radius: 22px 22px 0 0; background: #fff; box-shadow: 0 -12px 48px rgba(0,0,0,.16), 0 -2px 8px rgba(0,0,0,.05); transform: translateY(calc(100% + 64px)); visibility: hidden; transition: transform .5s var(--ease), visibility 0s .5s; }
-    .insp.open, .msheet.open { transform: none; visibility: visible; transition: transform .5s var(--ease), visibility 0s; }
-    .insp .glass-in { flex: 1; height: auto; min-height: 0; border-radius: 22px 22px 0 0; }
-    .insp-top { display: none; }
-    .insp-body { margin-top: 0; }
-    .sheet-bar { display: flex; flex: 0 0 auto; align-items: center; justify-content: space-between; gap: 8px; height: 56px; padding: 0 12px 0 10px; }
-    /* back and forward through everything opened in the sheet; forward only exists once you've gone back */
-    .sheet-nav { display: flex; align-items: center; gap: 2px; }
-    .sheet-nb { display: grid; place-items: center; width: 36px; height: 36px; padding: 0; border: 0; border-radius: 999px; background: none; color: var(--ink-2); cursor: pointer; transition: background .2s var(--ease), transform .16s var(--ease); }
-    .sheet-nb:active { transform: scale(.94); background: var(--wash); }
-    .sheet-nb[hidden] { display: none; }
-    .sheet-nb.in { animation: nb-in .32s var(--ease); }
-    @keyframes nb-in { from { opacity: 0; transform: translateX(-6px); } }
-    .sheet-nb svg { width: 14px; height: 14px; }
-    .sheet-bar .t-label { margin-left: 2px; }
-    .sheet-x { display: grid; place-items: center; width: 36px; height: 36px; margin-left: auto; border: 0; border-radius: 999px; background: var(--wash); color: var(--ink-2); cursor: pointer; transition: background .2s var(--ease), transform .16s var(--ease); }
-    .sheet-x:active { transform: scale(.94); }
-    .sheet-x svg { width: 14px; height: 14px; }
-    .msheet { display: flex; }
-    /* four pages side by side: swipe sideways between sections, scroll down within one */
-    /* each section is a card on a grey ground; the neighbours peek at the edges and step back as they leave the centre */
-    .idx-body { position: relative; flex: 1; min-height: 0; display: flex; gap: 10px; padding: 12px 0 16px 20px; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; scrollbar-width: none; background: linear-gradient(180deg, #F7F7F7, #F1F1F1); }
-    .idx-body::after { content: ''; flex: 0 0 10px; }
-    .idx-body::-webkit-scrollbar, .idx-page::-webkit-scrollbar { display: none; }
-    .idx-page { position: relative; flex: 0 0 calc(100% - 40px); min-width: 0; overflow-y: auto; overscroll-behavior: contain; scroll-snap-align: center; scroll-snap-stop: always; scrollbar-width: none; padding: 10px 8px 24px; border-radius: 20px; background: #fff; box-shadow: 0 0 0 1px rgba(0,0,0,.04), 0 1px 2px rgba(0,0,0,.04), 0 8px 24px rgba(0,0,0,.06); transform-origin: 50% 40%; will-change: transform, opacity; }
-    .idx-body .row.hit { background: var(--wash); }
-    /* jump tabs: the headings' type on the underline row; the underline follows the section in view */
-    .idx-tabs { flex: 0 0 auto; padding: 0 20px; }
-    #idxTabs { justify-content: space-between; gap: 14px; }
-    #idxTabs button { padding: 12px 0 13px; font: 400 10.5px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
-    #idxTabs button[aria-selected="true"] { color: var(--ink); }
-
-    /* the rest of the chart: a full-screen sheet over the chart, with a bar that slides away on the way down */
-    #rest { display: none; }
-    body.rest-open #rest { display: block; position: relative; z-index: 10; min-height: 100vh; min-height: 100dvh; padding: 0 28px 80px; background: linear-gradient(180deg, #FCFCFC, #F4F4F4); }
-    body.rest-settled #chart { display: none; }
-    body.rest-open #chart { position: fixed; top: 0; left: 0; right: 0; } /* out of the way while the rest slides over it */
-    html:has(> body:not(.rest-open)), body:not(.rest-open) { overflow: hidden; overscroll-behavior: none; background: #123540; }
-    .rest-bar { display: flex; position: sticky; top: 0; z-index: 3; align-items: center; justify-content: space-between; gap: 12px; height: 56px; margin: 0 -28px; padding: env(safe-area-inset-top) 12px 0 28px; box-sizing: content-box; background: rgba(252,252,252,.82); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); box-shadow: 0 1px 0 var(--hair); transition: transform .45s var(--ease); }
-    .rest-bar.away { transform: translateY(calc(-100% - 2px)); }
-    .rest-bar .rb-t { font: 300 12.5px/1 var(--mono); color: var(--ink-3); }
-    .rest-meta { display: block; padding: 28px 0 0; }
-    .rest-meta .hero-head { display: flex; margin: 0; }
-    #rest .rest-meta + .sec { margin-top: 56px; }
+/* ---------- phone (≤960px): the chart is its own full screen; everything else waits in sheets ---------- */
+.read-btn,
+.minfo,
+.mtabs-wrap,
+.sheet-bar,
+.scrim,
+.msheet,
+.rest-bar,
+.rest-meta {
+  display: none;
+}
+#rest {
+  display: contents;
+}
+@media (max-width: 960px) {
+  .page {
+    padding: 0;
   }
-  @media (max-width: 640px) {
-    body.rest-open #rest { padding: 0 16px 64px; }
-    .rest-bar { margin: 0 -16px; padding-left: 16px; }
+  #chart {
+    position: relative;
+    z-index: 5;
+    height: 100vh;
+    height: 100lvh;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
   }
+  #chart .hero-head.off-plate,
+  #wheelNote,
+  #chart .legend {
+    display: none;
+  }
+  #chart .reveal {
+    opacity: 1;
+    transform: none;
+  }
+  #chart .plate {
+    flex: 1;
+    min-height: 0;
+    margin: 0;
+    border-radius: 0;
+    display: flex;
+    flex-direction: column;
+    padding: calc(env(safe-area-inset-top) + 8px) 10px calc(env(safe-area-inset-bottom) + 10px);
+    padding-bottom: calc(env(safe-area-inset-bottom) + 10px + 100lvh - 100dvh);
+  }
+  .hero-head.on-plate {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 2px 6px 10px;
+    position: relative;
+    color: #fff;
+  }
+  .hero-head.on-plate .t-label {
+    color: rgba(255, 255, 255, 0.62);
+  }
+  .hero-head.on-plate h1 {
+    font-size: 26px;
+    margin-top: 4px;
+    color: #fff;
+  }
+  .hero-head.on-plate .hero-meta {
+    display: none;
+  }
+  .read-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    height: 34px;
+    padding: 0 14px;
+    border: 0;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.16);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.34);
+    color: #fff;
+    font: 300 12.5px/1 var(--mono);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition:
+      background 0.2s var(--ease),
+      transform 0.16s var(--ease);
+  }
+  .read-btn:active {
+    transform: scale(0.98);
+    background: rgba(255, 255, 255, 0.24);
+  }
+  .read-btn svg {
+    width: 12px;
+    height: 12px;
+  }
+  .hero-grid {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .wheel-card {
+    flex: 1;
+    min-height: 0;
+  }
+  .wheel-card .glass-in {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 10px 12px 0;
+  }
+  /* the wheel takes only the height it needs (a square at full width) and gives way first on short screens */
+  .wheel-wrap {
+    position: relative;
+    flex: 0 1 auto;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    min-height: 220px;
+    padding: 0;
+    margin: 6px 0 4px;
+  }
+  #wheel {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+
+  /* what's in focus, right under the wheel: name and stepper, position, tag, three lines, More */
+  .minfo {
+    display: flex;
+    flex-direction: column;
+    flex: 1 0 150px;
+    min-height: 150px;
+    padding: 8px 4px 8px 8px;
+    box-shadow: 0 -1px 0 var(--hair);
+  }
+  .mi-in {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    flex: 1;
+    animation: el-in 0.25s ease-out;
+  }
+  .mi-top {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+  }
+  .mi-name {
+    flex: 0 1 auto;
+    margin-right: auto;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 38px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--ink);
+    cursor: pointer;
+    text-align: left;
+    -webkit-tap-highlight-color: transparent;
+    transition: transform 0.16s var(--ease);
+  }
+  .mi-name:active {
+    transform: scale(0.98);
+  }
+  .mi-name .sym {
+    font-size: 19px;
+    line-height: 1;
+  }
+  .mi-name b {
+    font: 400 23px/1.1 var(--serif);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .mi-name svg {
+    flex: 0 0 auto;
+    width: 11px;
+    height: 11px;
+    color: var(--ink-3);
+  }
+  /* with nothing picked, "Your chart" is the way in: a big muted button that opens everything */
+  .minfo:not(.pinned) .mi-top {
+    margin-bottom: 10px;
+  }
+  .minfo:not(.pinned) .mi-name {
+    flex: 1 1 auto;
+    height: 56px;
+    margin-right: 6px;
+    padding: 0 16px 0 18px;
+    gap: 10px;
+    border-radius: 18px;
+    background: rgba(0, 0, 0, 0.05);
+    box-shadow:
+      inset 0 0 0 1px rgba(0, 0, 0, 0.04),
+      0 1px 2px rgba(0, 0, 0, 0.04),
+      0 6px 18px rgba(0, 0, 0, 0.05);
+    transition:
+      transform 0.16s var(--ease),
+      background 0.2s var(--ease);
+  }
+  .minfo:not(.pinned) .mi-name:active {
+    transform: scale(0.98);
+    background: rgba(0, 0, 0, 0.08);
+  }
+  .minfo:not(.pinned) .mi-name b {
+    flex: 0 0 auto;
+    margin-right: auto;
+  }
+  .mi-see {
+    font: 300 11.5px/1 var(--mono);
+    color: var(--ink-3);
+    white-space: nowrap;
+  }
+  .minfo:not(.pinned) .mi-name svg {
+    width: 13px;
+    height: 13px;
+    color: var(--ink-2);
+    transform: rotate(-90deg);
+  }
+  /* rest state: Sun, Moon, Rising tiles, then the chart signatures as chips */
+  .mi-rest {
+    flex: 1;
+    min-height: 0;
+    margin: 0 -4px -8px 0;
+    padding: 0 4px 16px 0;
+    overflow-y: auto;
+    scrollbar-width: none;
+    -webkit-mask-image: linear-gradient(#000 calc(100% - 16px), transparent);
+    mask-image: linear-gradient(#000 calc(100% - 16px), transparent);
+  }
+  .mi-rest::-webkit-scrollbar {
+    display: none;
+  }
+  .mi-b3 {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+    margin-right: 4px;
+  }
+  .b3 {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+    padding: 9px 10px 10px 11px;
+    border: 0;
+    border-radius: 14px;
+    background: var(--wash);
+    color: var(--ink);
+    text-align: left;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition:
+      transform 0.16s var(--ease),
+      background 0.2s var(--ease);
+  }
+  .b3:active {
+    transform: scale(0.98);
+    background: var(--wash-2);
+  }
+  .b3-k {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    height: 13px;
+    font: 400 10.5px/1 var(--mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+  .b3-k .sym {
+    font-size: 12px;
+    color: var(--ink-2);
+  }
+  .b3-k .ax-sym {
+    font: 400 8.5px/1 var(--mono);
+    letter-spacing: 0.04em;
+    color: var(--ink-2);
+  }
+  .b3-s {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 4px;
+    min-width: 0;
+  }
+  .b3-s b {
+    font: 400 18px/1.1 var(--serif);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .b3-s .sym {
+    flex: 0 0 auto;
+    font-size: 15px;
+    line-height: 1;
+  }
+  .mi-sigs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+    margin: 6px 4px 0 0;
+  }
+  .sig {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    min-height: 48px;
+    padding: 7px 10px 7px 7px;
+    border: 0;
+    border-radius: 14px;
+    background: #fff;
+    box-shadow:
+      inset 0 0 0 1px var(--line),
+      0 1px 2px rgba(0, 0, 0, 0.03);
+    font: 300 11.5px/1.4 var(--mono);
+    color: var(--ink-3);
+    text-align: left;
+    text-wrap: balance;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition:
+      transform 0.16s var(--ease),
+      background 0.2s var(--ease);
+  }
+  .sig:active {
+    transform: scale(0.98);
+    background: var(--bg-2);
+  }
+  .sig-ic {
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    color: var(--c);
+    background: color-mix(in srgb, var(--c) 13%, transparent);
+  }
+  .sig-ic .sym {
+    font-size: 12.5px;
+    line-height: 1;
+  }
+  .sig-ic b {
+    font: 400 11px/1 var(--mono);
+    color: var(--ink);
+  }
+  .sig-ic svg {
+    width: 11px;
+    height: 11px;
+  }
+  .sig-tx b {
+    font-weight: 400;
+    color: var(--ink);
+  }
+  .sig-tx .sym {
+    margin-right: 3px;
+  }
+  .sig-el svg {
+    width: 9px;
+    height: 9px;
+    margin-right: 3px;
+    vertical-align: -0.5px;
+  }
+  .minfo:not(.pinned) .mi-body {
+    display: none;
+  }
+  .mi-pos {
+    font: 300 12px/1.5 var(--mono);
+    color: var(--ink-2);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-right: 4px;
+  }
+  .mi-body {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    margin-top: 4px;
+    padding: 0 4px 0 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+    overflow: hidden;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .mi-tag {
+    display: block;
+    font: 300 12.5px/1.5 var(--sans);
+    color: var(--ink-3);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .mi-tag:empty {
+    display: none;
+  }
+  /* three lines at least; a taller screen shows more, faded where the card takes over */
+  .mi-text {
+    display: block;
+    font: 300 13.5px/1.5 var(--sans);
+    color: var(--ink-2);
+  }
+  .mi-body {
+    -webkit-mask-image: linear-gradient(#000 calc(100% - 22px), transparent);
+    mask-image: linear-gradient(#000 calc(100% - 22px), transparent);
+  }
+  .minfo:not(.pinned) .mi-body {
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+  .minfo:not(.pinned) .mi-text {
+    color: var(--ink-3);
+  }
+  .mi-more {
+    position: absolute;
+    right: 4px;
+    bottom: 0;
+    z-index: 1;
+    border: 0;
+    padding: 0 0 0 40px;
+    cursor: pointer;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0), #fff 45%);
+    font: 400 12.5px/1.6 var(--mono);
+    color: var(--ink);
+  }
+  .minfo:not(.pinned) .mi-more {
+    display: none;
+  }
+
+  /* mode tabs along the bottom, by the thumb */
+  .mtabs-wrap {
+    display: block;
+    flex: 0 0 auto;
+    margin: 0 -12px;
+    padding: 0 20px;
+    box-shadow: 0 -1px 0 var(--hair);
+  }
+  #mtabs {
+    justify-content: space-between;
+    gap: 14px;
+    box-shadow: none;
+  }
+  #mtabs button {
+    padding: 15px 0 14px;
+    font-size: 12.5px;
+  }
+  #mtabs .loz {
+    bottom: 8px;
+  }
+
+  /* sheets: the More card (the inspector) and the index rise from the bottom over a dimmed chart */
+  .scrim {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 25;
+    background: rgba(0, 0, 0, 0.4);
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 0.3s var(--ease),
+      visibility 0s 0.3s;
+  }
+  .scrim.on {
+    opacity: 1;
+    visibility: visible;
+    transition-delay: 0s;
+  }
+  .insp,
+  .msheet {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 30;
+    height: 86vh;
+    height: 86dvh;
+    display: flex;
+    flex-direction: column;
+    padding: 0 0 env(safe-area-inset-bottom);
+    border-radius: 22px 22px 0 0;
+    background: #fff;
+    box-shadow:
+      0 -12px 48px rgba(0, 0, 0, 0.16),
+      0 -2px 8px rgba(0, 0, 0, 0.05);
+    transform: translateY(calc(100% + 64px));
+    visibility: hidden;
+    transition:
+      transform 0.5s var(--ease),
+      visibility 0s 0.5s;
+  }
+  .insp.open,
+  .msheet.open {
+    transform: none;
+    visibility: visible;
+    transition:
+      transform 0.5s var(--ease),
+      visibility 0s;
+  }
+  .insp .glass-in {
+    flex: 1;
+    height: auto;
+    min-height: 0;
+    border-radius: 22px 22px 0 0;
+  }
+  .insp-top {
+    display: none;
+  }
+  .insp-body {
+    margin-top: 0;
+  }
+  .sheet-bar {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    height: 56px;
+    padding: 0 12px 0 10px;
+  }
+  /* back and forward through everything opened in the sheet; forward only exists once you've gone back */
+  .sheet-nav {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+  }
+  .sheet-nb {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 0;
+    border-radius: 999px;
+    background: none;
+    color: var(--ink-2);
+    cursor: pointer;
+    transition:
+      background 0.2s var(--ease),
+      transform 0.16s var(--ease);
+  }
+  .sheet-nb:active {
+    transform: scale(0.94);
+    background: var(--wash);
+  }
+  .sheet-nb[hidden] {
+    display: none;
+  }
+  .sheet-nb.in {
+    animation: nb-in 0.32s var(--ease);
+  }
+  @keyframes nb-in {
+    from {
+      opacity: 0;
+      transform: translateX(-6px);
+    }
+  }
+  .sheet-nb svg {
+    width: 14px;
+    height: 14px;
+  }
+  .sheet-bar .t-label {
+    margin-left: 2px;
+  }
+  .sheet-x {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    margin-left: auto;
+    border: 0;
+    border-radius: 999px;
+    background: var(--wash);
+    color: var(--ink-2);
+    cursor: pointer;
+    transition:
+      background 0.2s var(--ease),
+      transform 0.16s var(--ease);
+  }
+  .sheet-x:active {
+    transform: scale(0.94);
+  }
+  .sheet-x svg {
+    width: 14px;
+    height: 14px;
+  }
+  .msheet {
+    display: flex;
+  }
+  /* four pages side by side: swipe sideways between sections, scroll down within one */
+  /* each section is a card on a grey ground; the neighbours peek at the edges and step back as they leave the centre */
+  .idx-body {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    gap: 10px;
+    padding: 12px 0 16px 20px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    background: linear-gradient(180deg, #f7f7f7, #f1f1f1);
+  }
+  .idx-body::after {
+    content: '';
+    flex: 0 0 10px;
+  }
+  .idx-body::-webkit-scrollbar,
+  .idx-page::-webkit-scrollbar {
+    display: none;
+  }
+  .idx-page {
+    position: relative;
+    flex: 0 0 calc(100% - 40px);
+    min-width: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scroll-snap-align: center;
+    scroll-snap-stop: always;
+    scrollbar-width: none;
+    padding: 10px 8px 24px;
+    border-radius: 20px;
+    background: #fff;
+    box-shadow:
+      0 0 0 1px rgba(0, 0, 0, 0.04),
+      0 1px 2px rgba(0, 0, 0, 0.04),
+      0 8px 24px rgba(0, 0, 0, 0.06);
+    transform-origin: 50% 40%;
+    will-change: transform, opacity;
+  }
+  .idx-body .row.hit {
+    background: var(--wash);
+  }
+  /* jump tabs: the headings' type on the underline row; the underline follows the section in view */
+  .idx-tabs {
+    flex: 0 0 auto;
+    padding: 0 20px;
+  }
+  #idxTabs {
+    justify-content: space-between;
+    gap: 14px;
+  }
+  #idxTabs button {
+    padding: 12px 0 13px;
+    font: 400 10.5px/1 var(--mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+  #idxTabs button[aria-selected='true'] {
+    color: var(--ink);
+  }
+
+  /* the rest of the chart: a full-screen sheet over the chart, with a bar that slides away on the way down */
+  #rest {
+    display: none;
+  }
+  body.rest-open #rest {
+    display: block;
+    position: relative;
+    z-index: 10;
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding: 0 28px 80px;
+    background: linear-gradient(180deg, #fcfcfc, #f4f4f4);
+  }
+  body.rest-settled #chart {
+    display: none;
+  }
+  body.rest-open #chart {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+  } /* out of the way while the rest slides over it */
+  html:has(> body:not(.rest-open)),
+  body:not(.rest-open) {
+    overflow: hidden;
+    overscroll-behavior: none;
+    background: #123540;
+  }
+  .rest-bar {
+    display: flex;
+    position: sticky;
+    top: 0;
+    z-index: 3;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    height: 56px;
+    margin: 0 -28px;
+    padding: env(safe-area-inset-top) 12px 0 28px;
+    box-sizing: content-box;
+    background: rgba(252, 252, 252, 0.82);
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+    box-shadow: 0 1px 0 var(--hair);
+    transition: transform 0.45s var(--ease);
+  }
+  .rest-bar.away {
+    transform: translateY(calc(-100% - 2px));
+  }
+  .rest-bar .rb-t {
+    font: 300 12.5px/1 var(--mono);
+    color: var(--ink-3);
+  }
+  .rest-meta {
+    display: block;
+    padding: 28px 0 0;
+  }
+  .rest-meta .hero-head {
+    display: flex;
+    margin: 0;
+  }
+  #rest .rest-meta + .sec {
+    margin-top: 56px;
+  }
+}
+@media (max-width: 640px) {
+  body.rest-open #rest {
+    padding: 0 16px 64px;
+  }
+  .rest-bar {
+    margin: 0 -16px;
+    padding-left: 16px;
+  }
+}

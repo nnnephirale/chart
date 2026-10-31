@@ -1,16 +1,53 @@
-  /* ---------- page grid ---------- */
-  .page { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 56px; max-width: 1280px; margin: 0 auto; padding: 104px 40px 96px; }
-  main { min-width: 0; }
+/* ---------- page grid ---------- */
+.page {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr);
+  gap: 56px;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 104px 40px 96px;
+}
+main {
+  min-width: 0;
+}
 
-  /* ---------- section rail + flying dot ---------- */
-  .rail { position: sticky; top: 104px; align-self: start; transition: translate .5s var(--ease); }
-  .rail ol { list-style: none; margin: 0; padding: 0 0 0 16px; position: relative; }
-  .rail li a {
-    display: block; padding: 5px 0; font: 300 12.5px/1.4 var(--mono); color: var(--ink-3);
-    text-decoration: none; transition: color .2s var(--ease);
-  }
-  .rail li a span { display: inline-block; }
-  .rail li a:hover { color: var(--ink-2); }
-  .rail li a[aria-current="true"] { color: var(--ink); }
-  .rail .dot { position: absolute; left: 0; top: 0; width: 5px; height: 5px; margin-top: -2.5px; border-radius: 50%; background: var(--ink); }
-
+/* ---------- section rail + flying dot ---------- */
+.rail {
+  position: sticky;
+  top: 104px;
+  align-self: start;
+  transition: translate 0.5s var(--ease);
+}
+.rail ol {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 16px;
+  position: relative;
+}
+.rail li a {
+  display: block;
+  padding: 5px 0;
+  font: 300 12.5px/1.4 var(--mono);
+  color: var(--ink-3);
+  text-decoration: none;
+  transition: color 0.2s var(--ease);
+}
+.rail li a span {
+  display: inline-block;
+}
+.rail li a:hover {
+  color: var(--ink-2);
+}
+.rail li a[aria-current='true'] {
+  color: var(--ink);
+}
+.rail .dot {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 5px;
+  height: 5px;
+  margin-top: -2.5px;
+  border-radius: 50%;
+  background: var(--ink);
+}

@@ -13,7 +13,7 @@ Edit `src/`, never the built pages. `node scripts/build.mjs` writes each page as
 | `tests/build.test.mjs` | Fails when a built page differs from a fresh build of `src/`. |
 | `tests/docs-map.test.mjs` | Fails when this map misses a source file or names one that is gone. |
 | `package.json` | `npm run build` and `npm test`. No dependencies. |
-| `.prettierrc.json` | Formatting for `src/css` and `src/js` (`npx prettier --write src/css src/js`). `.prettierignore` keeps `src/js/01-content.js` as JSON and leaves `src/page.html` alone. |
+| `.prettierrc.json` | Formatting for `src/css` and `src/js` (`npx prettier --write src/css src/js`). `.prettierignore` keeps `src/js/01-content.js` as JSON and leaves the HTML alone; the `:root` tokens in `src/css/01-tokens-base.css` are `prettier-ignore` because JS reads `--spring-loz` back as written. |
 
 Built pages:
 

@@ -1,45 +1,132 @@
-  /* ---------- responsive ---------- */
-  @media (max-width: 1180px) {
-    .page { grid-template-columns: minmax(0, 1fr); padding: 28px 28px 80px; }
-    .rail { display: none; }
-    .tr { grid-template-columns: 28px 130px 120px 130px 1fr 90px; }
+/* ---------- responsive ---------- */
+@media (max-width: 1180px) {
+  .page {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 28px 28px 80px;
   }
-  @media (max-width: 960px) {
-    .ph { grid-template-columns: 96px minmax(0, 1fr) 52px; }
-    .ph-s { padding: 14px 0 10px 12px; }
-    .ph-n { padding-right: 12px; }
-    .ph-n span { display: none; }
-    .pr { grid-template-columns: 24px 1fr auto; padding: 10px 8px; }
-    .pr .nt { display: none; }
-    .hero-grid { grid-template-columns: minmax(0, 1fr); }
-    .insp .glass-in { height: 560px; }
-    .houses { grid-template-columns: repeat(3, 1fr); }
-    .asp-layout, .two, .configs, .codes { grid-template-columns: minmax(0, 1fr); }
-    .agrid { overflow-x: auto; }
+  .rail {
+    display: none;
   }
-  @media (max-width: 640px) {
-    body { font-size: 14px; }
-    .page { padding: 16px 16px 64px; }
-    .hero-head { flex-direction: column; align-items: flex-start; }
-    .hero-meta { text-align: left; }
-    .plate { padding: 10px; border-radius: 24px; }
-    .glass { padding: 4px; border-radius: 22px; }
-    .wheel-card .glass-in { padding: 10px; }
-    .toolbar { flex-wrap: wrap; }
-    /* the lozenges run edge to edge and scroll; the ends fade where more options sit off-screen */
-    #segTabs { width: calc(100% + 40px); margin: 0 -20px; padding: 0 20px; }
-    #segTabs button { padding: 8px 0 12px; }
-    .houses { grid-template-columns: repeat(2, 1fr); }
-    .tr { grid-template-columns: 24px 1fr auto; row-gap: 6px; }
-    .tr .nt, .tr .hide-sm { display: none; }
-    .ar { grid-template-columns: minmax(0,1fr) 60px 56px; }
-    .ar .k, .ar .ty { display: none; }
-    .stories, .feats, .prompts { padding: 2px 18px; }
-    .story { grid-template-columns: minmax(0, 1fr); }
-    /* long content collapses on mobile */
-    .collapsible .prose { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-    .collapsible.open .prose { display: block; }
-    .collapsible .more { display: inline-block; }
-    .sec { margin-top: 80px; }
+  .tr {
+    grid-template-columns: 28px 130px 120px 130px 1fr 90px;
   }
-
+}
+@media (max-width: 960px) {
+  .ph {
+    grid-template-columns: 96px minmax(0, 1fr) 52px;
+  }
+  .ph-s {
+    padding: 14px 0 10px 12px;
+  }
+  .ph-n {
+    padding-right: 12px;
+  }
+  .ph-n span {
+    display: none;
+  }
+  .pr {
+    grid-template-columns: 24px 1fr auto;
+    padding: 10px 8px;
+  }
+  .pr .nt {
+    display: none;
+  }
+  .hero-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .insp .glass-in {
+    height: 560px;
+  }
+  .houses {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .asp-layout,
+  .two,
+  .configs,
+  .codes {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .agrid {
+    overflow-x: auto;
+  }
+}
+@media (max-width: 640px) {
+  body {
+    font-size: 14px;
+  }
+  .page {
+    padding: 16px 16px 64px;
+  }
+  .hero-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .hero-meta {
+    text-align: left;
+  }
+  .plate {
+    padding: 10px;
+    border-radius: 24px;
+  }
+  .glass {
+    padding: 4px;
+    border-radius: 22px;
+  }
+  .wheel-card .glass-in {
+    padding: 10px;
+  }
+  .toolbar {
+    flex-wrap: wrap;
+  }
+  /* the lozenges run edge to edge and scroll; the ends fade where more options sit off-screen */
+  #segTabs {
+    width: calc(100% + 40px);
+    margin: 0 -20px;
+    padding: 0 20px;
+  }
+  #segTabs button {
+    padding: 8px 0 12px;
+  }
+  .houses {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .tr {
+    grid-template-columns: 24px 1fr auto;
+    row-gap: 6px;
+  }
+  .tr .nt,
+  .tr .hide-sm {
+    display: none;
+  }
+  .ar {
+    grid-template-columns: minmax(0, 1fr) 60px 56px;
+  }
+  .ar .k,
+  .ar .ty {
+    display: none;
+  }
+  .stories,
+  .feats,
+  .prompts {
+    padding: 2px 18px;
+  }
+  .story {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  /* long content collapses on mobile */
+  .collapsible .prose {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .collapsible.open .prose {
+    display: block;
+  }
+  .collapsible .more {
+    display: inline-block;
+  }
+  .sec {
+    margin-top: 80px;
+  }
+}

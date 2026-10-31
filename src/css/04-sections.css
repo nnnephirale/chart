@@ -1,18 +1,82 @@
-  /* ---------- sections ---------- */
-  .sec { margin-top: 112px; }
-  #chart.sec { margin-top: 0; }
-  .sec-head { margin-bottom: 22px; max-width: 640px; }
-  .sec-head .t-small { margin: 10px 0 0; }
-  .card { background: var(--card); border-radius: var(--r-card); box-shadow: 0 0 0 1px var(--hair), var(--shadow); }
-  .lift { transition: transform .5s var(--ease), box-shadow .5s var(--ease); }
-  @media (hover: hover) { .lift:hover { transform: translateY(-3px); box-shadow: 0 0 0 1px var(--hair), var(--shadow-lift); } }
-  .callout { margin-top: 14px; padding: 16px 20px; border-radius: 16px; background: var(--wash); font: 300 14px/1.65 var(--sans); color: var(--ink-2); max-width: 760px; }
-  .callout strong { font-weight: 500; color: var(--ink); }
-  .note { margin: 14px 4px 0; max-width: 680px; }
-  .flash { animation: flash 1.6s var(--ease); }
-  @keyframes flash { 0% { box-shadow: 0 0 0 1px var(--hair), 0 0 0 6px rgba(0,0,0,.07), var(--shadow); } 100% { box-shadow: 0 0 0 1px var(--hair), 0 0 0 6px rgba(0,0,0,0), var(--shadow); } }
+/* ---------- sections ---------- */
+.sec {
+  margin-top: 112px;
+}
+#chart.sec {
+  margin-top: 0;
+}
+.sec-head {
+  margin-bottom: 22px;
+  max-width: 640px;
+}
+.sec-head .t-small {
+  margin: 10px 0 0;
+}
+.card {
+  background: var(--card);
+  border-radius: var(--r-card);
+  box-shadow:
+    0 0 0 1px var(--hair),
+    var(--shadow);
+}
+.lift {
+  transition:
+    transform 0.5s var(--ease),
+    box-shadow 0.5s var(--ease);
+}
+@media (hover: hover) {
+  .lift:hover {
+    transform: translateY(-3px);
+    box-shadow:
+      0 0 0 1px var(--hair),
+      var(--shadow-lift);
+  }
+}
+.callout {
+  margin-top: 14px;
+  padding: 16px 20px;
+  border-radius: 16px;
+  background: var(--wash);
+  font: 300 14px/1.65 var(--sans);
+  color: var(--ink-2);
+  max-width: 760px;
+}
+.callout strong {
+  font-weight: 500;
+  color: var(--ink);
+}
+.note {
+  margin: 14px 4px 0;
+  max-width: 680px;
+}
+.flash {
+  animation: flash 1.6s var(--ease);
+}
+@keyframes flash {
+  0% {
+    box-shadow:
+      0 0 0 1px var(--hair),
+      0 0 0 6px rgba(0, 0, 0, 0.07),
+      var(--shadow);
+  }
+  100% {
+    box-shadow:
+      0 0 0 1px var(--hair),
+      0 0 0 6px rgba(0, 0, 0, 0),
+      var(--shadow);
+  }
+}
 
-  /* reveal: fade up once when scrolled into view (a transition, so nothing lingers once it settles) */
-  .js .reveal { opacity: 0; transform: translateY(8px); }
-  .js .reveal.in { opacity: 1; transform: none; transition: opacity .5s var(--ease), transform .5s var(--ease); transition-delay: var(--d, 0s); }
-
+/* reveal: fade up once when scrolled into view (a transition, so nothing lingers once it settles) */
+.js .reveal {
+  opacity: 0;
+  transform: translateY(8px);
+}
+.js .reveal.in {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.5s var(--ease),
+    transform 0.5s var(--ease);
+  transition-delay: var(--d, 0s);
+}

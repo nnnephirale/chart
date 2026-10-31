@@ -1,35 +1,180 @@
-  /* ---------- desktop: no top bar, full-screen chart, icon rail that opens on hover ---------- */
-  @media (min-width: 961px) {
-    html { scroll-padding-top: 40px; }
-    .page { display: flex; max-width: none; margin: 0; padding: 0; gap: 0; }
-    main { flex: 1; min-width: 0; padding-bottom: 96px; }
-    .rail { display: block; order: 2; position: sticky; top: 0; height: 100vh; flex: 0 0 auto; width: 80px; padding: 12px 12px 12px 0; translate: none !important; transition: width .5s var(--ease); z-index: 30; }
-    .rail:hover, .rail:focus-within { width: 236px; }
-    .rail-panel { height: 100%; display: flex; flex-direction: column; border-radius: 22px; background: rgba(255,255,255,.92); box-shadow: 0 0 0 1px var(--hair), var(--shadow); padding: 16px 10px; overflow: hidden; }
-    .rail-brand { align-self: flex-end; display: grid; place-items: center; width: 48px; height: 40px; margin-bottom: 18px; font: 400 23px/1 var(--serif); color: var(--ink); text-decoration: none; border-radius: 12px; }
-    .rail ol { padding: 0; flex: 1; }
-    .rail li a { display: flex; flex-direction: row-reverse; align-items: center; gap: 14px; height: 40px; padding: 0 14px; border-radius: 12px; white-space: nowrap; color: var(--ink-3); transition: color .2s var(--ease), background .2s var(--ease); }
-    .rail li a:hover { background: var(--wash); color: var(--ink-2); }
-    .rail li a[aria-current="true"] { color: var(--ink); }
-    .rail .ic { width: 20px; height: 20px; flex-shrink: 0; }
-    .rail .lb { opacity: 0; transition: opacity .12s ease-out; }
-    .rail:hover .lb, .rail:focus-within .lb { opacity: 1; transition-duration: .25s; transition-delay: .08s; }
-    .rail .dot { left: auto; right: 3px; }
-    .sec { max-width: 1120px; margin-left: auto; margin-right: auto; padding: 0 56px; }
-    main footer { max-width: 1120px; margin-left: auto; margin-right: auto; padding-left: 56px; padding-right: 56px; }
-    #chart { max-width: none; padding: 0; margin-top: 0; }
-    #chart .hero-head.off-plate { display: none; }
-    .plate { margin: 12px; height: calc(100vh - 24px); min-height: 680px; border-radius: 28px; padding: 26px 28px 28px; display: flex; flex-direction: column; }
-    .hero-head.on-plate { display: flex; position: relative; margin-bottom: 22px; color: #fff; }
-    .hero-head.on-plate .t-label { color: rgba(255,255,255,.62); }
-    .hero-head.on-plate h1 { color: #fff; }
-    .hero-head.on-plate .hero-meta { color: rgba(255,255,255,.6); }
-    .hero-head.on-plate .hero-meta b { color: rgba(255,255,255,.92); }
-    /* the row takes the plate's remaining height, never its content's: the wheel scales to fit it */
-    .hero-grid { flex: 1; min-height: 0; grid-template-columns: minmax(0, 1fr) 400px; grid-template-rows: minmax(0, 1fr); }
-    .wheel-card, .insp { min-height: 0; }
-    .wheel-wrap { position: relative; min-height: 0; padding: 0; margin: 8px 0; }
-    #wheel { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; }
-    #chart .note { max-width: 1120px; margin: 18px auto 0; padding: 0 56px; }
+/* ---------- desktop: no top bar, full-screen chart, icon rail that opens on hover ---------- */
+@media (min-width: 961px) {
+  html {
+    scroll-padding-top: 40px;
   }
-
+  .page {
+    display: flex;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    gap: 0;
+  }
+  main {
+    flex: 1;
+    min-width: 0;
+    padding-bottom: 96px;
+  }
+  .rail {
+    display: block;
+    order: 2;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    flex: 0 0 auto;
+    width: 80px;
+    padding: 12px 12px 12px 0;
+    translate: none !important;
+    transition: width 0.5s var(--ease);
+    z-index: 30;
+  }
+  .rail:hover,
+  .rail:focus-within {
+    width: 236px;
+  }
+  .rail-panel {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.92);
+    box-shadow:
+      0 0 0 1px var(--hair),
+      var(--shadow);
+    padding: 16px 10px;
+    overflow: hidden;
+  }
+  .rail-brand {
+    align-self: flex-end;
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 40px;
+    margin-bottom: 18px;
+    font: 400 23px/1 var(--serif);
+    color: var(--ink);
+    text-decoration: none;
+    border-radius: 12px;
+  }
+  .rail ol {
+    padding: 0;
+    flex: 1;
+  }
+  .rail li a {
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: center;
+    gap: 14px;
+    height: 40px;
+    padding: 0 14px;
+    border-radius: 12px;
+    white-space: nowrap;
+    color: var(--ink-3);
+    transition:
+      color 0.2s var(--ease),
+      background 0.2s var(--ease);
+  }
+  .rail li a:hover {
+    background: var(--wash);
+    color: var(--ink-2);
+  }
+  .rail li a[aria-current='true'] {
+    color: var(--ink);
+  }
+  .rail .ic {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+  }
+  .rail .lb {
+    opacity: 0;
+    transition: opacity 0.12s ease-out;
+  }
+  .rail:hover .lb,
+  .rail:focus-within .lb {
+    opacity: 1;
+    transition-duration: 0.25s;
+    transition-delay: 0.08s;
+  }
+  .rail .dot {
+    left: auto;
+    right: 3px;
+  }
+  .sec {
+    max-width: 1120px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0 56px;
+  }
+  main footer {
+    max-width: 1120px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 56px;
+    padding-right: 56px;
+  }
+  #chart {
+    max-width: none;
+    padding: 0;
+    margin-top: 0;
+  }
+  #chart .hero-head.off-plate {
+    display: none;
+  }
+  .plate {
+    margin: 12px;
+    height: calc(100vh - 24px);
+    min-height: 680px;
+    border-radius: 28px;
+    padding: 26px 28px 28px;
+    display: flex;
+    flex-direction: column;
+  }
+  .hero-head.on-plate {
+    display: flex;
+    position: relative;
+    margin-bottom: 22px;
+    color: #fff;
+  }
+  .hero-head.on-plate .t-label {
+    color: rgba(255, 255, 255, 0.62);
+  }
+  .hero-head.on-plate h1 {
+    color: #fff;
+  }
+  .hero-head.on-plate .hero-meta {
+    color: rgba(255, 255, 255, 0.6);
+  }
+  .hero-head.on-plate .hero-meta b {
+    color: rgba(255, 255, 255, 0.92);
+  }
+  /* the row takes the plate's remaining height, never its content's: the wheel scales to fit it */
+  .hero-grid {
+    flex: 1;
+    min-height: 0;
+    grid-template-columns: minmax(0, 1fr) 400px;
+    grid-template-rows: minmax(0, 1fr);
+  }
+  .wheel-card,
+  .insp {
+    min-height: 0;
+  }
+  .wheel-wrap {
+    position: relative;
+    min-height: 0;
+    padding: 0;
+    margin: 8px 0;
+  }
+  #wheel {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+  }
+  #chart .note {
+    max-width: 1120px;
+    margin: 18px auto 0;
+    padding: 0 56px;
+  }
+}

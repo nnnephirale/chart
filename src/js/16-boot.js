@@ -1,6 +1,5 @@
-  Z.ready = true;
-  addEventListener('resize', zoomSync);
-  infoRender();
+Z.ready = true;
+addEventListener('resize', zoomSync);
+infoRender();
 
-  paint();
-
+paint();

@@ -1,43 +1,233 @@
-  /* ---------- hero ---------- */
-  .hero-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 22px; }
-  .hero-head h1 { font: 400 40px/1 var(--serif); margin: 8px 0 0; letter-spacing: -.01em; }
-  .hero-head.on-plate { display: none; }
-  .hero-meta { display: grid; grid-template-columns: auto auto; gap: 4px 18px; font: 300 12px/1.5 var(--mono); color: var(--ink-3); text-align: right; }
-  .hero-meta b { font-weight: 400; color: var(--ink-2); }
-  .plate { position: relative; border-radius: 30px; padding: 26px; overflow: hidden; background: linear-gradient(135deg, #0b2a33, #2f6b80 55%, #8f8fe0); }
-  .plate canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
-  .hero-grid { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) 372px; gap: 18px; align-items: stretch; }
-  /* glass border: translucent white rim around a white card, best on the plate */
-  .glass { padding: 6px; border-radius: 26px; background: rgba(255,255,255,.3); box-shadow: inset 0 0 0 1px rgba(255,255,255,.5), 0 24px 60px rgba(4,20,28,.28); }
-  .glass-in { background: #fff; border-radius: 20px; height: 100%; }
+/* ---------- hero ---------- */
+.hero-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 22px;
+}
+.hero-head h1 {
+  font: 400 40px/1 var(--serif);
+  margin: 8px 0 0;
+  letter-spacing: -0.01em;
+}
+.hero-head.on-plate {
+  display: none;
+}
+.hero-meta {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 4px 18px;
+  font: 300 12px/1.5 var(--mono);
+  color: var(--ink-3);
+  text-align: right;
+}
+.hero-meta b {
+  font-weight: 400;
+  color: var(--ink-2);
+}
+.plate {
+  position: relative;
+  border-radius: 30px;
+  padding: 26px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #0b2a33, #2f6b80 55%, #8f8fe0);
+}
+.plate canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.hero-grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 372px;
+  gap: 18px;
+  align-items: stretch;
+}
+/* glass border: translucent white rim around a white card, best on the plate */
+.glass {
+  padding: 6px;
+  border-radius: 26px;
+  background: rgba(255, 255, 255, 0.3);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.5),
+    0 24px 60px rgba(4, 20, 28, 0.28);
+}
+.glass-in {
+  background: #fff;
+  border-radius: 20px;
+  height: 100%;
+}
 
-  .wheel-card .glass-in { display: flex; flex-direction: column; padding: 18px 20px 14px; }
-  .toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-  .check { display: inline-flex; align-items: center; gap: 7px; font: 300 12.5px/1 var(--mono); color: var(--ink-3); cursor: pointer; user-select: none; }
-  .check input { appearance: none; width: 14px; height: 14px; margin: 0; border-radius: 4px; box-shadow: inset 0 0 0 1px var(--ink-4); transition: background .2s var(--ease), box-shadow .2s var(--ease); cursor: pointer; display: grid; place-items: center; }
-  .check input::after { content: ''; width: 7px; height: 4px; border: 1.5px solid #fff; border-top: 0; border-right: 0; transform: rotate(-45deg) translate(1px,-1px) scale(.6); opacity: 0; transition: opacity .2s, transform .3s var(--ease); }
-  .check input:checked { background: var(--ink-2); box-shadow: none; }
-  .check input:checked::after { opacity: 1; transform: rotate(-45deg) translate(1px,-1px) scale(1); }
-  .check:hover { color: var(--ink-2); }
-  .wheel-wrap { flex: 1; display: grid; place-items: center; padding: 6px 0; }
-  #wheel { width: 100%; max-width: 600px; height: auto; display: block; overflow: visible; touch-action: manipulation; }
-  /* same inset as the Glyphs/Names text: the pill's 3px rim + its button's 13px side and 5px top padding */
-  .legend { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 4px; padding: 8px 16px; box-shadow: 0 1px 0 var(--hair); font: 300 11.5px/1.4 var(--mono); color: var(--ink-3); }
-  .legend span { display: inline-flex; align-items: center; gap: 6px; }
-  .legend i { width: 10px; height: 2px; border-radius: 1px; }
-  .legend .el i { width: 7px; height: 7px; border-radius: 50%; }
-  .legend .sep { width: 1px; height: 12px; background: var(--line); }
-  /* the element key only matters when signs are in play: Signs mode, or a sign locked in any mode */
-  .legend .el, .legend .sep { display: none; }
-  .legend.show-el .el, .legend.show-el .sep { display: inline-flex; animation: el-in .2s ease-out; }
-  @keyframes el-in { from { opacity: 0; } }
+.wheel-card .glass-in {
+  display: flex;
+  flex-direction: column;
+  padding: 18px 20px 14px;
+}
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.check {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font: 300 12.5px/1 var(--mono);
+  color: var(--ink-3);
+  cursor: pointer;
+  user-select: none;
+}
+.check input {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  border-radius: 4px;
+  box-shadow: inset 0 0 0 1px var(--ink-4);
+  transition:
+    background 0.2s var(--ease),
+    box-shadow 0.2s var(--ease);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+.check input::after {
+  content: '';
+  width: 7px;
+  height: 4px;
+  border: 1.5px solid #fff;
+  border-top: 0;
+  border-right: 0;
+  transform: rotate(-45deg) translate(1px, -1px) scale(0.6);
+  opacity: 0;
+  transition:
+    opacity 0.2s,
+    transform 0.3s var(--ease);
+}
+.check input:checked {
+  background: var(--ink-2);
+  box-shadow: none;
+}
+.check input:checked::after {
+  opacity: 1;
+  transform: rotate(-45deg) translate(1px, -1px) scale(1);
+}
+.check:hover {
+  color: var(--ink-2);
+}
+.wheel-wrap {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  padding: 6px 0;
+}
+#wheel {
+  width: 100%;
+  max-width: 600px;
+  height: auto;
+  display: block;
+  overflow: visible;
+  touch-action: manipulation;
+}
+/* same inset as the Glyphs/Names text: the pill's 3px rim + its button's 13px side and 5px top padding */
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin-top: 4px;
+  padding: 8px 16px;
+  box-shadow: 0 1px 0 var(--hair);
+  font: 300 11.5px/1.4 var(--mono);
+  color: var(--ink-3);
+}
+.legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.legend i {
+  width: 10px;
+  height: 2px;
+  border-radius: 1px;
+}
+.legend .el i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+.legend .sep {
+  width: 1px;
+  height: 12px;
+  background: var(--line);
+}
+/* the element key only matters when signs are in play: Signs mode, or a sign locked in any mode */
+.legend .el,
+.legend .sep {
+  display: none;
+}
+.legend.show-el .el,
+.legend.show-el .sep {
+  display: inline-flex;
+  animation: el-in 0.2s ease-out;
+}
+@keyframes el-in {
+  from {
+    opacity: 0;
+  }
+}
 
-  /* segmented control with gliding lozenge (Resurf) */
-  .seg { position: relative; display: inline-flex; gap: 2px; padding: 3px; border-radius: 999px; background: var(--wash); box-shadow: inset 0 0 0 .5px rgba(0,0,0,.06); }
-  .seg .loz { position: absolute; top: 3px; bottom: 3px; left: 0; width: 0; border-radius: 999px; background: #fff; box-shadow: 0 2px 8px -2px rgba(0,0,0,.1), 0 0 0 .5px rgba(0,0,0,.08); pointer-events: none; }
-  .seg button { position: relative; z-index: 1; border: 0; background: none; cursor: pointer; padding: 5px 13px; border-radius: 999px; font: 300 12.5px/18px var(--mono); color: var(--ink-3); transition: color .2s cubic-bezier(.4,0,.2,1); white-space: nowrap; }
-  .seg button:hover { color: var(--ink-2); }
-  .seg button[aria-selected="true"] { color: var(--ink); font-weight: 400; }
-  .seg button .sym { font-size: 13px; }
-  .seg.sm button { padding: 4px 10px; font-size: 12px; }
-
+/* segmented control with gliding lozenge (Resurf) */
+.seg {
+  position: relative;
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 999px;
+  background: var(--wash);
+  box-shadow: inset 0 0 0 0.5px rgba(0, 0, 0, 0.06);
+}
+.seg .loz {
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  left: 0;
+  width: 0;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow:
+    0 2px 8px -2px rgba(0, 0, 0, 0.1),
+    0 0 0 0.5px rgba(0, 0, 0, 0.08);
+  pointer-events: none;
+}
+.seg button {
+  position: relative;
+  z-index: 1;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  padding: 5px 13px;
+  border-radius: 999px;
+  font: 300 12.5px/18px var(--mono);
+  color: var(--ink-3);
+  transition: color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+}
+.seg button:hover {
+  color: var(--ink-2);
+}
+.seg button[aria-selected='true'] {
+  color: var(--ink);
+  font-weight: 400;
+}
+.seg button .sym {
+  font-size: 13px;
+}
+.seg.sm button {
+  padding: 4px 10px;
+  font-size: 12px;
+}

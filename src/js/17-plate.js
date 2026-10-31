@@ -1,10 +1,11 @@
-  /* ───────── plate: the Superhuman texture, in Lu's water palette ───────── */
-  (() => {
-    const canvas = $('#plate'), gl = canvas.getContext('webgl2', { antialias: false, premultipliedAlpha: false });
-    if (!gl) return;
-    const VERT = `#version 300 es
+/* ───────── plate: the Superhuman texture, in Lu's water palette ───────── */
+(() => {
+  const canvas = $('#plate'),
+    gl = canvas.getContext('webgl2', { antialias: false, premultipliedAlpha: false });
+  if (!gl) return;
+  const VERT = `#version 300 es
 in vec2 p; void main(){ gl_Position = vec4(p, 0., 1.); }`;
-    const FRAG = `#version 300 es
+  const FRAG = `#version 300 es
 precision highp float;
 uniform vec2 uRes; uniform float uTime, uDpr; uniform vec3 uC[5]; uniform vec3 uHi;
 out vec4 o;
@@ -31,22 +32,81 @@ void main(){
   col += (h1(gl_FragCoord.xy + fract(t*7.)*91.) - .5)*.035;
   o = vec4(clamp(col,0.,1.),1.);
 }`;
-    const sh = (type, src) => { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); return s; };
-    const prog = gl.createProgram(); gl.attachShader(prog, sh(gl.VERTEX_SHADER, VERT)); gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, FRAG)); gl.linkProgram(prog);
-    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) return;
-    gl.useProgram(prog);
-    gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer()); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
-    const loc = gl.getAttribLocation(prog, 'p'); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-    const U = {}; ['uRes', 'uTime', 'uDpr', 'uC', 'uHi'].forEach((n) => { U[n] = gl.getUniformLocation(prog, n); });
-    const rgb = (h) => { const n = parseInt(h.slice(1), 16); return [(n >> 16 & 255) / 255, (n >> 8 & 255) / 255, (n & 255) / 255]; };
-    gl.uniform3fv(U.uC, ['#0b2a33', '#174a57', '#2f6b80', '#5d7fc0', '#a9a6ea'].flatMap(rgb)); gl.uniform3fv(U.uHi, rgb('#e4e4ff'));
-    // the texture is soft noise: a 0.75× buffer upscaled is indistinguishable, and it drifts slowly enough for ~30fps
-    let dpr = .75, time = 3, last = performance.now(), visible = true, raf = 0, sizeT = 0;
-    const size = () => { const r = canvas.getBoundingClientRect(); canvas.width = Math.max(2, Math.round(r.width * dpr)); canvas.height = Math.max(2, Math.round(r.height * dpr)); draw(); };
-    const draw = () => { gl.viewport(0, 0, canvas.width, canvas.height); gl.uniform2f(U.uRes, canvas.width, canvas.height); gl.uniform1f(U.uTime, time); gl.uniform1f(U.uDpr, dpr); gl.drawArrays(gl.TRIANGLES, 0, 3); };
-    const loop = (now) => { raf = 0; if (now - last >= 32) { const dt = Math.min(.05, (now - last) / 1000); last = now; time += dt * .12; draw(); } if (visible && !RM) raf = requestAnimationFrame(loop); };
-    // while the rail pushes the page (or the window drags), CSS stretches the old buffer; reallocate once it settles
-    size(); new ResizeObserver(() => { clearTimeout(sizeT); sizeT = setTimeout(size, 140); }).observe(canvas);
-    new IntersectionObserver(([e]) => { visible = e.isIntersecting; if (visible && !RM && !raf) { last = performance.now(); raf = requestAnimationFrame(loop); } }).observe(canvas);
-    document.addEventListener('visibilitychange', () => { visible = !document.hidden; if (visible && !RM && !raf) { last = performance.now(); raf = requestAnimationFrame(loop); } });
-  })();
+  const sh = (type, src) => {
+    const s = gl.createShader(type);
+    gl.shaderSource(s, src);
+    gl.compileShader(s);
+    return s;
+  };
+  const prog = gl.createProgram();
+  gl.attachShader(prog, sh(gl.VERTEX_SHADER, VERT));
+  gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, FRAG));
+  gl.linkProgram(prog);
+  if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) return;
+  gl.useProgram(prog);
+  gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+  const loc = gl.getAttribLocation(prog, 'p');
+  gl.enableVertexAttribArray(loc);
+  gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+  const U = {};
+  ['uRes', 'uTime', 'uDpr', 'uC', 'uHi'].forEach((n) => {
+    U[n] = gl.getUniformLocation(prog, n);
+  });
+  const rgb = (h) => {
+    const n = parseInt(h.slice(1), 16);
+    return [((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255];
+  };
+  gl.uniform3fv(U.uC, ['#0b2a33', '#174a57', '#2f6b80', '#5d7fc0', '#a9a6ea'].flatMap(rgb));
+  gl.uniform3fv(U.uHi, rgb('#e4e4ff'));
+  // the texture is soft noise: a 0.75× buffer upscaled is indistinguishable, and it drifts slowly enough for ~30fps
+  let dpr = 0.75,
+    time = 3,
+    last = performance.now(),
+    visible = true,
+    raf = 0,
+    sizeT = 0;
+  const size = () => {
+    const r = canvas.getBoundingClientRect();
+    canvas.width = Math.max(2, Math.round(r.width * dpr));
+    canvas.height = Math.max(2, Math.round(r.height * dpr));
+    draw();
+  };
+  const draw = () => {
+    gl.viewport(0, 0, canvas.width, canvas.height);
+    gl.uniform2f(U.uRes, canvas.width, canvas.height);
+    gl.uniform1f(U.uTime, time);
+    gl.uniform1f(U.uDpr, dpr);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+  };
+  const loop = (now) => {
+    raf = 0;
+    if (now - last >= 32) {
+      const dt = Math.min(0.05, (now - last) / 1000);
+      last = now;
+      time += dt * 0.12;
+      draw();
+    }
+    if (visible && !RM) raf = requestAnimationFrame(loop);
+  };
+  // while the rail pushes the page (or the window drags), CSS stretches the old buffer; reallocate once it settles
+  size();
+  new ResizeObserver(() => {
+    clearTimeout(sizeT);
+    sizeT = setTimeout(size, 140);
+  }).observe(canvas);
+  new IntersectionObserver(([e]) => {
+    visible = e.isIntersecting;
+    if (visible && !RM && !raf) {
+      last = performance.now();
+      raf = requestAnimationFrame(loop);
+    }
+  }).observe(canvas);
+  document.addEventListener('visibilitychange', () => {
+    visible = !document.hidden;
+    if (visible && !RM && !raf) {
+      last = performance.now();
+      raf = requestAnimationFrame(loop);
+    }
+  });
+})();
